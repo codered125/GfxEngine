@@ -116,7 +116,7 @@ void drawScene()
 	glTranslatef(0.0f, 0.0f, -8.0f);
 
 	//Ambient light
-	GLfloat ambientColor[] = { 0.2f,0.2f, 0.2f, 1.0f };
+	GLfloat ambientColor[] = { 0.2f,0.5f, 0.2f, 1.0f };
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
 
 	//positioned light
@@ -149,7 +149,7 @@ void drawScene()
 	cubes.SetFaces(Front, Back, Left, Right, Top, Bottom);
 	cubes.setPoints();
 	cubes.DetermineFaces(center);
-	cubes.Draw();
+	cubes.Draw(renderingProg);
 	
 	//Send the 3D scene to the screen
 	glutSwapBuffers(); 

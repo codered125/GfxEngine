@@ -32,7 +32,7 @@ public:
 	enum  FaceType { None, Front, Back, Left, Right, Top, Bottom };
 	FaceType thisFaceType = FaceType::None;
 
-	Point generalCenterPoint, ourCenterPoint;
+	Point generalCenterPoint, ourCenterPoint, normal;
 
 	Point  Points[4];
 
@@ -105,6 +105,6 @@ public:
 
 	void setPoints();
 	void DetermineFaces(Point inputCenter);
-	void Draw();// GLuint texID);
+	void Draw(GLuint & program);// GLuint texID);
 	void SetFaces(Face & inFront, Face & inBack, Face & inLeft, Face & inRight, Face & inTop, Face & inBottom );
 };

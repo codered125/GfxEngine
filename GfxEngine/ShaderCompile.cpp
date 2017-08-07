@@ -14,12 +14,14 @@ GLuint compileShader()
 	static const GLchar * vertexShaderSource[] = {
 		"#version 400									 \n"
 		"												 \n"
-		"in vec4 Points;								 \n"
+		"uniform vec4 Points [24];						 \n"
+		"uniform vec4 instace;							 \n"
 		"out float Ratio;								 \n"
 		"												 \n"
 		"void main()									 \n"
 		"{												 \n"
-		"gl_Position = Points;							 \n"
+		"Points[gl_VertexID] = instance * 1.0f;				 \n"
+		"gl_Position = Points[gl_VertexID];				 \n"
 		"Ratio = gl_VertexID;							 \n"
 		"}												 "
 	};
@@ -27,12 +29,12 @@ GLuint compileShader()
 	static const GLchar * fragmentShaderSource[] = {
 		"#version 400									 \n"
 		"												 \n"
-		"in float Ratio;									 \n"
+		"in float Ratio;								 \n"
 		"out vec4 FragColor;							 \n"
 		"												 \n"
 		"void main()									 \n"
 		"{												 \n"
-		"FragColor = vec4(1.0, 1.0, 1.0, 1.0) / Ratio;	 \n"
+		"FragColor = vec4(0.50, 0.30, 0.70, 1.0) / Ratio;\n"
 		"}												 \n"
 	};
 

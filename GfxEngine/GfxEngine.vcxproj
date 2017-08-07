@@ -76,7 +76,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:\Documents\Development\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32.lib;D:\Documents\Development\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32s.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\Documents\GitHub\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32.lib;D:\Documents\GitHub\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32s.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -86,7 +86,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:\Documents\Development\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32.lib;D:\Documents\Development\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32s.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>D:\Documents\GitHub\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32.lib;D:\Documents\GitHub\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32s.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

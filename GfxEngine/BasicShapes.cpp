@@ -233,16 +233,22 @@ void Cube::setPoints()
 {
 	ArrayHolder[0] = Front;
 	Front->thisFaceType = Face::FaceType::Front;
+	Front->normal.setLocation(0.0f, 0.0f, 1.0f);
 	ArrayHolder[1] = Back;
 	Back->thisFaceType = Face::FaceType::Back;
+	Back->normal.setLocation(0.0f, 0.0f, -1.0f);
 	ArrayHolder[2] = Left;
 	Left->thisFaceType = Face::FaceType::Left;
+	Left->normal.setLocation(-1.0f, 0.0f, 0.0f);
 	ArrayHolder[3] = Right;
 	Right->thisFaceType = Face::FaceType::Right;
+	Right->normal.setLocation(1.0f, 0.0f, 0.0f);
 	ArrayHolder[4] = Top;
 	Top->thisFaceType = Face::FaceType::Top;
+	Top->normal.setLocation(0.0f, 1.0f, 0.0f);
 	ArrayHolder[5] = Bottom;
 	Bottom->thisFaceType = Face::FaceType::Bottom;
+	Bottom->normal.setLocation(0.0f, -1.0f, 0.0f);
 }
 
 void Cube::DetermineFaces(Point inputCenter)
@@ -254,25 +260,29 @@ void Cube::DetermineFaces(Point inputCenter)
 	}
 }
 
-void Cube::Draw()
+void Cube::Draw(GLuint & program)
 {
 	int pointIterator = 0;
 	GLfloat holder[24][4];
 	glBegin(GL_QUADS);
 	for (Face* iterator : ArrayHolder) {
-
+		glNormal3f(iterator->normal.getX(), iterator->normal.getY(), iterator->normal.getZ());
 		iterator->DetermineFaceType();
 		for (Point iterator2 : iterator->Points) 
 		{
-			 GLfloat param[] = { iterator2.getX(), iterator2.getY(), iterator2.getZ(), 0.0f };
+			 GLfloat param[] = { iterator2.getX(), iterator2.getY(), iterator2.getZ(), 1.0f };
 			 holder[pointIterator][0] = iterator2.getX();
 			 holder[pointIterator][1] = iterator2.getY();
 			 holder[pointIterator][2] = iterator2.getZ();
-			 holder[pointIterator][3] = 0.0f;
-			glVertexAttrib4fv(0, holder[pointIterator]);
+			 holder[pointIterator][3] = 1.0f;
+			//glVertexAttrib4fv(0, holder[pointIterator]);
+			//glVertexAttrib4fv
+			 if (glGetUniformLocation(program, "Points[pointIterator]") == GL_FALSE) std::cout << "Failed \n";
+			glUniform4fv(glGetUniformLocation(program, "Points[pointIterator]"), 4, holder[pointIterator]);
+			
 			glVertex3f(iterator2.getX(), iterator2.getY(), iterator2.getZ());
-			glNormal3f(iterator2.getX() + iterator2.getX() - iterator->generalCenterPoint.getX(), iterator2.getY() + iterator2.getY() - iterator->generalCenterPoint.getY(), iterator2.getZ() + iterator2.getZ() - iterator->generalCenterPoint.getZ());
 			pointIterator++;
+			
 			
 		}
 	}
