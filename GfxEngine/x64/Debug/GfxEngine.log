@@ -1,0 +1,17 @@
+﻿  GlutWindow.cpp
+  BasicShapes.cpp
+  Generating Code...
+BasicShapes.obj : error LNK2019: unresolved external symbol __imp_glutSwapBuffers referenced in function "public: void __cdecl Shape::SetRotation(float,float,float,float)" (?SetRotation@Shape@@QEAAXMMMM@Z)
+GlutWindow.obj : error LNK2001: unresolved external symbol __imp_glutSwapBuffers
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp___glutInitWithExit referenced in function glutInit_ATEXIT_HACK
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp_glutInitDisplayMode referenced in function main
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp_glutInitWindowSize referenced in function main
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp_glutMainLoop referenced in function main
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp___glutCreateWindowWithExit referenced in function glutCreateWindow_ATEXIT_HACK
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp_glutPostRedisplay referenced in function "void __cdecl idle(int)" (?idle@@YAXH@Z)
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp_glutDisplayFunc referenced in function main
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp_glutReshapeFunc referenced in function main
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp_glutKeyboardFunc referenced in function main
+GlutWindow.obj : error LNK2019: unresolved external symbol __imp_glutTimerFunc referenced in function "void __cdecl update(int)" (?update@@YAXH@Z)
+glut32.lib : warning LNK4272: library machine type 'X86' conflicts with target machine type 'x64'
+D:\Development\GfxEngine\x64\Debug\GfxEngine.exe : fatal error LNK1120: 11 unresolved externals
