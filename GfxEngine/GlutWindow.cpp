@@ -31,8 +31,9 @@ Face Front, Back, Left, Right, Top, Bottom;
 Point center; 
 Cube cubes{center};
 
-GLuint renderingProg;
-GLuint VAO;
+GLuint * renderingProgRef[6];
+GLuint renderingProg[6];
+GLuint VAO[6];
 GLuint SqrID;
 
 
@@ -74,6 +75,21 @@ void initRendering()
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
 	glEnable(GL_NORMALIZE);
+	glEnable(GL_TEXTURE);
+
+	
+	glewExperimental = GL_TRUE;
+	GLenum err = glewInit();
+	//ShaderCode
+	for (int i = 0; i < 6; i++) {
+		renderingProg[i] =  compileShader();
+		renderingProgRef[i] = &renderingProg[i];
+		glGenVertexArrays(1, &VAO[i]);
+		glBindVertexArray(VAO[i]);
+	}
+
+
+
 }
 
 
@@ -131,17 +147,9 @@ void drawScene()
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColour1);
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
 	
-	//ShaderCode
-	renderingProg = compileShader();
-	glewExperimental = GL_TRUE;
-	GLenum err = glewInit();
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	glUseProgram(renderingProg);
-	
-
 
 	glRotatef(_angle, 1.0f, 1.0f, 1.0f);
+
 	
 	center.setLocation(-1.5f, -1.0f, 1.5f);
 	//cubes.
@@ -149,7 +157,7 @@ void drawScene()
 	cubes.SetFaces(Front, Back, Left, Right, Top, Bottom);
 	cubes.setPoints();
 	cubes.DetermineFaces(center);
-	cubes.Draw(renderingProg);
+	cubes.Draw(renderingProgRef);
 	
 	//Send the 3D scene to the screen
 	glutSwapBuffers(); 
@@ -195,44 +203,7 @@ void update(int value) {
 	glutPostRedisplay();
 	glutTimerFunc(25, update, 0);
 }
-void createShape()
-{
-	//p1a.setLocation();
-	//p1b.setLocation(1.5f, -1.0f, 1.5f);
-	//p1c.setLocation(1.5f, 1.0f, 1.5f);
-	//p1d.setLocation(-1.5f, 1.0f, 1.5f);
-	//sqrF.VerticeCount = 4;
 
-	//p2a.setLocation(-1.5f, -1.0f, -1.5f);
-	//p2b.setLocation(-1.5f, 1.0f, -1.5f);
-	//p2c.setLocation(1.5f, 1.0f, -1.5f);
-	//p2d.setLocation(1.5f, -1.0f, -1.5f);
-	//sqrB.VerticeCount = 4;
-
-	/*p3a.setLocation(-1.5f, -1.0f, -1.5f);
-	p3b.setLocation(-1.5f, -1.0f, 1.5f);
-	p3c.setLocation(-1.5f, 1.0f, 1.5f);
-	p3d.setLocation(-1.5f, 1.0f, -1.5f);
-	sqrL.VerticeCount = 4;
-
-	p4a.setLocation(1.5f, -1.0f, -1.5f);
-	p4b.setLocation(1.5f, 1.0f, -1.5f);
-	p4c.setLocation(1.5f, 1.0f, 1.5f);
-	p4d.setLocation(1.5f, -1.0f, 1.5f);
-	sqrR.VerticeCount = 4;
-
-	p5a.setLocation(-1.5f, 1.0f, -1.5f);
-	p5b.setLocation(1.5f, 1.0f, -1.5f);
-	p5c.setLocation(-1.5f, 1.0f, 1.5f);
-	p5d.setLocation(1.5f, 1.0f, 1.5f);
-
-	p6a.setLocation(-1.5f, -1.0f, -1.5f);
-	p6b.setLocation(1.5f, -1.0f, -1.5f);
-	p6c.setLocation(-1.5f, -1.0f, 1.5f);
-	p6d.setLocation(1.5f, -1.0f, 1.5f);
-*/
-
-}
 //Called when a key is pressed
 void handleKeypress(unsigned char key, int x, int y)
 {    

@@ -74,9 +74,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>D:\Documents\GitHub\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32.lib;D:\Documents\GitHub\GfxEngine\GfxEngine\glew-2.1.0\lib\Release\Win32\glew32s.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew-2.1.0\lib\Release\Win32\glew32.lib;glew-2.1.0\lib\Release\Win32\glew32s.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
