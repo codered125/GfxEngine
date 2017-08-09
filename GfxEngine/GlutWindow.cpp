@@ -31,10 +31,9 @@ Face Front, Back, Left, Right, Top, Bottom;
 Point center; 
 Cube cubes{center};
 
-GLuint * renderingProgRef[6];
-GLuint renderingProg[6];
-GLuint VAO[6];
-GLuint SqrID;
+GLuint renderingProg;
+GLuint VAO = 0;
+GLuint SqrID = 0;
 
 
 int main(int argc, char** argv)
@@ -81,15 +80,10 @@ void initRendering()
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 	//ShaderCode
-	for (int i = 0; i < 6; i++) {
-		renderingProg[i] =  compileShader();
-		renderingProgRef[i] = &renderingProg[i];
-		glGenVertexArrays(1, &VAO[i]);
-		glBindVertexArray(VAO[i]);
-	}
-
-
-
+	renderingProg =  compileShader();
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+	glUseProgram(renderingProg);
 }
 
 
@@ -122,14 +116,15 @@ void drawScene()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//Clear information from last draw
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	GLfloat bg[]{ 0.0f, 0.0f, 0.0f, 1.0f };
+	glClearBufferfv(GL_COLOR, 0, bg);
 	//Switch to the drawing perspective
 	glMatrixMode(GL_MODELVIEW); 
 
 	//Reset the drawing perspective
 	glLoadIdentity(); 
 
-	glTranslatef(0.0f, 0.0f, -8.0f);
+	glTranslatef(0.0f, 1.0f, -16.0f);
 
 	//Ambient light
 	GLfloat ambientColor[] = { 0.2f,0.5f, 0.2f, 1.0f };
@@ -150,6 +145,15 @@ void drawScene()
 
 	glRotatef(_angle, 1.0f, 1.0f, 1.0f);
 
+	glewExperimental = GL_TRUE;
+	GLenum err = glewInit();
+	//ShaderCode
+	renderingProg = compileShader();
+	glGenVertexArrays(1, &VAO);
+	//glCreateVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+	glUseProgram(renderingProg);
+
 	
 	center.setLocation(-1.5f, -1.0f, 1.5f);
 	//cubes.
@@ -157,8 +161,10 @@ void drawScene()
 	cubes.SetFaces(Front, Back, Left, Right, Top, Bottom);
 	cubes.setPoints();
 	cubes.DetermineFaces(center);
-	cubes.Draw(renderingProgRef);
+	cubes.Draw();
 	
+
+
 	//Send the 3D scene to the screen
 	glutSwapBuffers(); 
 }

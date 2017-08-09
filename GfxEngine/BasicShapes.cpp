@@ -221,18 +221,6 @@ void Face::DrawTopAndBottom()
 	Points[3].setLocation(ourCenterPoint.getX() + (width / 2.0f), ourCenterPoint.getY(), ourCenterPoint.getZ() - (width / 2.0f));
 }
 
-void Face::ShaderWork(GLuint & program)
-{
-	for (int PointIterator = 0; PointIterator < 4; PointIterator++)
-	{
-		
-		GLfloat PointArr [4 ]= { Points[PointIterator].getX(), Points[PointIterator].getY(), Points[PointIterator].getZ(), 1.0f };
-
-
-	}
-
-	//
-}
 
 Cube::Cube()
 {
@@ -245,15 +233,15 @@ Cube::Cube(Point generalCenterPoint)
 
 void Cube::setPoints()
 {
-	ArrayHolder[2] = Front;
+	ArrayHolder[0] = Front;
 	Front->thisFaceType = Face::FaceType::Front;
 	Front->normal.setLocation(0.0f, 0.0f, 1.0f);
 	
-	ArrayHolder[4] = Back;
+	ArrayHolder[1] = Back;
 	Back->thisFaceType = Face::FaceType::Back;
 	Back->normal.setLocation(0.0f, 0.0f, -1.0f);
 	
-	ArrayHolder[1] = Left;
+	ArrayHolder[2] = Left;
 	Left->thisFaceType = Face::FaceType::Left;
 	Left->normal.setLocation(-1.0f, 0.0f, 0.0f);
 	
@@ -261,7 +249,7 @@ void Cube::setPoints()
 	Right->thisFaceType = Face::FaceType::Right;
 	Right->normal.setLocation(1.0f, 0.0f, 0.0f);
 	
-	ArrayHolder[0] = Top;
+	ArrayHolder[4] = Top;
 	Top->thisFaceType = Face::FaceType::Top;
 	Top->normal.setLocation(0.0f, 1.0f, 0.0f);
 
@@ -275,39 +263,33 @@ void Cube::DetermineFaces(Point inputCenter)
 	for (Face* iterator : ArrayHolder)
 	{
 		iterator->generalCenterPoint = inputCenter;
-
 	}
 }
 
-void Cube::Draw(GLuint * program[6])
+void Cube::Draw()
 {
 	int pointCounter = 0;
-
-	GLfloat holder[24][4];
+	//GLfloat holder1[24][4];
+	GLfloat holder1[24];
+	GLfloat holder2[24];
+	GLfloat holder3[24];
 	glBegin(GL_QUADS);
-	for (int FaceIterator = 0; FaceIterator < 6; FaceIterator++) {
-		glUseProgram(*program[FaceIterator]);
+	for (int FaceIterator = 0; FaceIterator < 6; FaceIterator++) {	
 		glNormal3f(ArrayHolder[FaceIterator]->normal.getX(), ArrayHolder[FaceIterator]->normal.getY(), ArrayHolder[FaceIterator]->normal.getZ());
 		ArrayHolder[FaceIterator]->DetermineFaceType();
 		for (int PointIterator = 0; PointIterator < 4; PointIterator++)
 		{
-			 Point iterator2 = ArrayHolder[FaceIterator]->Points[PointIterator];
-			 GLfloat param[] = { iterator2.getX(), iterator2.getY(), iterator2.getZ(), 1.0f };
-			 holder[pointCounter][0] = iterator2.getX();
-			 holder[pointCounter][1] = iterator2.getY();
-			 holder[pointCounter][2] = iterator2.getZ();
-			 holder[pointCounter][3] = 1.0f;
-
-			 glVertexAttrib4fv(PointIterator, param);
-
-			
-			glVertex3f(iterator2.getX(), iterator2.getY(), iterator2.getZ());
-			pointCounter++;	
-
+			 holder1[pointCounter] = ArrayHolder[FaceIterator]->Points[PointIterator].getX();
+			 holder2[pointCounter] = ArrayHolder[FaceIterator]->Points[PointIterator].getY();
+			 holder3[pointCounter] = ArrayHolder[FaceIterator]->Points[PointIterator].getZ();
+			glVertex3f(holder1[pointCounter], holder2[pointCounter], holder3[pointCounter]);
+			pointCounter++;
 		}
-		glDrawArrays(GL_QUADS, 0, 4);
 	}
-	
+	glVertexAttrib1fv(0, holder1);
+	glVertexAttrib1fv(1, holder2);
+	glVertexAttrib1fv(2, holder3);
+	glDrawArrays(GL_QUADS, 0, 24);
 	glEnd();
 	
 }

@@ -48,7 +48,6 @@ public:
 
 	void DrawTopAndBottom();
 
-	void ShaderWork(GLuint & program);
 	};
 
 
@@ -108,6 +107,6 @@ public:
 
 	void setPoints();
 	void DetermineFaces(Point inputCenter);
-	void Draw(GLuint * program[6]);// GLuint texID);
+	void Draw();// GLuint texID);
 	void SetFaces(Face & inFront, Face & inBack, Face & inLeft, Face & inRight, Face & inTop, Face & inBottom );
 };

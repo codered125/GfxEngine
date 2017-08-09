@@ -11,35 +11,38 @@ GLuint compileShader()
 	GLuint program;
 
 
+
+
+
 	static const GLchar * vertexShaderSource[] = {
-		"#version 400									 \n"
+		"#version 400 core								 \n"
 		"												 \n"
-		"in vec4 p1;									 \n"
-		"in vec4 p2;									 \n"
-		"in vec4 p3;									 \n"
-		"in vec4 p4;									 \n"
-		"vec4 [4] Holder; 	 \n"
+		"layout (location = 0) in float [24]  p1;		 \n"
+		"layout (location = 1) in float [24]  p2;		 \n"
+		"layout (location = 2) in float [24]  p3;		 \n"
+		"vec4 currentPoint;								 \n"
 		"out float Ratio;								 \n"
 		"												 \n"
-		"void main()									 \n"
+		"void main(void)								 \n"
 		"{												 \n"
-		"Holder = vec4[](p1, p2, p3, p4); \n"
-		"gl_Position = Holder[gl_VertexID];				 \n"
+		"currentPoint = vec4(p1[gl_VertexID], p2[gl_VertexID], p3[gl_VertexID], 1.0f);			 \n"
+		"gl_Position = currentPoint;					 \n"
 		"Ratio = gl_VertexID;							 \n"
 		"}												 \n"
 	};
 
 
 	static const GLchar * fragmentShaderSource[] = {
-		"#version 400									 \n"
+		"#version 400 core								 \n"
 		"												 \n"
 		"in float Ratio;								 \n"
-		"out vec4 FragColor;							 \n"
+		"vec4 FragColor;							 \n"
 		"												 \n"
-		"void main()									 \n"
+		"void main(void)								 \n"
 		"{												 \n"
-		"FragColor = vec4(0.5f / Ratio, 0.15f / Ratio, 0.20f / Ratio, 0.60f);	 \n"
-		"gl_FragColor = FragColor;						 \n"
+//		"FragColor = vec4(0.75f / Ratio, 0.15f / Ratio, 0.80f / Ratio, 0.60f);	 \n"
+		"FragColor = vec4(0.93f, 0.25f, 1.0f, 1.0f);		 \n"
+		"gl_FragColor = FragColor / Ratio;				 \n"
 		"}												 \n"
 	};
 
