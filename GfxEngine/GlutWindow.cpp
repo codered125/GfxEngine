@@ -49,6 +49,7 @@ int main(int argc, char** argv)
 	//Create the window
 	glutCreateWindow("Moses' Game Engine");
 
+	
 	//Initialize rendering
 	initRendering();
 
@@ -75,15 +76,23 @@ void initRendering()
 	glEnable(GL_LIGHT1);
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_TEXTURE);
-
 	
+
+	//ShaderCode
+
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
-	//ShaderCode
-	renderingProg =  compileShader();
-	glGenVertexArrays(1, &VAO);
+
+	renderingProg = compileShader();
+	//glGenVertexArrays(1, &VAO);
+
+	glCreateVertexArrays(1, &VAO);
+	glEnableVertexAttribArray(0);
 	glBindVertexArray(VAO);
+
 	glUseProgram(renderingProg);
+
+
 }
 
 
@@ -144,16 +153,6 @@ void drawScene()
 	
 
 	glRotatef(_angle, 1.0f, 1.0f, 1.0f);
-
-	glewExperimental = GL_TRUE;
-	GLenum err = glewInit();
-	//ShaderCode
-	renderingProg = compileShader();
-	glGenVertexArrays(1, &VAO);
-	//glCreateVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	glUseProgram(renderingProg);
-
 	
 	center.setLocation(-1.5f, -1.0f, 1.5f);
 	//cubes.
@@ -163,7 +162,10 @@ void drawScene()
 	cubes.DetermineFaces(center);
 	cubes.Draw();
 	
-
+	glVertexAttrib1fv(0, cubes.holder1);
+	glVertexAttrib1fv(1, cubes.holder2);
+	glVertexAttrib1fv(2, cubes.holder3);
+	glDrawArrays(GL_QUADS, 0, 24);
 
 	//Send the 3D scene to the screen
 	glutSwapBuffers(); 
@@ -230,19 +232,19 @@ void handleKeypress(unsigned char key, int x, int y)
 			break;
 
 		case 119:// W Key
-			translate(0.3, 2);
+			translate(0.3f, 2);
 			break;
 			
 		case 115: //s Key
-			translate(-0.3, 2);
+			translate(-0.3f, 2);
 			break;
 
 		case 97: //a key
-			translate(-0.3, 1);
+			translate(-0.3f, 1);
 			break;
 
 		case 100://d key
-			translate(0.3, 1);
+			translate(0.3f, 1);
 			break;
 	}
 }

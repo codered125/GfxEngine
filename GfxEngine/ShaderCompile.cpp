@@ -10,10 +10,6 @@ GLuint compileShader()
 	GLuint fragShader;
 	GLuint program;
 
-
-
-
-
 	static const GLchar * vertexShaderSource[] = {
 		"#version 400 core								 \n"
 		"												 \n"
@@ -25,8 +21,8 @@ GLuint compileShader()
 		"												 \n"
 		"void main(void)								 \n"
 		"{												 \n"
-		"currentPoint = vec4(p1[gl_VertexID], p2[gl_VertexID], p3[gl_VertexID], 1.0f);			 \n"
-		"gl_Position = currentPoint;					 \n"
+		"gl_Position.xyz = vec3(p1[gl_VertexID], p2[gl_VertexID], p3[gl_VertexID]);			 \n"
+		"gl_Position.z = 1.0f;							 \n"
 		"Ratio = gl_VertexID;							 \n"
 		"}												 \n"
 	};
@@ -68,6 +64,8 @@ GLuint compileShader()
 	glAttachShader(program, fragShader);
 	glLinkProgram(program);
 
+	glDetachShader(program, vertShader);
+	glDetachShader(program, fragShader);
 
 	glDeleteShader(vertShader);
 	glDeleteShader(fragShader);

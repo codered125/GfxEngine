@@ -1,4 +1,5 @@
 #include "glut.h"
+#include "include\GLFW\glfw3.h"
 #include "stdafx.h"
 //#include <iostream>
 //#include <sstream>
@@ -104,6 +105,10 @@ private:
 public:
 	Face* ArrayHolder[6];
 	Point generalCenterPoint;
+
+	GLfloat holder1[24];
+	GLfloat holder2[24];
+	GLfloat holder3[24];
 
 	void setPoints();
 	void DetermineFaces(Point inputCenter);

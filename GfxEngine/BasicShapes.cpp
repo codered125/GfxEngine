@@ -270,9 +270,7 @@ void Cube::Draw()
 {
 	int pointCounter = 0;
 	//GLfloat holder1[24][4];
-	GLfloat holder1[24];
-	GLfloat holder2[24];
-	GLfloat holder3[24];
+
 	glBegin(GL_QUADS);
 	for (int FaceIterator = 0; FaceIterator < 6; FaceIterator++) {	
 		glNormal3f(ArrayHolder[FaceIterator]->normal.getX(), ArrayHolder[FaceIterator]->normal.getY(), ArrayHolder[FaceIterator]->normal.getZ());
@@ -282,14 +280,13 @@ void Cube::Draw()
 			 holder1[pointCounter] = ArrayHolder[FaceIterator]->Points[PointIterator].getX();
 			 holder2[pointCounter] = ArrayHolder[FaceIterator]->Points[PointIterator].getY();
 			 holder3[pointCounter] = ArrayHolder[FaceIterator]->Points[PointIterator].getZ();
-			glVertex3f(holder1[pointCounter], holder2[pointCounter], holder3[pointCounter]);
+			glVertex4f(holder1[pointCounter], holder2[pointCounter], holder3[pointCounter], 1.0f);
+
 			pointCounter++;
+
 		}
 	}
-	glVertexAttrib1fv(0, holder1);
-	glVertexAttrib1fv(1, holder2);
-	glVertexAttrib1fv(2, holder3);
-	glDrawArrays(GL_QUADS, 0, 24);
+
 	glEnd();
 	
 }
