@@ -107,11 +107,6 @@ Cube::Cube()
 {
 }
 
-Cube::Cube(Point generalCenterPoint)
-{
-	//ourCenterPoint = generalCenterPoint;
-}
-
 void Cube::setPoints(Point inputCenter)
 {
 	ArrayHolder[0] = Front;
@@ -156,14 +151,14 @@ void Cube::Draw()
 		ArrayHolder[FaceIterator]->DetermineCentrerPoint();
 		for (int PointIterator = 0; PointIterator < 4; PointIterator++)
 		{
-			 holder1[pointCounter] = ArrayHolder[FaceIterator]->Points[PointIterator].getX();
-			 holder2[pointCounter] = ArrayHolder[FaceIterator]->Points[PointIterator].getY();
-			 holder3[pointCounter] = ArrayHolder[FaceIterator]->Points[PointIterator].getZ();
-			 holderEmbed[pointCounter][0] = holder1[pointCounter];
-			 holderEmbed[pointCounter][1] = holder2[pointCounter];
-			 holderEmbed[pointCounter][2] = holder3[pointCounter];
+			 GLfloat x = ArrayHolder[FaceIterator]->Points[PointIterator].getX();
+			 GLfloat y = ArrayHolder[FaceIterator]->Points[PointIterator].getY();
+			 GLfloat z = ArrayHolder[FaceIterator]->Points[PointIterator].getZ();
+			 holderEmbed[pointCounter][0] = x;
+			 holderEmbed[pointCounter][1] = y;
+			 holderEmbed[pointCounter][2] = z;
 			 holderEmbed[pointCounter][3] = 1.0f;
-			 glVertex4f(holder1[pointCounter] + 2.0f, holder2[pointCounter] + 2.0f, holder3[pointCounter] + 1.0f, 1.0f);
+			 glVertex4f(x + 2.0f, y + 2.0f, z + 1.0f, 1.0f);
 			 pointCounter++;
 		}
 	}

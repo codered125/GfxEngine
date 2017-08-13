@@ -1,9 +1,7 @@
 #include "glut.h"
 #include "include\GLFW\glfw3.h"
 #include "stdafx.h"
-//#include <iostream>
-//#include <sstream>
-//#include <vector>
+
 
 //#pragma once
 
@@ -40,7 +38,7 @@ public:
 
 
 	void DetermineCentrerPoint();
-
+private:
 	void DrawFrontAndBack();
 
 	void DrawLeftAndRight();
@@ -53,7 +51,6 @@ class Cube
 {
 public:
 	Cube();
-	Cube(Point generalCenterPoint);
 
 private:
 	Face* Front;
@@ -67,9 +64,6 @@ public:
 	Face* ArrayHolder[6];
 	Point generalCenterPoint;
 
-	GLfloat holder1[24];
-	GLfloat holder2[24];
-	GLfloat holder3[24];
 	GLfloat holderEmbed[24][4];
 	void setPoints(Point inputCenter);
 	void Draw();// GLuint texID);

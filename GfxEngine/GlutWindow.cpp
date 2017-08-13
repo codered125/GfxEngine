@@ -28,7 +28,7 @@ void update(int value);
 
 Face Front, Back, Left, Right, Top, Bottom;
 Point center; 
-Cube cubes{center};
+Cube cubes;
 
 GLuint renderingProg;
 GLuint VAO = 0;
