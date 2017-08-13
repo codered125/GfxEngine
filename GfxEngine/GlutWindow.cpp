@@ -23,7 +23,6 @@ void colourise();
 void drawScene();
 void handleResize(int w, int h);
 void update(int value);
-void createShape();
 
 //--------------------------Function declarations--------------------------------------------//
 
@@ -33,8 +32,8 @@ Cube cubes{center};
 
 GLuint renderingProg;
 GLuint VAO = 0;
-GLuint SqrID = 0;
 
+GLuint vertex_buffer[3];
 
 int main(int argc, char** argv)
 {
@@ -42,13 +41,11 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
-
 	//Set the window size
 	glutInitWindowSize(800, 800); 
 
 	//Create the window
 	glutCreateWindow("Moses' Game Engine");
-
 	
 	//Initialize rendering
 	initRendering();
@@ -57,9 +54,7 @@ int main(int argc, char** argv)
 	glutDisplayFunc(drawScene);
 	glutKeyboardFunc(handleKeypress);
 	glutReshapeFunc(handleResize);
-
 	glutTimerFunc(25, update, 0); //Add a timer
-
 
 	glutMainLoop(); 
 	return 0; 
@@ -79,20 +74,11 @@ void initRendering()
 	
 
 	//ShaderCode
-
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
 
-	renderingProg = compileShader();
-	//glGenVertexArrays(1, &VAO);
 
-	glCreateVertexArrays(1, &VAO);
-	glEnableVertexAttribArray(0);
-	glBindVertexArray(VAO);
-
-	glUseProgram(renderingProg);
-
-
+	//glCreateVertexArrays(1, &VAO);
 }
 
 
@@ -151,21 +137,38 @@ void drawScene()
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColour1);
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
 	
-
 	glRotatef(_angle, 1.0f, 1.0f, 1.0f);
 	
+	//cubes
 	center.setLocation(-1.5f, -1.0f, 1.5f);
-	//cubes.
 	cubes.generalCenterPoint = center;
 	cubes.SetFaces(Front, Back, Left, Right, Top, Bottom);
-	cubes.setPoints();
-	cubes.DetermineFaces(center);
+	cubes.setPoints(center);
 	cubes.Draw();
-	
-	glVertexAttrib1fv(0, cubes.holder1);
-	glVertexAttrib1fv(1, cubes.holder2);
-	glVertexAttrib1fv(2, cubes.holder3);
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	//Initialise our first buffer object
+	//Theres 96 flots in holder embed that we want to pass
+	//4 is the ammount of floats per vertice we want to process
+	// Enable attribute index 0 as being used 
+	glGenBuffers(1, &vertex_buffer[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 96 , cubes.holderEmbed , GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,	0,0);
+	glEnableVertexAttribArray(0);
+
+
+
+
+	renderingProg = compileShader();
+	glBindAttribLocation(renderingProg, 0, "in_Position");
+	glLinkProgram(renderingProg);
+	glUseProgram(renderingProg);
+
 	glDrawArrays(GL_QUADS, 0, 24);
+
 
 	//Send the 3D scene to the screen
 	glutSwapBuffers(); 
@@ -194,7 +197,6 @@ void rotate()
 	//sqrF.SetRotation(angle, 1.0f, 0.0f, 0.0f);
 	idle(0);
 }
-
 void translate(float value, int direction)
 {
 	//sqrF.Translate(&sqrF, value, direction);
