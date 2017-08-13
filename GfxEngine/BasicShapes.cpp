@@ -154,10 +154,14 @@ void Cube::Draw()
 			 GLfloat x = ArrayHolder[FaceIterator]->Points[PointIterator].getX();
 			 GLfloat y = ArrayHolder[FaceIterator]->Points[PointIterator].getY();
 			 GLfloat z = ArrayHolder[FaceIterator]->Points[PointIterator].getZ();
-			 holderEmbed[pointCounter][0] = x;
-			 holderEmbed[pointCounter][1] = y;
-			 holderEmbed[pointCounter][2] = z;
-			 holderEmbed[pointCounter][3] = 1.0f;
+			 Points[pointCounter][0] = x;
+			 Points[pointCounter][1] = y;
+			 Points[pointCounter][2] = z;
+			 Points[pointCounter][3] = 1.0f;
+			 Colours[pointCounter][0] = 1.0;
+			 Colours[pointCounter][1] = 1.0 / pointCounter;
+			 Colours[pointCounter][2] = 1.0 / pointCounter;
+			 Colours[pointCounter][3] = 1.0;
 			 glVertex4f(x + 2.0f, y + 2.0f, z + 1.0f, 1.0f);
 			 pointCounter++;
 		}
