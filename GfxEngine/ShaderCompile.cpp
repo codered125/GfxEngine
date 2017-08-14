@@ -51,17 +51,19 @@ GLuint compileShader()
 	program = glCreateProgram();
 	glAttachShader(program, vertShader);
 	glAttachShader(program, fragShader);
+
 	glLinkProgram(program);
 
 	GLint IsLinked = 0;
 	glGetProgramiv(program, GL_LINK_STATUS, (int *)&IsLinked);
 	if (IsLinked == GL_FALSE)std::cout << "Failed Link \n";
 
+
 	glDetachShader(program, vertShader);
 	glDetachShader(program, fragShader);
 
-	glDeleteShader(vertShader);
-	glDeleteShader(fragShader);
+	//glDeleteShader(vertShader);
+	//glDeleteShader(fragShader);
 	return program;
 }
 

@@ -146,7 +146,7 @@ void drawScene()
 	cubes.setPoints(center);
 	cubes.Draw();
 
-	glGenVertexArrays(1, &VAO[0]);
+	glGenVertexArrays(2, VAO);
 	glBindVertexArray(VAO[0]);
 
 	//Initialise our first buffer object
@@ -170,9 +170,6 @@ void drawScene()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 96, cubes.Colours, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(1);
-
-
-
 
 	renderingProg = compileShader();
 	glBindAttribLocation(renderingProg, 0, "in_Position");
