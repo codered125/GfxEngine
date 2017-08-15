@@ -4,9 +4,9 @@
 //#include <gl\GL.h>
 //#include <gl\GLU.h>
 
-#include <iostream>
-#include <stdlib.h>
-#include "BasicShapes.h"
+//#include <iostream>
+//#include <stdlib.h>
+//#include "BasicShapes.h"
 
 using namespace std;
 
@@ -31,9 +31,7 @@ Point center;
 Cube cubes;
 
 GLuint renderingProg;
-GLuint VAO [2];
 
-GLuint vertex_buffer[2];
 
 int main(int argc, char** argv)
 {
@@ -146,39 +144,7 @@ void drawScene()
 	cubes.setPoints(center);
 	cubes.Draw();
 
-	glGenVertexArrays(2, VAO);
-	glBindVertexArray(VAO[0]);
-
-	//Initialise our first buffer object
-	//Theres 96 flots in holder embed that we want to pass
-	//4 is the ammount of floats per vertice we want to process
-	// Enable attribute index 0 as being used 
-	glGenBuffers(2, vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 96 , cubes.Points , GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,	0,0);
-	glEnableVertexAttribArray(0);
-
-//	glGenVertexArrays(1, &VAO[1]);
-//	glBindVertexArray(VAO[1]);
-
-	//Initialise our first buffer object
-	//Theres 96 flots in holder embed that we want to pass
-	//4 is the ammount of floats per vertice we want to process
-	// Enable attribute index 0 as being used 
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 96, cubes.Colours, GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(1);
-
-	renderingProg = compileShader();
-	glBindAttribLocation(renderingProg, 0, "in_Position");
-	glBindAttribLocation(renderingProg, 1, "in_Colour");
-	glLinkProgram(renderingProg);
-	glUseProgram(renderingProg);
-
-	glDrawArrays(GL_QUADS, 0, 24);
-
+	compileShader(cubes);
 
 	//Send the 3D scene to the screen
 	glutSwapBuffers(); 

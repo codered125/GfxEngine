@@ -1,4 +1,3 @@
-#include "ShaderCompile.h"
 #include "BasicShapes.h"
 Point::Point()
 {

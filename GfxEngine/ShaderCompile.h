@@ -12,11 +12,10 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
+#include "BasicShapes.h"
 
 #include "stdafx.h"
 
 
-GLuint compileShader(); 
-unsigned long getFileLength(std::ifstream& file);
+void compileShader(Cube input);
 
-int loadsahder(char* filename, GLchar** ShaderSource, unsigned long * RealLength);
