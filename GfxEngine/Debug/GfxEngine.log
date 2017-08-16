@@ -1,3 +1,8 @@
 ﻿  ShaderCompile.cpp
-  GfxEngine.vcxproj -> D:\Documents\GitHub\GfxEngine\Debug\GfxEngine.exe
-  GfxEngine.vcxproj -> D:\Documents\GitHub\GfxEngine\Debug\GfxEngine.pdb (Partial PDB)
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  stdafx.cpp
+  GlutWindow.cpp
+  BasicShapes.cpp
+  GfxEngine.vcxproj -> D:\Moman\GFxRestart\GfxEngine\Debug\GfxEngine.exe
+  GfxEngine.vcxproj -> D:\Moman\GFxRestart\GfxEngine\Debug\GfxEngine.pdb (Partial PDB)

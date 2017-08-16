@@ -51,21 +51,23 @@ void compileShader(Cube input)
 	if (fragisCompiled == GL_FALSE)std::cout << "Failed Frag \n";
 
 
-
-
-	glGenVertexArrays(2, VAO);
+	glGenVertexArrays(1, &VAO[0]);
 	glBindVertexArray(VAO[0]);
+
 
 	//Initialise our first buffer object
 	//Theres 96 flots in holder embed that we want to pass
 	//4 is the ammount of floats per vertice we want to process
 	// Enable attribute index 0 as being used 
 	glGenBuffers(2, vertex_buffer);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 96, input.Points, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);
 
+
+	
 	//glGenVertexArrays(1, &VAO[1]);
 	//glBindVertexArray(VAO[1]);
 
@@ -85,19 +87,24 @@ void compileShader(Cube input)
 	program = glCreateProgram();
 	glAttachShader(program, vertShader);
 	glAttachShader(program, fragShader);
+	
+
+
+	glLinkProgram(program);
+	glUseProgram(program);
+	glDrawArrays(GL_QUADS, 0, 24);
+
 	glDetachShader(program, vertShader);
 	glDetachShader(program, fragShader);
 
 	glDeleteShader(vertShader);
 	glDeleteShader(fragShader);
 
-	glLinkProgram(program);
-	glUseProgram(program);
-	glDrawArrays(GL_QUADS, 0, 24);
 
-	GLint IsLinked = 0;
-	glGetProgramiv(program, GL_LINK_STATUS, (int *)&IsLinked);
-	if (IsLinked == GL_FALSE)std::cout << "Failed Link \n";
+
+//	GLint IsLinked = 0;
+//	glGetProgramiv(program, GL_LINK_STATUS, (int *)&IsLinked);
+//	if (IsLinked == GL_FALSE)std::cout << "Failed Link \n";
 	//return program;
 }
 

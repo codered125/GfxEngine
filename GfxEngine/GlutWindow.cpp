@@ -136,7 +136,8 @@ void drawScene()
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
 	
 	glRotatef(_angle, 1.0f, 1.0f, 1.0f);
-	
+	glShadeModel(GL_SMOOTH);
+
 	//cubes
 	center.setLocation(-1.5f, -1.0f, 1.5f);
 	cubes.generalCenterPoint = center;
