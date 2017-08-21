@@ -2,7 +2,5 @@
   Generating Code...
   Skipping... (no relevant changes detected)
   stdafx.cpp
-  GlutWindow.cpp
-  BasicShapes.cpp
   GfxEngine.vcxproj -> D:\Moman\GFxRestart\GfxEngine\Debug\GfxEngine.exe
   GfxEngine.vcxproj -> D:\Moman\GFxRestart\GfxEngine\Debug\GfxEngine.pdb (Partial PDB)

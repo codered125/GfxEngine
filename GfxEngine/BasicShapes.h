@@ -67,6 +67,7 @@ public:
 	GLfloat Points[24][4];
 	GLfloat Colours[24][4];
 	void setPoints(Point inputCenter);
-	void Draw();// GLuint texID);
+	void PortToArray();// GLuint texID);
+	void Draw();
 	void SetFaces(Face & inFront, Face & inBack, Face & inLeft, Face & inRight, Face & inTop, Face & inBottom );
 };

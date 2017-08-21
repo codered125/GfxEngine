@@ -137,16 +137,16 @@ void Cube::setPoints(Point inputCenter)
 	Bottom->thisFaceType = Face::FaceType::Bottom;
 	Bottom->normal.setLocation(0.0f, -1.0f, 0.0f);
 	Bottom->generalCenterPoint = inputCenter;
+
+	PortToArray();
 }
 
 
-void Cube::Draw()
+void Cube::PortToArray()
 {
 	int pointCounter = 0;
-
-   glBegin(GL_QUADS);
 	for (int FaceIterator = 0; FaceIterator < 6; FaceIterator++) {	
-		glNormal3f(ArrayHolder[FaceIterator]->normal.getX(), ArrayHolder[FaceIterator]->normal.getY(), ArrayHolder[FaceIterator]->normal.getZ());
+	//	glNormal3f(ArrayHolder[FaceIterator]->normal.getX(), ArrayHolder[FaceIterator]->normal.getY(), ArrayHolder[FaceIterator]->normal.getZ());
 		ArrayHolder[FaceIterator]->DetermineCentrerPoint();
 		for (int PointIterator = 0; PointIterator < 4; PointIterator++)
 		{
@@ -157,12 +157,30 @@ void Cube::Draw()
 			 Points[pointCounter][1] = y;
 			 Points[pointCounter][2] = z;
 			 Points[pointCounter][3] = 1.0f;
-			 Colours[pointCounter][0] = 1.0;
-			 Colours[pointCounter][1] = 1.0 / pointCounter;
-			 Colours[pointCounter][2] = 1.0 / pointCounter;
+			 Colours[pointCounter][0] = 0.7;
+			 Colours[pointCounter][1] = 0.15;
+			 Colours[pointCounter][2] = 0.7f;
 			 Colours[pointCounter][3] = 1.0;
-			 glVertex4f(x + 2.0f, y + 2.0f, z + 1.0f, 1.0f);
-			 pointCounter++;
+			
+		}
+	}
+
+}
+
+void Cube::Draw()
+{
+	glBegin(GL_QUADS);
+	int pointCounter = 0;
+	for (int FaceIterator = 0; FaceIterator < 6; FaceIterator++) {
+		glNormal3f(ArrayHolder[FaceIterator]->normal.getX(), ArrayHolder[FaceIterator]->normal.getY(), ArrayHolder[FaceIterator]->normal.getZ());
+		glColor3fv(Colours[0]);
+		for (int PointIterator = 0; PointIterator < 4; PointIterator++)
+		{
+			GLfloat x = ArrayHolder[FaceIterator]->Points[PointIterator].getX();
+			GLfloat y = ArrayHolder[FaceIterator]->Points[PointIterator].getY();
+			GLfloat z = ArrayHolder[FaceIterator]->Points[PointIterator].getZ();
+			glVertex4f(x + 2.0f, y + 2.0f, z + 1.0f,1.0f);
+			pointCounter++;
 		}
 	}
 	glEnd();

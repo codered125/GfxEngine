@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 	glutInitWindowSize(800, 800); 
 
 	//Create the window
-	glutCreateWindow("Moses' Game Engine");
+	glutCreateWindow("Moses' PlayBoy Mansion");
 	
 	//Initialize rendering
 	initRendering();
@@ -69,8 +69,8 @@ void initRendering()
 	glEnable(GL_LIGHT1);
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_TEXTURE);
-	
-
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_ALPHA_TEST);
 	//ShaderCode
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();
@@ -109,7 +109,7 @@ void drawScene()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//Clear information from last draw
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	GLfloat bg[]{ 0.0f, 0.0f, 0.0f, 1.0f };
+	GLfloat bg[]{ 0.30f, 0.30f, 0.30f, 1.0f };
 	glClearBufferfv(GL_COLOR, 0, bg);
 	//Switch to the drawing perspective
 	glMatrixMode(GL_MODELVIEW); 
@@ -143,8 +143,7 @@ void drawScene()
 	cubes.generalCenterPoint = center;
 	cubes.SetFaces(Front, Back, Left, Right, Top, Bottom);
 	cubes.setPoints(center);
-	cubes.Draw();
-
+	//cubes.Draw();
 	compileShader(cubes);
 
 	//Send the 3D scene to the screen
