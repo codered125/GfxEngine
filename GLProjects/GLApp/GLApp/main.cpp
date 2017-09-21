@@ -4,6 +4,23 @@
 
 const GLint width = 600, height = 800;
 
+const GLchar  * VertShaderSourceCode =
+"#version 330 core \n"
+"layout (location = 0) in vec3 position; \n"
+"void main() \n"
+"{\n"
+"gl_Position = vec4 (position.x , position.y, position.z, 1.0f);"
+"}"
+"\n";
+
+const GLchar  * FragmentShaderSourceCode =
+"#version 330 core \n"
+"out vec4 color;\n"
+"void main () \n"
+"{"
+"color = vec4 (1.0f, 0.5f, 0.2f, 1.0f);  \n"
+"}";
+
 int main()
 {
 	glfwInit();
@@ -52,6 +69,36 @@ int main()
 	}
 
 	glViewport(0, 0, screenWidth, screenHeight);
+
+	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertShader, 1, &VertShaderSourceCode, NULL);
+	glCompileShader(vertShader);
+
+
+	GLint Success;
+	GLchar inforlog[512];
+
+	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &Success);
+	if(!Success)
+	{
+		glGetShaderInfoLog(vertShader, 512, NULL, inforlog);
+		std::cout << "VertCompile Fail\n" << inforlog << std::endl;
+	}
+
+	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragShader, 1, &FragmentShaderSourceCode, NULL);
+	glCompileShader(fragShader);
+
+
+	
+
+	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &Success);
+	if (!Success)
+	{
+		glGetShaderInfoLog(fragShader, 512, NULL, inforlog);
+		std::cout << "frag  Fail\n" << inforlog << std::endl;
+	}
+
 	while (!glfwWindowShouldClose(window))
 	{
 		//check for events/inputs
