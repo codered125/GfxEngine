@@ -4,22 +4,7 @@
 
 const GLint width = 600, height = 800;
 
-const GLchar  * VertShaderSourceCode =
-"#version 330 core \n"
-"layout (location = 0) in vec3 position; \n"
-"void main() \n"
-"{\n"
-"gl_Position = vec4 (position.x , position.y, position.z, 1.0f);"
-"}"
-"\n";
 
-const GLchar  * FragmentShaderSourceCode =
-"#version 330 core \n"
-"out vec4 color;\n"
-"void main () \n"
-"{"
-"color = vec4 (1.0f, 0.5f, 0.2f, 1.0f);  \n"
-"}";
 
 int main()
 {
@@ -64,62 +49,19 @@ int main()
 	//inline initiation and safety check
 	if (GLEW_OK != glewInit())
 	{
-		std::cout << "Failed to initilaise Glew" << std::endl;
+		std::cout << "Failed to initializes Glew" << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	glViewport(0, 0, screenWidth, screenHeight);
 
-	//Create vertex shader
-	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertShader, 1, &VertShaderSourceCode, NULL);
-	glCompileShader(vertShader);
-
-
-	GLint Success;
-	GLchar infolog[512];
-
-	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &Success);
-	if(!Success)
-	{
-		glGetShaderInfoLog(vertShader, 512, NULL, infolog);
-		std::cout << "VertCompile Fail\n" << infolog << std::endl;
-	}
-
-	//Create Fragment shader
-	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragShader, 1, &FragmentShaderSourceCode, NULL);
-	glCompileShader(fragShader);
-
-	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &Success);
-	if (!Success)
-	{
-		glGetShaderInfoLog(fragShader, 512, NULL, infolog);
-		std::cout << "frag  Fail\n" << infolog << std::endl;
-	}
-
+	
 	//Attachment process
-
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertShader);
-	glAttachShader(shaderProgram, fragShader);
-	glLinkProgram(shaderProgram);
-
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &Success);
-	if (!Success)
-	{
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infolog);
-		std::cout << "program  Fail\n" << infolog << std::endl;
-	}
-
-	glDeleteShader(vertShader);
-	glDeleteShader(fragShader);
-
 	GLfloat verts[] =
 	{
-		-0.5f, -0.5f, 0.0f,//bottomleft
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f//Top Right
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0, 0.0f,//bottom left
+		0.5f, -0.5f, 0.0f, //Bottom Right
+		0.0f, 0.5f, 0.0f//Top middle
 	};
 
 	GLuint vbo, vao;
@@ -148,9 +90,12 @@ int main()
 		//draw
 		glUseProgram(shaderProgram);
 		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, )
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(0);
 		glfwSwapBuffers(window);
 
 	}
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
 	return EXIT_SUCCESS;
 }
