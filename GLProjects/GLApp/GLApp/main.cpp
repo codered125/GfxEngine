@@ -70,34 +70,69 @@ int main()
 
 	glViewport(0, 0, screenWidth, screenHeight);
 
+	//Create vertex shader
 	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertShader, 1, &VertShaderSourceCode, NULL);
 	glCompileShader(vertShader);
 
 
 	GLint Success;
-	GLchar inforlog[512];
+	GLchar infolog[512];
 
 	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &Success);
 	if(!Success)
 	{
-		glGetShaderInfoLog(vertShader, 512, NULL, inforlog);
-		std::cout << "VertCompile Fail\n" << inforlog << std::endl;
+		glGetShaderInfoLog(vertShader, 512, NULL, infolog);
+		std::cout << "VertCompile Fail\n" << infolog << std::endl;
 	}
 
+	//Create Fragment shader
 	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragShader, 1, &FragmentShaderSourceCode, NULL);
 	glCompileShader(fragShader);
 
-
-	
-
 	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &Success);
 	if (!Success)
 	{
-		glGetShaderInfoLog(fragShader, 512, NULL, inforlog);
-		std::cout << "frag  Fail\n" << inforlog << std::endl;
+		glGetShaderInfoLog(fragShader, 512, NULL, infolog);
+		std::cout << "frag  Fail\n" << infolog << std::endl;
 	}
+
+	//Attachment process
+
+	GLuint shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertShader);
+	glAttachShader(shaderProgram, fragShader);
+	glLinkProgram(shaderProgram);
+
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &Success);
+	if (!Success)
+	{
+		glGetProgramInfoLog(shaderProgram, 512, NULL, infolog);
+		std::cout << "program  Fail\n" << infolog << std::endl;
+	}
+
+	glDeleteShader(vertShader);
+	glDeleteShader(fragShader);
+
+	GLfloat verts[] =
+	{
+		-0.5f, -0.5f, 0.0f,//bottomleft
+		0.5f, -0.5f, 0.0f,
+		0.0f, 0.5f, 0.0f//Top Right
+	};
+
+	GLuint vbo, vao;
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &vbo);
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -111,6 +146,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//draw
+		glUseProgram(shaderProgram);
+		glBindVertexArray(vao);
+		glDrawArrays(GL_TRIANGLES, 0, )
 		glfwSwapBuffers(window);
 
 	}
