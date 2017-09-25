@@ -1,0 +1,7 @@
+﻿cl : Command line warning D9025: overriding '/TC' with '/TP'
+  SOIL2.c
+  image_helper.c
+  image_DXT.c
+  etc1_utils.c
+  Generating Code...
+  soil2-static-lib.vcxproj -> D:\Documents\GitHub\GfxEngine\GLProjects\External Libraries\SOIL2\SOIL2\make\windows\..\..\lib\windows\soil2-debug.lib

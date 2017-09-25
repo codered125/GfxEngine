@@ -1,7 +1,10 @@
 #include <iostream>
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
-#include <SOIL2.h>
+#include <SOIL2\src\SOIL2\SOIL2.h>
+#include <glm.hpp>
+#include <gtc\matrix_transform.hpp>
+#include <gtc\type_ptr.hpp>
 #include "Shader.h"
 
 const GLint width = 600, height = 800;
@@ -58,15 +61,15 @@ int main()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	Shader ourShader("Shader/core.vs", "frag.frag");
+	Shader ourShader("Shaders/core.vs", "Shaders/frag.frag");
 	//Attachment process
 	GLfloat verts[] =
 	{
 		//positon						//colour				//TexCood(Normalised)
 		0.5f, 0.5f, 0.0f,       1.0f, 0.0f, 0.0f,				1.0f, 1.0f, //TopRight
 		0.5f, -0.5f, 0.0f,		0.0f, 1.0f,	0.0f,				1.0f, 0.0f,	//BottomRight
-		-0.5f, 0.5f, 0.0f,		0.0f, 0.0f, 1.0f,				0.0f, 1.0f, //TopLeft
-		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,				0.0f, 0.0f //BottomLeft
+		-0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,				0.0f, 0.0f, //BottomLeft
+		- 0.5f, 0.5f, 0.0f,		0.0f, 0.0f, 1.0f,				0.0f, 1.0f //TopLeft
 
 
 	};
@@ -78,6 +81,7 @@ int main()
 	};
 
 
+	//Generate our buffers and array
 
 	GLuint vbo, vao, ebo;
 	glGenVertexArrays(1, &vao);
@@ -108,7 +112,7 @@ int main()
 	//Unbind vao
 	glBindVertexArray(0);
 
-	//Textyre storage + width and height
+	//Texture storage + width and height
 	GLuint texture;
 	int texWidth, texHeight;
 	//Texture initialisation
@@ -116,10 +120,10 @@ int main()
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	//Setting texture parameters
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	//Load image
 	unsigned char * image = SOIL_load_image("Images/Spiral.png", &texWidth, &texHeight, 0, SOIL_LOAD_RGBA);
@@ -137,21 +141,35 @@ int main()
 		//check for events/inputs
 		glfwPollEvents();
 		
-		//handle game logic
+		//GAME LOGIC
 
-		//render
+		//RENDER
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//draw
+		//DRAW
+
+		//Using our shader
 		ourShader.use();
+
+		//Create transform
+		glm::mat4 transform;
+		//Translate transform 
+		transform = glm::translate(transform, glm::vec3(-0.5f, 0.5f, 0.0f));
+		//Rotate it along z axis( not using it currently so nothing should change) by tick
+		transform = glm::rotate(transform, (GLfloat)glfwGetTime() * -2.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		GLint transformLoc = glGetUniformLocation(ourShader.shaderProgram, "transform");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
+		//Activating the texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "ourTexture"), 0);
 
 
 		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 		glfwSwapBuffers(window);
 
