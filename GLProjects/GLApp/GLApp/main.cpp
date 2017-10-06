@@ -6,10 +6,26 @@
 #include <gtc\matrix_transform.hpp>
 #include <gtc\type_ptr.hpp>
 #include "Shader.h"
+#include "Camera.h"
 
-const GLint width = 600, height = 800;
+const GLint width = 1200, height = 800;
 
 void  GLFWInit();
+int SCREEN_WIDTH, SCREEN_HEIGHT;
+
+void KeyCallback(GLFWwindow  * window, int key, int scancode, int action, int mode);
+void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset);
+void MouseCallback(GLFWwindow * window, double xPos, double yPos);
+void DoMovement();
+
+Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
+GLfloat lastX = width / 2.0f;
+GLfloat lastY = height / 2.0f;
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+
+bool Keys[1024];
+bool firstMouse = true;
 
 
 
@@ -24,8 +40,8 @@ int main()
 
 	//Going to get the real size and height of the screen and store it to our storage
 	//helps with high density displays. Will use it when creating viewport
-	int screenWidth, screenHeight;
-	glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
+
+	glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
 
 	if (window == nullptr) 
 	{
@@ -38,6 +54,13 @@ int main()
 	//Makes current windows
 	glfwMakeContextCurrent(window);
 
+
+	glfwSetKeyCallback(window, KeyCallback);
+	glfwSetCursorPosCallback(window, MouseCallback);
+	glfwSetScrollCallback(window, ScrollCallback);
+	
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	//Tells glew to use a modern approach to retrieving function pointers and extensions
 	glewExperimental = GL_TRUE;
 
@@ -48,7 +71,7 @@ int main()
 		return EXIT_FAILURE;
 	}
 
-	glViewport(0, 0, screenWidth, screenHeight);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -56,9 +79,6 @@ int main()
 
 	Shader ourShader("Shaders/core.vs", "Shaders/frag.frag");
 
-
-
-	// use with Perspective Projection
 	GLfloat vertices[] = {
 		//xyz tex coord
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -102,6 +122,21 @@ int main()
 		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
 		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
+
+
+	glm::vec3 cubePositions[] =
+	{
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(2.0f, 5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f, 3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f, 2.0f, -2.5f),
+		glm::vec3(1.5f, 0.2f, -1.5f),
+		glm::vec3(-1.3f, 1.0f, -1.5f)
 	};
 
 
@@ -153,21 +188,23 @@ int main()
 	SOIL_free_image_data(image);
 	//Unbinding it now
 	glBindTexture(GL_TEXTURE_2D, 0);
-	//perspetive projection
-	glm::mat4 projection;
+
+
 
 	//view frustrum = aspect ratio (screenwidth / screen height), near clipping plane anything closer than the number isnt rendered same with far clipping plane
 	//perspective
-	projection = glm::perspective(45.0f, (GLfloat)screenWidth / screenHeight, 0.1f, 1000.0f);
+	//glm::mat4 projection;
 
-	//ortho
-	//projection = glm::ortho(0.0f, (GLfloat)screenWidth, 0.0f, (GLfloat)screenHeight, 0.1f, 1000.0f);
 
 	while (!glfwWindowShouldClose(window))
 	{
-																	//check for events/inputs
+		GLfloat currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+											//check for events/inputs
 		glfwPollEvents();
-		
+		DoMovement();
 																	
 		//GAME LOGIC
 
@@ -175,36 +212,43 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
+		//Using our shader
+		ourShader.use();
 																	//DRAW
 		//Activating the texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
-		glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "ourTexture"), 0);
+		glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "ourTexture1"), 0);
 
-		//Using our shader
-		ourShader.use();
-		
-		glm::mat4 model;
+
+		glm::mat4 projection;
+		projection = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+	
 		glm::mat4 view;
 		//perspective
-		model = glm::rotate(model, (GLfloat)glfwGetTime() * 1.0f, glm::vec3(0.5f, 1.0f, 0.0f));
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-
-		//Ortho
-		//view = glm::translate(view, glm::vec3(screenWidth / 2.0f, screenHeight / 2.0f, -700.0f));
-		//model = glm::rotate(model, (GLfloat) 0.5f, glm::vec3(1.0f, 0.0f, 0.0f));
+		view = ourCamera.GetViewMatrix();
 
 		GLint modelLoc = glGetUniformLocation(ourShader.shaderProgram, "model");
 		GLint viewLoc = glGetUniformLocation(ourShader.shaderProgram, "view");
 		GLint projectionLoc = glGetUniformLocation(ourShader.shaderProgram, "projection");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		
+		//for (GLuint i = 0; i < (GLint) cubePositions->length; i++)
+		for (GLuint i = 0; i < 10; i++)
+		{
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			GLfloat angle = 20.0f * i;
+			model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
 		glBindVertexArray(0);
 
 		//swap screen buffers
@@ -213,6 +257,7 @@ int main()
 	}
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
+	glfwTerminate();
 	return EXIT_SUCCESS;
 }
 
@@ -229,4 +274,46 @@ void  GLFWInit()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	//Toggles Resizeability
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+}
+
+void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)glfwSetWindowShouldClose(window, GL_TRUE);
+
+	if (key > 0 && key < 1024)
+	{
+		if (GLFW_PRESS == action) Keys[key] = true;
+		else if (GLFW_RELEASE == action)Keys[key] = false;
+	}
+}
+
+void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset)
+{
+	ourCamera.ProessMouseSroll(yOffset);
+}
+
+void MouseCallback(GLFWwindow * window, double xPos, double yPos)
+{
+	if (firstMouse)
+	{
+		lastX = xPos;
+		lastY = yPos;
+		firstMouse = false;
+	}
+
+	GLfloat xOffset = xPos - lastX;
+	GLfloat yOffset = lastY - yPos; //this is reverse because opengl Y coords start from bottom left and go reverse
+
+	lastX = xPos;
+	lastY = yPos;
+	ourCamera.ProcessMouseMovement(xOffset, yOffset);
+}
+
+void DoMovement()
+{
+	if (Keys[GLFW_KEY_W] || Keys[GLFW_KEY_UP]) ourCamera.ProcessKeyboard(EForward, deltaTime);
+	if (Keys[GLFW_KEY_S] || Keys[GLFW_KEY_DOWN]) ourCamera.ProcessKeyboard(EBackward, deltaTime);
+	if (Keys[GLFW_KEY_A] || Keys[GLFW_KEY_LEFT]) ourCamera.ProcessKeyboard(ELeft, deltaTime);
+	if (Keys[GLFW_KEY_D] || Keys[GLFW_KEY_RIGHT]) ourCamera.ProcessKeyboard(ERight, deltaTime);
+	
 }
