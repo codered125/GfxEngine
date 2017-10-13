@@ -1,6 +1,6 @@
-﻿  ShaderCompile.cpp
+﻿  stdafx.cpp
+  ShaderCompile.cpp
   Generating Code...
-  Skipping... (no relevant changes detected)
-  stdafx.cpp
+  LINK : D:\Moman\GFxRestart\GfxEngine\Debug\GfxEngine.exe not found or not built by the last incremental link; performing full link
   GfxEngine.vcxproj -> D:\Moman\GFxRestart\GfxEngine\Debug\GfxEngine.exe
   GfxEngine.vcxproj -> D:\Moman\GFxRestart\GfxEngine\Debug\GfxEngine.pdb (Partial PDB)

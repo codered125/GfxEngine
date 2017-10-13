@@ -18,7 +18,7 @@ const GLfloat YAW = -90.0f;
 const GLfloat PITCH = 0.0f;
 const GLfloat SPEED = 6.0f;
 //Mousemovement sense
-const GLfloat SENSITIVTY = 0.25f;
+const GLfloat SENSITIVTY = 0.15f;
 
 //Feild of view
 const GLfloat ZOOM = 45.0f; 
@@ -80,7 +80,7 @@ public:
 
 	void ProessMouseSroll(GLfloat yOffset)
 	{
-		if (this->zoom >= 1.0f && this->zoom <= 45.0f) this->zoom -= yOffset;
+		if (this->zoom >= 1.0f && this->zoom <= 45.0f) this->zoom -= (yOffset / 5);
 		if (this->zoom <= 1.0f) this->zoom = 1.0f;
 		if (this->zoom >= 45.0f) this->zoom = 45.0f;
 	}
