@@ -11,7 +11,7 @@ public:
 	GLfloat size; 
 	GLfloat originPoint;
 
-	GLfloat vertices[] = {
+	GLfloat vertices[180] = {
 		//xyz tex coord
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,

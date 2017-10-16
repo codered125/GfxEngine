@@ -162,6 +162,10 @@
   <ItemGroup>
     <None Include="Shaders\core.vs" />
     <None Include="Shaders\frag.frag" />
+    <None Include="Shaders\Lamp.frag" />
+    <None Include="Shaders\Lamp.vs" />
+    <None Include="Shaders\Lighting.frag" />
+    <None Include="Shaders\Lighting.vs" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc" />

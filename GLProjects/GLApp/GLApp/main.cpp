@@ -24,10 +24,12 @@ GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
-
+Cube base;
 bool Keys[1024];
 bool firstMouse = true;
 
+glm::vec3 lightPos (1.2f, 1.0f, 2.0f);
+glm::vec3
 
 
 int main()
@@ -108,7 +110,7 @@ int main()
 	glBindVertexArray(vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), base.vertices, GL_STATIC_DRAW);
 
 
 	//Position Attributes
