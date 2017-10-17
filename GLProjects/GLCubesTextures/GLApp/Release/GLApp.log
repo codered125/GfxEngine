@@ -1,0 +1,4 @@
+﻿  main.cpp
+main.obj : error LNK2001: unresolved external symbol _SOIL_free_image_data
+main.obj : error LNK2001: unresolved external symbol _SOIL_load_image
+D:\Documents\GitHub\GfxEngine\GLProjects\GLApp\Release\GLApp.exe : fatal error LNK1120: 2 unresolved externals
