@@ -25,7 +25,40 @@ const GLfloat ZOOM = 45.0f;
 
 class Camera 
 {
-public:
+
+
+private:
+	// Camera Attributes
+	glm::vec3 position;
+	glm::vec3 front;
+	glm::vec3 up;
+	glm::vec3 right;
+	glm::vec3 worldUp;
+
+	// Eular Angles
+	GLfloat yaw;
+	GLfloat pitch;
+
+	// Camera options
+	GLfloat movementSpeed;
+	GLfloat mouseSensitivity;
+	GLfloat zoom;
+
+
+
+
+	void updateCameraVectors()
+	{
+		glm::vec3 front;
+		front.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+		front.y = sin(glm::radians(this->pitch));
+		front.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+		this->front = glm::normalize(front);
+		// Also re-calculate the Right and Up vector
+		this->right = glm::normalize(glm::cross(this->front, this->worldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+		this->up = glm::normalize(glm::cross(this->right, this->front));
+	}
+
 public:
 	// Constructor with vectors
 	Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), GLfloat yaw = YAW, GLfloat pitch = PITCH) : front(glm::vec3(0.0f, 0.0f, -1.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVTY), zoom(ZOOM)
@@ -89,32 +122,9 @@ public:
 	
 
 
-private:
-	// Camera Attributes
-	glm::vec3 position;
-	glm::vec3 front;
-	glm::vec3 up;
-	glm::vec3 right;
-	glm::vec3 worldUp;
 
-	// Eular Angles
-	GLfloat yaw;
-	GLfloat pitch;
-
-	// Camera options
-	GLfloat movementSpeed;
-	GLfloat mouseSensitivity;
-	GLfloat zoom;
-
-	void updateCameraVectors() 
+	glm::vec3 getPosition()
 	{
-		glm::vec3 front;
-		front.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-		front.y = sin(glm::radians(this->pitch));
-		front.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-		this->front = glm::normalize(front);
-		// Also re-calculate the Right and Up vector
-		this->right = glm::normalize(glm::cross(this->front, this->worldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-		this->up = glm::normalize(glm::cross(this->right, this->front));
+		return this->position;
 	}
 };
