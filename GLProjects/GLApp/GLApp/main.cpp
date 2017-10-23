@@ -151,14 +151,28 @@ int main()
 
 		//Use Correct shader, get location of object and light colour in shader and then set them
 		lightShader.use();
-		GLint objectColourLoc = glGetUniformLocation(lightShader.shaderProgram, "objectColour");
-		GLint lightColourLoc = glGetUniformLocation(lightShader.shaderProgram, "lightColour");
-		GLint lightPosLoc = glGetUniformLocation(lightShader.shaderProgram, "lightPos");
+		//GLint objectColourLoc = glGetUniformLocation(lightShader.shaderProgram, "objectColour");
+		//GLint lightColourLoc = glGetUniformLocation(lightShader.shaderProgram, "lightColour");
+		GLint lightPosLoc = glGetUniformLocation(lightShader.shaderProgram, "light.position");
 		GLint viewPosLoc = glGetUniformLocation(lightShader.shaderProgram, "viewPos");
-		glUniform3f(objectColourLoc, 1.0f, 0.5f, 0.31f);
-		glUniform3f(lightColourLoc, 1.0f, 1.0f, 1.0f);
 		glUniform3f(lightPosLoc, lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(viewPosLoc, ourCamera.getPosition().x, ourCamera.getPosition().y, ourCamera.getPosition().z);
+
+		glm::vec3 lightColour;
+		lightColour.r = sin(glfwGetTime() * 2.0f);
+		lightColour.g = sin(glfwGetTime() * 0.7f);
+		lightColour.b = sin(glfwGetTime() * 1.3f);
+
+		glm::vec3 diffuseColour = lightColour * glm::vec3(0.5f);
+		glm::vec3 ambientColour = diffuseColour * glm::vec3(0.2f);
+		glUniform3f(glGetUniformLocation(lightShader.shaderProgram, "light.ambient"), ambientColour.r, ambientColour.g, ambientColour.b);
+		glUniform3f(glGetUniformLocation(lightShader.shaderProgram, "light.diffuse"), diffuseColour.r, diffuseColour.g, diffuseColour.b);
+		glUniform3f(glGetUniformLocation(lightShader.shaderProgram, "light.specular"), 1.0f, 1.0f, 1.0f);
+
+		glUniform3f(glGetUniformLocation(lightShader.shaderProgram, "material.ambient"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(glGetUniformLocation(lightShader.shaderProgram, "material.diffuse"), 1.0f, 0.5f, 0.31f);
+		glUniform3f(glGetUniformLocation(lightShader.shaderProgram, "material.specular"), 0.5, 0.5f, 0.5f);
+		glUniform1f(glGetUniformLocation(lightShader.shaderProgram, "material.shininess"),32.0f);
 
 		glm::mat4 view;
 		view = ourCamera.GetViewMatrix();
