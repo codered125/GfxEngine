@@ -127,4 +127,10 @@ public:
 	{
 		return this->position;
 	}
+
+
+	glm::vec3 getFront()
+	{
+		return this->front;
+	}
 };

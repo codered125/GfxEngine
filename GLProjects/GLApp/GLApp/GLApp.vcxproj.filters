@@ -65,5 +65,11 @@
     <Image Include="Images\Spiral.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Images\box.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\box_spec.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

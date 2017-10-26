@@ -171,6 +171,8 @@
     <ResourceCompile Include="GLApp.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Images\box.png" />
+    <Image Include="Images\box_spec.png" />
     <Image Include="Images\Spiral.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
