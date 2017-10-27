@@ -211,7 +211,8 @@ int main()
 		// the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
 		// by defining light types as classes and set their values in there, or by using a more efficient uniform approach
 		// by using 'Uniform buffer objects', but that is something we discuss in the 'Advanced GLSL' tutorial.
-		// == ==========================
+		
+		
 		// Directional light
 		glUniform3f(glGetUniformLocation(lightShader.shaderProgram, "dirLight.direction"), -0.2f, -1.0f, -0.3f);
 		glUniform3f(glGetUniformLocation(lightShader.shaderProgram, "dirLight.ambient"), 0.05f, 0.05f, 0.05f);
