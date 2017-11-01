@@ -7,6 +7,7 @@
 #include <gtc\type_ptr.hpp>
 #include "Shader.h"
 #include "Cube.h"
+#include "Model.h"
 #include "Camera.h"
 
 const GLint width = 1200, height = 800;
@@ -80,6 +81,8 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	Shader shader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
+	Model ourModel("Models/nanosuit.obj");
 
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
@@ -94,6 +97,17 @@ int main()
 		//RENDER
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		shader.use();
+
+		glm::mat4 view = ourCamera.GetViewMatrix();
+		glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV)); 
+		glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+		glm::mat4 model;
+		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+		glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		ourModel.Draw(shader);
 
 		//swap screen buffers
 		glfwSwapBuffers(window);

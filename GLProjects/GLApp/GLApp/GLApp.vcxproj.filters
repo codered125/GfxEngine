@@ -21,6 +21,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -62,6 +65,12 @@
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="Shaders\Lamp.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\modelLoading.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\modelLoading.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
   </ItemGroup>

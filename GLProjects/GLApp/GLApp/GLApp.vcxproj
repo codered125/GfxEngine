@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -169,6 +170,8 @@
     <None Include="Shaders\Lamp.vs" />
     <None Include="Shaders\Lighting.frag" />
     <None Include="Shaders\Lighting.vs" />
+    <None Include="Shaders\modelLoading.frag" />
+    <None Include="Shaders\modelLoading.vs" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc" />
