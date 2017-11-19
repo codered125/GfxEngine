@@ -29,7 +29,7 @@ public:
 		this->loadModel(inpath);
 	}
 
-	void Draw(Shader shader)
+	void Draw(Shader *shader)
 	{
 		for (GLuint i = 0; i < this->meshes.size(); i++)
 		{
@@ -123,11 +123,11 @@ private:
 		if (mesh->mMaterialIndex >= 0)
 		{
 			aiMaterial * material = scene->mMaterials[mesh->mMaterialIndex];
-			vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+			vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "material.texture_diffuse");
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
 
-			vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_s[ecular");
+			vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		}
 
