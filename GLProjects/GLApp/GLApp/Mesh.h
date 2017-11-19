@@ -46,7 +46,7 @@ public:
 		this->SetupMesh();
 	}
 
-	void Draw(Shader shader)
+	void Draw(Shader * shader)
 	{
 		GLuint diffuseNr = 1;
 		GLuint specularNR = 1;
@@ -59,23 +59,23 @@ public:
 			string number;
 			string name = this->textures[i].type;
 
-			if ("texture_diffuse" == name)
+			if ("material.texture_diffuse" == name)
 			{
 				ss << diffuseNr++;
 			}
-			else if ("texture_specular" == name)
+			else if ("material.texture_specular" == name)
 			{
 				ss << specularNR++;
 			}
 
 			number = ss.str();
 
-			glUniform1i(glGetUniformLocation(shader.shaderProgram, (name + number).c_str()), i);
+			glUniform1i(glGetUniformLocation(shader->shaderProgram, (name + number).c_str()), i);
 			glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
 
 		}
 
-		glUniform1f(glGetUniformLocation(shader.shaderProgram, "material.shininess"), 16.0f);
+		glUniform1f(glGetUniformLocation(shader->shaderProgram, "material.shininess"), 16.0f);
 
 		glBindVertexArray(this->VAO);
 		glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
