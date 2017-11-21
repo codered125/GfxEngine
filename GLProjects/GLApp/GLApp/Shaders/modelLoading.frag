@@ -88,7 +88,7 @@ vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir )
     // Diffuse shading
     float diff = max( dot( normal, lightDir ), 0.0 );
     
-    // Specular shading
+    // Specular shading (BlinPhong)
     vec3 reflectDir = reflect( -lightDir, normal );
     float spec = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.shininess );
     
@@ -112,7 +112,7 @@ vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     // Diffuse shading
     float diff = max( dot( normal, lightDir ), 0.0 );
     
-    // Specular shading
+    // Specular shading (BlinPhong)
     vec3 reflectDir = reflect( -lightDir, normal );
     float spec = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.shininess );
     
@@ -143,7 +143,7 @@ vec3 CalcSpotLight( SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     // Diffuse shading
     float diff = max( dot( normal, lightDir ), 0.0 );
     
-    // Specular shading
+    // Specular shading (BlinPhong)
     vec3 reflectDir = reflect( -lightDir, normal );
     float spec = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.shininess );
     
