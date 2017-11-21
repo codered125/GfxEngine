@@ -1,11 +1,11 @@
 ﻿  main.cpp
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(178): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(185): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(186): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(190): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(191): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(193): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(194): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(210): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(180): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(187): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(188): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(192): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(193): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(195): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(196): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(212): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
   GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
   GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.pdb (Partial PDB)

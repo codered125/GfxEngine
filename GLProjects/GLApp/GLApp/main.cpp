@@ -33,24 +33,25 @@ bool Keys[1024];
 bool firstMouse = true;
 glm::vec3 pointLightPositions[] =
 {
-	glm::vec3(0.7f, 0.2f, 2.0f),
-	glm::vec3(2.3f, -3.3f, -4.0f),
-	glm::vec3(-4.0f, 2.0f, -6.0f),
-	glm::vec3(0.0f, 0.0f, -3.0f)
+	glm::vec3(0.7f, 0.2f, 2.0f), //yellow
+	glm::vec3(2.3f, -3.3f, -3.0f), //Greeb
+	glm::vec3(-4.0f, 2.0f, -3.0f), //Red
+	glm::vec3(0.0f, 0.0f, -3.0f) //Blue
 };
 glm::vec3 pointLightColours[] =
 {
+	
+	glm::vec3(1.0f, 1.0f, 0.0f),//Yellow
+	glm::vec3(0.0f, 1.0f, 0.0f),//Green
+	glm::vec3(1.0f, 0.0f, 0.0f),//Red
+	glm::vec3(0.0f, 0.0f, 1.0f)//Blue
+	
 	/*
-	glm::vec3(0.3f, 0.3f, 0.3f),
-	glm::vec3(0.0f, 1.0f, 0.0f),
-	glm::vec3(1.0f, 0.0f, 0.0f),
-	glm::vec3(0.0f, 0.0f, 1.0f)
-	*/
-
 	glm::vec3(1.0f, 1.0f, 1.0f),
 	glm::vec3(1.0f, 1.0f, 1.0f),
 	glm::vec3(1.0f, 1.0f, 1.0f),
 	glm::vec3(1.0f, 1.0f, 1.0f)
+	*/
 };
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -106,7 +107,7 @@ int main()
 	Shader shader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	//Model ourModel("Models/Nanosuit/nanosuit.obj");
-	Model ourModel("Models/Brough/Brough_Castle_Model_121k.obj");
+	Model ourModel("Models/OldMan/muro.obj");
 	
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
@@ -129,8 +130,9 @@ int main()
 
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-		model = glm::rotate(model, -90.0f , glm::vec3( 1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
+		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+		//model = glm::rotate(model, -90.0f , glm::vec3( 1.0f, 0.0f, 0.0f));
 
 		glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		initialiseLights(&shader);
