@@ -9,6 +9,7 @@
 #include "Cube.h"
 #include "Model.h"
 #include "Camera.h"
+#include "TextureLoading.h"
 
 const GLint width = 1200, height = 800;
 
@@ -40,18 +41,18 @@ glm::vec3 pointLightPositions[] =
 };
 glm::vec3 pointLightColours[] =
 {
-	/*
+	
 	glm::vec3(1.0f, 1.0f, 0.0f),//Yellow
 	glm::vec3(0.0f, 1.0f, 0.0f),//Green
 	glm::vec3(1.0f, 0.0f, 0.0f),//Red
 	glm::vec3(0.0f, 0.0f, 1.0f)//Blue
-	*/
+	/*
 	
 	glm::vec3(1.0f, 1.0f, 1.0f),
 	glm::vec3(1.0f, 1.0f, 1.0f),
 	glm::vec3(1.0f, 1.0f, 1.0f),
 	glm::vec3(1.0f, 1.0f, 1.0f)
-	
+	*/
 };
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -105,10 +106,35 @@ int main()
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Shader shader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
+	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	//Model ourModel("Models/Nanosuit/nanosuit.obj");
 	Model ourModel("Models/OldMan/muro.obj");
 	
+
+	// Setup skybox VAO
+	GLuint skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glBindVertexArray(skyboxVAO);
+
+	glGenBuffers(1, &skyboxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(base.skyboxVertices), &base.skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+	glBindVertexArray(0);
+
+
+	// Cubemap (Skybox)
+	vector<const GLchar*> faces;
+	faces.push_back("Images/skybox/back.tga");
+	faces.push_back("Images/skybox/bottom.tga");
+	faces.push_back("Images/skybox/front.tga");
+	faces.push_back("Images/skybox/left.tga");
+	faces.push_back("Images/skybox/right.tga");
+	faces.push_back("Images/skybox/front.tga");
+	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
+
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 
@@ -120,7 +146,7 @@ int main()
 		DoMovement();
 
 		//RENDER
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		shader.use();
 
@@ -138,6 +164,20 @@ int main()
 		initialiseLights(&shader);
 		ourModel.Draw(&shader);
 		DrawLights(&lampShader);
+
+		// Draw skybox as last
+		// skybox cube
+		glDepthFunc(GL_LEQUAL);  // Change depth function so depth test passes when values are equal to depth buffer's content
+		view = glm::mat4(glm::mat3(ourCamera.GetViewMatrix()));	// Remove any translation component of the view matrix
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader.shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+
+		glBindVertexArray(skyboxVAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS); // Set depth function back to default
+
 
 
 		//swap screen buffers
@@ -220,11 +260,12 @@ void DrawLights(Shader * lampShader)
 	lampShader->use();
 	GLuint lightVAO, lightVBO;
 
+	glGenBuffers(1, &lightVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
 	glGenVertexArrays(1, &lightVAO);
 	glBindVertexArray(lightVAO);
 
-	glGenBuffers(1, &lightVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
+
 	glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), base.vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
