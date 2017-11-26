@@ -162,6 +162,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="TextureLoading.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\core.vs" />
@@ -172,6 +173,8 @@
     <None Include="Shaders\Lighting.vs" />
     <None Include="Shaders\modelLoading.frag" />
     <None Include="Shaders\modelLoading.vs" />
+    <None Include="Shaders\Skybox.frag" />
+    <None Include="Shaders\Skybox.vs" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc" />
@@ -179,6 +182,12 @@
   <ItemGroup>
     <Image Include="Images\box.png" />
     <Image Include="Images\box_spec.png" />
+    <Image Include="Images\skybox\back.tga" />
+    <Image Include="Images\skybox\bottom.tga" />
+    <Image Include="Images\skybox\front.tga" />
+    <Image Include="Images\skybox\left.tga" />
+    <Image Include="Images\skybox\right.tga" />
+    <Image Include="Images\skybox\top.tga" />
     <Image Include="Images\Spiral.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

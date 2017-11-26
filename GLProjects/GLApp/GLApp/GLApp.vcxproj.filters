@@ -47,6 +47,9 @@
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TextureLoading.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\core.vs">
@@ -73,6 +76,12 @@
     <None Include="Shaders\modelLoading.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="Shaders\Skybox.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\Skybox.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc">
@@ -87,6 +96,24 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Images\box_spec.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\back.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\bottom.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\front.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\left.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\right.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\top.tga">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
