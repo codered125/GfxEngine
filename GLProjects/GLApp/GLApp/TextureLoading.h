@@ -1,13 +1,15 @@
-#pragma
+#pragma once
 
+// GL Includes
 #define GLEW_STATIC
-#include <GL\glew.h>
+#include <GL/glew.h>
+
 #include <vector>
 
 class TextureLoading
 {
 public:
-	static GLuint LoadTexture(GLchar* path)
+	static GLuint LoadTexture(GLchar *path)
 	{
 		//Generate texture ID and load texture data
 		GLuint textureID;
@@ -33,6 +35,7 @@ public:
 
 		return textureID;
 	}
+
 	static GLuint LoadCubemap(vector<const GLchar * > faces)
 	{
 		GLuint textureID;
