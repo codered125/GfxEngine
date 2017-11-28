@@ -117,12 +117,12 @@ int main()
 
 	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
-	faces.push_back("Images/skybox/right.tga");
-	faces.push_back("Images/skybox/left.tga");
-	faces.push_back("Images/skybox/top.tga");
-	faces.push_back("Images/skybox/bottom.tga");
-	faces.push_back("Images/skybox/back.tga");
-	faces.push_back("Images/skybox/front.tga");
+	faces.push_back("Images/deser/right.tga");
+	faces.push_back("Images/deser/left.tga");
+	faces.push_back("Images/deser/top.tga");
+	faces.push_back("Images/deser/bottom.tga");
+	faces.push_back("Images/deser/back.tga");
+	faces.push_back("Images/deser/front.tga");
 
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
