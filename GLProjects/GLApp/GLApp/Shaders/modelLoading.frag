@@ -55,6 +55,7 @@ uniform DirLight dirLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
+uniform samplerCube skybox;
 
 vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir );
 vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir );
@@ -66,15 +67,19 @@ void main ()
     // Properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize( viewPos - FragPos );
-    
-    vec3 result = CalcDirLight( dirLight, norm, viewDir );    
+
+    vec3 result;
+	result += CalcDirLight( dirLight, norm, viewDir );    
     for ( int i = 0; i < NUMBER_OF_POINT_LIGHTS; i++ )
     {
         result += CalcPointLight( pointLights[i], norm, FragPos, viewDir );
     }
     result += CalcSpotLight( spotLight, norm, FragPos, viewDir );
-    
-    color = vec4( result, 1.0 );
+
+	//vec3 Reflective = refract(viewDir, norm, 1.0/ 1.52);
+	//result += texture(skybox, Reflective).rgb;
+	color = vec4( result, 1.0 );
+   //color = vec4(texture(skybox, Reflective).rgb, 1.0);
 };
 
 
