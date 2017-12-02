@@ -59,7 +59,8 @@ public:
 	};
 
 	GLfloat skyboxVertices[108] = {
-		// Positions
+		// Positions 
+
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
 		1.0f, -1.0f, -1.0f,
@@ -101,6 +102,7 @@ public:
 		1.0f, -1.0f, -1.0f,
 		-1.0f, -1.0f,  1.0f,
 		1.0f, -1.0f,  1.0f
+
 	};
 
 };
