@@ -9,6 +9,7 @@
 #include "Cube.h"
 #include "Model.h"
 #include "Camera.h"
+//#include "Light.h"
 #include "TextureLoading.h"
 
 const GLint width = 1200, height = 800;
@@ -33,6 +34,7 @@ GLfloat lastFrame = 0.0f;
 Cube base;
 bool Keys[1024];
 bool firstMouse = true;
+
 glm::vec3 pointLightPositions[] =
 {
 	glm::vec3(0.7f, 0.2f, 2.0f), //yellow
@@ -327,6 +329,7 @@ void initialiseLights(Shader * lightShader)
 
 
 	// Directional light
+	//Light Test = DirectionalLight(lightShader);
 	glUniform3f(glGetUniformLocation(lightShader->shaderProgram, "dirLight.direction"), -0.2f, -1.0f, -0.3f);
 	glUniform3f(glGetUniformLocation(lightShader->shaderProgram, "dirLight.ambient"), 0.05f, 0.05f, 0.05f);
 	glUniform3f(glGetUniformLocation(lightShader->shaderProgram, "dirLight.diffuse"), 0.4f, 0.4f, 0.4f);
@@ -335,11 +338,13 @@ void initialiseLights(Shader * lightShader)
 	// Point light 1
 	glUniform3f(glGetUniformLocation(lightShader->shaderProgram, "pointLights[0].position"), pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 	glUniform3f(glGetUniformLocation(lightShader->shaderProgram, "pointLights[0].ambient"), 0.05f, 0.05f, 0.05f);
-	glUniform3f(glGetUniformLocation(lightShader->shaderProgram, "pointLights[0].diffuse"), pointLightColours[0].x, pointLightColours[0].y, pointLightColours[0].z);
+//	glUniform3f(glGetUniformLocation(lightShader->shaderProgram, "pointLights[0].diffuse"), pointLightColours[0].x, pointLightColours[0].y, pointLightColours[0].z);
+	lightShader->setVec3("pointLights[0].diffuse", glm::vec3(pointLightColours[0].x, pointLightColours[0].y, pointLightColours[0].z));
 	glUniform3f(glGetUniformLocation(lightShader->shaderProgram, "pointLights[0].specular"), 1.0f, 1.0f, 1.0f);
 	glUniform1f(glGetUniformLocation(lightShader->shaderProgram, "pointLights[0].constant"), 1.0f);
 	glUniform1f(glGetUniformLocation(lightShader->shaderProgram, "pointLights[0].linear"), 0.09f);
 	glUniform1f(glGetUniformLocation(lightShader->shaderProgram, "pointLights[0].quadratic"), 0.032f);
+
 
 	// Point light 2
 	glUniform3f(glGetUniformLocation(lightShader->shaderProgram, "pointLights[1].position"), pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);

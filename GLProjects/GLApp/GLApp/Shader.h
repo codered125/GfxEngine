@@ -112,13 +112,25 @@ public:
 		glUseProgram(this->shaderProgram);
 	}
 
+	void setFloat(const std::string Accessor, float value)
+	{
+		glUniform1f(glGetUniformLocation(shaderProgram, Accessor.c_str()), value);
+	}
+
+
+	void setVec3(const std::string Accessor, glm::vec3 value)
+	{
+		glUniform3fv(glGetUniformLocation(shaderProgram, Accessor.c_str()), 1, &value[0]);
+	}
+
+	void setVec4(const std::string &Accessor, glm::vec4  &value)
+	{
+		glUniform4fv(glGetUniformLocation(shaderProgram, Accessor.c_str()), 1, &value[0]);
+	}
+
+	void setMat4(const std::string &Accessor, const glm::mat4 &value)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, Accessor.c_str()), 1, GL_FALSE, &value[0][0]);
+	}
 };
-
-
-
-
-
-
-
-
 #endif
