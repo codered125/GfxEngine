@@ -11,7 +11,7 @@ public:
 	GLfloat size;
 	GLfloat originPoint;
 	//SmoothShading
-	GLfloat vertices[288] = {
+	const GLfloat vertices[288] = {
 		//Front, back, left, right, down , up??
 			//xyz tex coord
 			// Positions            // Normals              // Texture Coords
@@ -58,7 +58,7 @@ public:
 			-0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,     0.0f,  1.0f
 	};
 
-	GLfloat skyboxVertices[108] = {
+	const GLfloat skyboxVertices[108] = {
 		// Positions 
 
 		-1.0f,  1.0f, -1.0f,

@@ -5,10 +5,27 @@
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
 #include <gtc\type_ptr.hpp>
+#include "Shader.h"
+
+using namespace std;
+
+
+
+enum LightType 
+{
+Point, Directional, Spot, nulls
+};
+
 
 struct Light
 {
-	std::string ShaderRef;
+	Light(Shader * inShader, LightType inType)
+	{
+		ltype = inType;
+		ShaderRef = inShader;
+	};
+
+	Shader * ShaderRef;
 	float cutOff;
 	float outerCutOff;
 	float constant;
@@ -20,23 +37,15 @@ struct Light
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
-	Light(std::string inShaderStorageName)
-	{
-		ShaderRef = inShaderStorageName;
-	};
+	
+	LightType ltype;
+	const GLchar accessor;
 
 };
 
 
+inline  Light PointLight(Shader * macShader) { return Light(macShader, LightType::Point); };
 
-#ifndef PointLight
+inline  Light SpotLight(Shader * macShader) { return Light(macShader, LightType::Spot); };
 
-#endif // !PointLight
-
-#ifndef SpotLight
-
-#endif // !PointLight
-
-#ifndef DirectionalLight
-
-#endif // !PointLight
+inline  Light DirectionalLight(Shader * macShader) { return Light(macShader, LightType::Directional); };
