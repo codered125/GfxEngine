@@ -19,13 +19,7 @@ Point, Directional, Spot, nulls
 
 struct Light
 {
-	Light(Shader * inShader, LightType inType)
-	{
-		ltype = inType;
-		ShaderRef = inShader;
-	};
-
-	Shader * ShaderRef;
+	Shader * ShaderRef = nullptr;
 	float cutOff;
 	float outerCutOff;
 	float constant;
@@ -38,14 +32,33 @@ struct Light
 	glm::vec3 diffuse;
 	glm::vec3 specular;
 	
-	LightType ltype;
-	const GLchar accessor;
+	LightType ltype = LightType::nulls;
+	std::string accessor, pos, dir, ambi, diff, spec = "";
+
+	Light(Shader * inShader, LightType inType, std::string inAccessor) : ltype(inType), ShaderRef(inShader)
+	{
+		accessor = inAccessor;
+		pos = inAccessor + ".position";
+		dir = inAccessor + ".direction";
+		ambi = inAccessor + ".ambient";
+		diff = inAccessor + ".diffuse";
+		spec = inAccessor + ".specular";
+	};
+
+	void setUpShader()
+	{
+		ShaderRef->setVec3(pos, position);
+		ShaderRef->setVec3(dir, direction);
+		ShaderRef->setVec3(ambi, ambient);
+		ShaderRef->setVec3(diff, diffuse);
+		ShaderRef->setVec3(spec, specular);
+	}
 
 };
 
 
-inline  Light PointLight(Shader * macShader) { return Light(macShader, LightType::Point); };
+inline  Light PointLight(Shader * macShader, std::string macAccessor) { return Light(macShader, LightType::Point, macAccessor); };
 
-inline  Light SpotLight(Shader * macShader) { return Light(macShader, LightType::Spot); };
+inline  Light SpotLight(Shader * macShader, std::string macAccessor) { return Light(macShader, LightType::Spot, macAccessor); };
 
-inline  Light DirectionalLight(Shader * macShader) { return Light(macShader, LightType::Directional); };
+inline  Light DirectionalLight(Shader * macShader, std::string macAccessor) { return Light(macShader, LightType::Directional, macAccessor); };
