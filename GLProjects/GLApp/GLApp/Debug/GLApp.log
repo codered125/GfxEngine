@@ -8,6 +8,5 @@ d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(222): warning C424
 d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(223): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
 d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(239): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
 d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(248): warning C4101: 'lightVBO': unreferenced local variable
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
   GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.pdb (Partial PDB)
