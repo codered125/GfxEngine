@@ -37,10 +37,10 @@ bool firstMouse = true;
 
 glm::vec3 pointLightPositions[] =
 {
-	glm::vec3(0.7f, 0.2f, 2.0f), //yellow
-	glm::vec3(2.3f, -2.3f, -2.0f), //Greeb
-	glm::vec3(-2.0f, 2.0f, -2.0f), //Red
-	glm::vec3(0.0f, 0.0f, -2.0f) //Blue
+	glm::vec3(2.0f, 0.0f, 3.0f), //yellow
+	glm::vec3(2.0f, 0.0f, -2.0f), //Greeb
+	glm::vec3(-2.0f, 0.0f, -2.0f), //Red
+	glm::vec3(-2.0f, 0.0f, 3.0f) //Blue
 };
 glm::vec3 pointLightColours[] =
 {
@@ -49,12 +49,11 @@ glm::vec3 pointLightColours[] =
 	glm::vec3(0.0f, 1.0f, 0.0f),//Green
 	glm::vec3(1.0f, 0.0f, 0.0f),//Red
 	glm::vec3(0.0f, 0.0f, 1.0f)//Blue
-							   /*
-
-							   glm::vec3(1.0f, 1.0f, 1.0f),
-							   glm::vec3(1.0f, 1.0f, 1.0f),
-							   glm::vec3(1.0f, 1.0f, 1.0f),
-							   glm::vec3(1.0f, 1.0f, 1.0f)
+	/*
+	 glm::vec3(1.0f, 1.0f, 1.0f),
+	 glm::vec3(1.0f, 1.0f, 1.0f),
+	glm::vec3(1.0f, 1.0f, 1.0f),
+	 glm::vec3(1.0f, 1.0f, 1.0f)
 							   */
 };
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
@@ -107,6 +106,7 @@ int main()
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_MULTISAMPLE);
 
 	Shader shader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
@@ -226,6 +226,7 @@ void  GLFWInit()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	//Toggles Resizeability
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 }
 
 void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode)
