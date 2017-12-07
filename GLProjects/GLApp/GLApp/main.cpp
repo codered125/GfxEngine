@@ -111,6 +111,8 @@ int main()
 	Shader shader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
+	Shader FloorShader("Shaders/Lighting.vs", "Shaders/Lighting.frag");
+	
 	//Model ourModel("Models/Nanosuit/nanosuit.obj");
 	Model ourModel("Models/OldMan/muro.obj");
 
@@ -163,10 +165,43 @@ int main()
 		ourModel.Draw(&shader);
 		DrawLights(&lampShader);
 
+		FloorShader.use();
+		GLuint floorTexture = TextureLoading::LoadTexture("Images/box.png");
+		GLuint floorTexSpec = TextureLoading::LoadTexture("Images/box_spec.png");
+		GLuint VBO, VAO;
+		glGenBuffers(1, &VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+		glGenVertexArrays(1, &VAO);
+		glBindVertexArray(VAO);
+
+		
+		glBufferData(GL_ARRAY_BUFFER, sizeof(&base.vertices), base.vertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
+		glEnableVertexAttribArray(0);
+
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *) (3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
+
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(6 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(2);
+
+		glUniform1i(glGetUniformLocation(FloorShader.shaderProgram, "material.diffuse"), 0);
+		glUniform1i(glGetUniformLocation(FloorShader.shaderProgram, "material.specular"), 1);
 
 
+		glUniformMatrix4fv(glGetUniformLocation(FloorShader.shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+		glUniformMatrix4fv(glGetUniformLocation(FloorShader.shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
+		model = glm::mat4();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, floorTexture);
 
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, floorTexSpec);
+		glUniformMatrix4fv(glGetUniformLocation(FloorShader.shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		initialiseLights(&FloorShader);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		//swap screen buffers
 		glfwSwapBuffers(window);
 
