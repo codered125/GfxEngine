@@ -176,7 +176,7 @@ int main()
 		glBindVertexArray(VAO);
 
 		
-		glBufferData(GL_ARRAY_BUFFER, sizeof(&base.vertices), base.vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), &base.vertices, GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
 		glEnableVertexAttribArray(0);
 
@@ -188,12 +188,14 @@ int main()
 
 		glUniform1i(glGetUniformLocation(FloorShader.shaderProgram, "material.diffuse"), 0);
 		glUniform1i(glGetUniformLocation(FloorShader.shaderProgram, "material.specular"), 1);
-
+		FloorShader.setFloat("material.shininess", 16.0f);
 
 		glUniformMatrix4fv(glGetUniformLocation(FloorShader.shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
 		glUniformMatrix4fv(glGetUniformLocation(FloorShader.shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
 		model = glm::mat4();
+		model = glm::scale(model, glm::vec3(10.0f, 0.5f, 10.0f));
+		model = glm::translate(model, glm::vec3(0.0f, -4.0f, 0.05));
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, floorTexture);
 
