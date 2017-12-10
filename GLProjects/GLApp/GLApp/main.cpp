@@ -29,8 +29,7 @@ void DrawSkybox(Shader * skyboxShaderRef, vector<const GLchar*> * facesRef);
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
-GLfloat deltaTime = 0.0f;
-GLfloat lastFrame = 0.0f;
+GLfloat deltaTime, SecondCounter,lastFrame = 0.0f;
 Cube base;
 bool Keys[1024];
 bool firstMouse = true;
@@ -277,6 +276,8 @@ void Tick()
 	GLfloat currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
+	SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + deltaTime;
+
 
 }
 
@@ -312,8 +313,8 @@ void DrawLights(Shader * lampShader)
 		model = glm::translate(model, pointLightPositions[i]);
 		model = glm::scale(model, glm::vec3(0.2f));
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		GLfloat convert[3] = { pointLightColours[i].x,pointLightColours[i].y,pointLightColours[i].z };
-		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, convert);
+		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &pointLightColours[i][0]);
+		lampShader->setFloat("inTime", SecondCounter);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 	glBindVertexArray(0);
