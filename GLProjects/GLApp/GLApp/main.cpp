@@ -25,7 +25,7 @@ void Tick();
 
 void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
-void DrawSkybox(Shader * skyboxShaderRef, vector<const GLchar*> * facesRef);
+void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
@@ -82,8 +82,6 @@ int main()
 
 	//Makes current windows
 	glfwMakeContextCurrent(window);
-
-
 	glfwSetKeyCallback(window, KeyCallback);
 	glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -107,14 +105,13 @@ int main()
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_MULTISAMPLE);
 
-	Shader shader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
+	Shader Modelshader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	Shader FloorShader("Shaders/Lighting.vs", "Shaders/Lighting.frag");
 	
 	//Model ourModel("Models/Nanosuit/nanosuit.obj");
 	Model ourModel("Models/OldMan/muro.obj");
-
 
 
 
@@ -126,6 +123,9 @@ int main()
 	faces.push_back("Images/deser/bottom.tga");
 	faces.push_back("Images/deser/back.tga");
 	faces.push_back("Images/deser/front.tga");
+	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
+	GLuint floorTexture = TextureLoading::LoadTexture("Images/box.png");
+	GLuint floorTexSpec = TextureLoading::LoadTexture("Images/box_spec.png");
 
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
@@ -141,14 +141,14 @@ int main()
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		DrawSkybox(&skyboxShader, &faces);
+		DrawSkybox(&skyboxShader, &cubemapTexture);
 
 
-		shader.use();
+		Modelshader.use();
 
 		glm::mat4 view = ourCamera.GetViewMatrix();
-		glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
-		glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(Modelshader.shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+		glUniformMatrix4fv(glGetUniformLocation(Modelshader.shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
@@ -156,17 +156,16 @@ int main()
 		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
 		//model = glm::rotate(model, -90.0f , glm::vec3( 1.0f, 0.0f, 0.0f));
 
-		glUniformMatrix4fv(glGetUniformLocation(shader.shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		initialiseLights(&shader);
+		glUniformMatrix4fv(glGetUniformLocation(Modelshader.shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		initialiseLights(&Modelshader);
 		GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
 
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		ourModel.Draw(&shader);
+		ourModel.Draw(&Modelshader);
 		DrawLights(&lampShader);
 
 		FloorShader.use();
-		GLuint floorTexture = TextureLoading::LoadTexture("Images/box.png");
-		GLuint floorTexSpec = TextureLoading::LoadTexture("Images/box_spec.png");
+
 		GLuint VBO, VAO;
 		glGenBuffers(1, &VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -320,7 +319,7 @@ void DrawLights(Shader * lampShader)
 	glBindVertexArray(0);
 }
 
-void DrawSkybox(Shader * skyboxShaderRef, vector<const GLchar*> *facesRef)
+void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 {
 	// Draw skybox as last
 	// skybox cube
@@ -349,8 +348,8 @@ void DrawSkybox(Shader * skyboxShaderRef, vector<const GLchar*> *facesRef)
 
 	glBindVertexArray(skyboxVAO);
 	glActiveTexture(GL_TEXTURE0);
-	GLuint cubemapTexture = TextureLoading::LoadCubemap(*facesRef);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	//GLuint cubemapTexture = TextureLoading::LoadCubemap(*facesRef);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, *facesRef);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS); // Set depth function back to default
