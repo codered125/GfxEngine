@@ -26,6 +26,8 @@ void Tick();
 void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
+void DrawModel(Shader * modelShader, Model * ourModel);
+void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex);
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
@@ -142,69 +144,12 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		DrawSkybox(&skyboxShader, &cubemapTexture);
-
-
-		Modelshader.use();
-
-		glm::mat4 view = ourCamera.GetViewMatrix();
-		glUniformMatrix4fv(glGetUniformLocation(Modelshader.shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
-		glUniformMatrix4fv(glGetUniformLocation(Modelshader.shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-		glm::mat4 model;
-		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
-		//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-		//model = glm::rotate(model, -90.0f , glm::vec3( 1.0f, 0.0f, 0.0f));
-
-		glUniformMatrix4fv(glGetUniformLocation(Modelshader.shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		initialiseLights(&Modelshader);
-		GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
-
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		ourModel.Draw(&Modelshader);
 		DrawLights(&lampShader);
+		DrawModel(&Modelshader, &ourModel);
+		DrawBox(&FloorShader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec);
 
-		FloorShader.use();
-
-		GLuint VBO, VAO;
-		glGenBuffers(1, &VBO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-		glGenVertexArrays(1, &VAO);
-		glBindVertexArray(VAO);
-
-		
-		glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), &base.vertices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *) (3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(1);
-
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(6 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(2);
-
-		glUniform1i(glGetUniformLocation(FloorShader.shaderProgram, "material.diffuse"), 0);
-		glUniform1i(glGetUniformLocation(FloorShader.shaderProgram, "material.specular"), 1);
-		FloorShader.setFloat("material.shininess", 16.0f);
-
-		glUniformMatrix4fv(glGetUniformLocation(FloorShader.shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
-		glUniformMatrix4fv(glGetUniformLocation(FloorShader.shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-		model = glm::mat4();
-		model = glm::scale(model, glm::vec3(10.0f, 0.5f, 10.0f));
-		model = glm::translate(model, glm::vec3(0.0f, -4.0f, 0.05));
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, floorTexture);
-
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, floorTexSpec);
-		glUniformMatrix4fv(glGetUniformLocation(FloorShader.shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		initialiseLights(&FloorShader);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
 		//swap screen buffers
 		glfwSwapBuffers(window);
-
 	}
 
 	glfwTerminate();
@@ -313,7 +258,7 @@ void DrawLights(Shader * lampShader)
 		model = glm::scale(model, glm::vec3(0.2f));
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &pointLightColours[i][0]);
-		lampShader->setFloat("inTime", SecondCounter);
+		lampShader->setFloat("outTime", SecondCounter);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 	glBindVertexArray(0);
@@ -355,6 +300,77 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 	glDepthFunc(GL_LESS); // Set depth function back to default
 
 
+}
+
+void DrawModel(Shader * modelShader, Model * ourModel)
+{
+
+	modelShader->use();
+	modelShader->setFloat("Time", SecondCounter);
+
+
+	glm::mat4 FOV;
+	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+
+	glm::mat4 view = ourCamera.GetViewMatrix();
+	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+	glm::mat4 model;
+	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
+	//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+	//model = glm::rotate(model, -90.0f , glm::vec3( 1.0f, 0.0f, 0.0f));
+
+	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	initialiseLights(modelShader);
+	ourModel->Draw(modelShader);
+}
+
+void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex)
+{
+
+	floorShader->use();
+	GLuint VBO, VAO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), &base.vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
+	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.diffuse"), 0);
+	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.specular"), 1);
+	floorShader->setFloat("material.shininess", 16.0f);
+	floorShader->setFloat("Time", SecondCounter);
+	glm::mat4 FOV;
+	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+
+	glm::mat4 view = ourCamera.GetViewMatrix();
+	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	
+	glm::mat4 model;
+	model = glm::mat4();
+	model = glm::scale(model, glm::vec3(10.0f, 0.5f, 10.0f));
+	model = glm::translate(model, Translation);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, *difftex);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, *spectex);
+	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	initialiseLights(floorShader);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 void initialiseLights(Shader * lightShader)

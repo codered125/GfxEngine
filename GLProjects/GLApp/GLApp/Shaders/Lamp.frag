@@ -1,6 +1,6 @@
 #version 330 core
 in vec3 Colour;
-in float outTime;
+uniform float outTime;
 out vec4 color;
 
 void main ()

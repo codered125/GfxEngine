@@ -55,6 +55,7 @@ uniform DirLight dirLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
+uniform float Time;
 
 // Function prototypes
 vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir );
@@ -96,7 +97,6 @@ vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir )
     vec3 ambient = light.ambient * vec3( texture( material.diffuse, TexCoords ) );
     vec3 diffuse = light.diffuse * diff * vec3( texture( material.diffuse, TexCoords ) );
     vec3 specular = light.specular * spec * vec3( texture( material.specular, TexCoords ) );
-    
     return ( ambient + diffuse + specular );
 }
 
@@ -128,6 +128,9 @@ vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
+
+	vec3 zero = vec3(0.0f, 0.0f, 0.0f);
+	diffuse = zero + ((diffuse - zero) * Time);
     
     return ( ambient + diffuse + specular );
 }

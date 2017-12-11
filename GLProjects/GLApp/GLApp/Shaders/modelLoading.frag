@@ -56,6 +56,7 @@ uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
 uniform samplerCube skybox;
+uniform float Time;
 
 vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir );
 vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir );
@@ -133,6 +134,9 @@ vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
+
+	vec3 zero = vec3(0.0f, 0.0f, 0.0f);
+	diffuse = zero + ((diffuse - zero) * Time);
     
     return ( ambient + diffuse + specular );
 }
