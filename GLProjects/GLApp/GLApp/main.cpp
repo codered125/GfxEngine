@@ -26,7 +26,7 @@ void Tick();
 void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
-void DrawModel(Shader * modelShader, Model * ourModel);
+void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model);
 void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex);
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
@@ -108,13 +108,14 @@ int main()
 	glEnable(GL_MULTISAMPLE);
 
 	Shader Modelshader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
+	Shader DeskShader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	Shader FloorShader("Shaders/Lighting.vs", "Shaders/Lighting.frag");
 	
 	//Model ourModel("Models/Nanosuit/nanosuit.obj");
 	Model ourModel("Models/OldMan/muro.obj");
-
+	Model deskModel("Models/Desk/Obj/Greydon Desk.obj");
 
 
 	// Cubemap (Skybox)
@@ -145,7 +146,18 @@ int main()
 
 		DrawSkybox(&skyboxShader, &cubemapTexture);
 		DrawLights(&lampShader);
-		DrawModel(&Modelshader, &ourModel);
+
+		glm::mat4 modelTransformation;
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0.0f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
+		DrawModel(&Modelshader, &ourModel, modelTransformation);
+		
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 1.75f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
+		modelTransformation = glm::rotate(modelTransformation, glm::degrees(80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		DrawModel(&DeskShader, &deskModel, modelTransformation);
+		
 		DrawBox(&FloorShader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec);
 
 		//swap screen buffers
@@ -220,7 +232,7 @@ void Tick()
 	GLfloat currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-	SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + deltaTime;
+	SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (deltaTime / 3);
 
 
 }
@@ -302,7 +314,7 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 
 }
 
-void DrawModel(Shader * modelShader, Model * ourModel)
+void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model)
 {
 
 	modelShader->use();
@@ -315,13 +327,6 @@ void DrawModel(Shader * modelShader, Model * ourModel)
 	glm::mat4 view = ourCamera.GetViewMatrix();
 	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
 	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-	model = glm::scale(model, glm::vec3(0.01f, 0.01f, 0.01f));
-	//model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-	//model = glm::rotate(model, -90.0f , glm::vec3( 1.0f, 0.0f, 0.0f));
-
 	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	initialiseLights(modelShader);
 	ourModel->Draw(modelShader);
