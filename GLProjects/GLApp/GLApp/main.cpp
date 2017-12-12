@@ -108,10 +108,8 @@ int main()
 	glEnable(GL_MULTISAMPLE);
 
 	Shader Modelshader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
-	Shader DeskShader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
-	Shader FloorShader("Shaders/Lighting.vs", "Shaders/Lighting.frag");
 	
 	//Model ourModel("Models/Nanosuit/nanosuit.obj");
 	Model ourModel("Models/OldMan/muro.obj");
@@ -142,7 +140,7 @@ int main()
 
 		//RENDER
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
 		DrawSkybox(&skyboxShader, &cubemapTexture);
 		DrawLights(&lampShader);
@@ -151,14 +149,18 @@ int main()
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
 		DrawModel(&Modelshader, &ourModel, modelTransformation);
-		
+
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 1.75f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
 		modelTransformation = glm::rotate(modelTransformation, glm::degrees(80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		DrawModel(&DeskShader, &deskModel, modelTransformation);
-		
-		DrawBox(&FloorShader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec);
+		DrawModel(&Modelshader, &deskModel, modelTransformation);
+
+		DrawBox(&Modelshader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec);
+
+
+
+
 
 		//swap screen buffers
 		glfwSwapBuffers(window);
