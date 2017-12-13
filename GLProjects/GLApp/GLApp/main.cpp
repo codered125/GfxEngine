@@ -110,6 +110,7 @@ int main()
 	Shader Modelshader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
+	Shader simpleDepthShader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
 	
 	//Model ourModel("Models/Nanosuit/nanosuit.obj");
 	Model ourModel("Models/OldMan/muro.obj");
@@ -130,6 +131,8 @@ int main()
 
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+	GLuint DPTex, DPFBO;
+	TextureLoading::SetupDPMapTex(&DPFBO, &DPTex);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -138,9 +141,23 @@ int main()
 		glfwPollEvents();
 		DoMovement();
 
-		//RENDER
-		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+		//ShadowMapPass
+		glViewport(0, 0, 1024, 1024);
+		glBindFramebuffer(GL_FRAMEBUFFER, DPFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
+		float nearPlane = 1.0f, farPlane = 7.5;
+		glm::mat4 lightProj = glm::orthoLH(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
+		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f));
+		glm::mat4 lightSpace = lightProj * lightView;
+
+
+
+
+		//RENDER
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+		glClear(GL_DEPTH_BUFFER_BIT );
 
 		DrawSkybox(&skyboxShader, &cubemapTexture);
 		DrawLights(&lampShader);
