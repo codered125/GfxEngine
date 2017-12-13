@@ -173,6 +173,8 @@
     <None Include="Shaders\Lighting.vs" />
     <None Include="Shaders\modelLoading.frag" />
     <None Include="Shaders\modelLoading.vs" />
+    <None Include="Shaders\ShadowMapping.frag" />
+    <None Include="Shaders\ShadowMapping.vs" />
     <None Include="Shaders\Skybox.frag" />
     <None Include="Shaders\Skybox.vs" />
   </ItemGroup>
