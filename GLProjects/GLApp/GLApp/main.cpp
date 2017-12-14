@@ -26,8 +26,8 @@ void Tick();
 void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
-void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model);
-void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex);
+void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool depthTest);
+void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex, bool depthTest);
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
@@ -119,12 +119,12 @@ int main()
 
 	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
-	faces.push_back("Images/deser/right.tga");
-	faces.push_back("Images/deser/left.tga");
-	faces.push_back("Images/deser/top.tga");
-	faces.push_back("Images/deser/bottom.tga");
-	faces.push_back("Images/deser/back.tga");
-	faces.push_back("Images/deser/front.tga");
+	faces.push_back("Images/HRSkybox/right.png");
+	faces.push_back("Images/HRSkybox/left.png");
+	faces.push_back("Images/HRSkybox/top.png");
+	faces.push_back("Images/HRSkybox/bottom.png");
+	faces.push_back("Images/HRSkybox/back.png");
+	faces.push_back("Images/HRSkybox/front.png");
 	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
 	GLuint floorTexture = TextureLoading::LoadTexture("Images/box.png");
 	GLuint floorTexSpec = TextureLoading::LoadTexture("Images/box_spec.png");
@@ -132,7 +132,8 @@ int main()
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	GLuint DPTex, DPFBO;
-	TextureLoading::SetupDPMapTex(&DPFBO, &DPTex);
+	//TextureLoading::SetupDPMapTex(&DPFBO, &DPTex);
+	float roationangle = 0;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -141,15 +142,36 @@ int main()
 		glfwPollEvents();
 		DoMovement();
 
+		/*
 		//ShadowMapPass
-		glViewport(0, 0, 1024, 1024);
-		glBindFramebuffer(GL_FRAMEBUFFER, DPFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		float nearPlane = 1.0f, farPlane = 7.5;
 		glm::mat4 lightProj = glm::orthoLH(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
 		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f));
 		glm::mat4 lightSpace = lightProj * lightView;
 
+		simpleDepthShader.use();
+		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpace);
+
+		glViewport(0, 0, 1024, 1024);
+		glBindFramebuffer(GL_FRAMEBUFFER, DPFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(GL_TEXTURE0);
+
+		glm::mat4 modelTransformation;
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0.0f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
+		DrawModel(&simpleDepthShader, &ourModel, modelTransformation, false);
+
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 1.75f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
+		modelTransformation = glm::rotate(modelTransformation, glm::degrees(80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		DrawModel(&simpleDepthShader, &deskModel, modelTransformation, false);
+
+		DrawBox(&simpleDepthShader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec, false);
+		*/
 
 
 
@@ -157,23 +179,23 @@ int main()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
-		glClear(GL_DEPTH_BUFFER_BIT );
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		DrawSkybox(&skyboxShader, &cubemapTexture);
 		DrawLights(&lampShader);
 
-		glm::mat4 modelTransformation;
+		glm::mat4 modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
-		DrawModel(&Modelshader, &ourModel, modelTransformation);
+		DrawModel(&Modelshader, &ourModel, modelTransformation, false);
 
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 1.75f));
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 3.75f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
-		modelTransformation = glm::rotate(modelTransformation, glm::degrees(80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		DrawModel(&Modelshader, &deskModel, modelTransformation);
+		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.3f), glm::vec3(0.0f, 1.0f, 0.0f));
+		DrawModel(&Modelshader, &deskModel, modelTransformation, false);
 
-		DrawBox(&Modelshader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec);
+		DrawBox(&Modelshader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec, false);
 
 
 
@@ -251,7 +273,7 @@ void Tick()
 	GLfloat currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-	SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (deltaTime / 3);
+	SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (deltaTime / 7);
 
 
 }
@@ -333,7 +355,7 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 
 }
 
-void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model)
+void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool depthTest)
 {
 
 	modelShader->use();
@@ -351,7 +373,7 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model)
 	ourModel->Draw(modelShader);
 }
 
-void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex)
+void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex, bool depthTest)
 {
 
 	floorShader->use();
@@ -411,7 +433,7 @@ void initialiseLights(Shader * lightShader)
 	Directional0.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
 	Directional0.ambient = glm::vec3(0.05f);
 	Directional0.diffuse = glm::vec3(0.4f);
-	Directional0.specular = glm::vec3(0.5f);
+	Directional0.specular = glm::vec3(0.5f, 0.5f, 0.2f);
 	Directional0.setUpShader();
 
 
