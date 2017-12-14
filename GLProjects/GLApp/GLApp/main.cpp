@@ -400,10 +400,12 @@ void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLui
 	floorShader->setFloat("Time", SecondCounter);
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
-	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+	floorShader->setMat4("projection", FOV);
+	//glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
 
 	glm::mat4 view = ourCamera.GetViewMatrix();
-	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	floorShader->setMat4("view", view);
+	//glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	
 	glm::mat4 model;
 	model = glm::mat4();
