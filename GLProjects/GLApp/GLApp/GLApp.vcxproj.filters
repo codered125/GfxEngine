@@ -88,6 +88,12 @@
     <None Include="Shaders\ShadowMapping.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="Shaders\framebuffersScreen.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\framebuffersScreen.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc">

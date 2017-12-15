@@ -27,7 +27,7 @@ void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
 void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool depthTest);
-void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex, bool depthTest);
+void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
@@ -35,7 +35,7 @@ GLfloat deltaTime, SecondCounter,lastFrame = 0.0f;
 Cube base;
 bool Keys[1024];
 bool firstMouse = true;
-
+bool hdr = false;
 glm::vec3 pointLightPositions[] =
 {
 	glm::vec3(2.0f, 0.0f, 3.0f), //yellow
@@ -50,12 +50,6 @@ glm::vec3 pointLightColours[] =
 	glm::vec3(0.0f, 1.0f, 0.0f),//Green
 	glm::vec3(1.0f, 0.0f, 0.0f),//Red
 	glm::vec3(0.0f, 0.0f, 1.0f)//Blue
-	/*
-	 glm::vec3(1.0f, 1.0f, 1.0f),
-	 glm::vec3(1.0f, 1.0f, 1.0f),
-	glm::vec3(1.0f, 1.0f, 1.0f),
-	 glm::vec3(1.0f, 1.0f, 1.0f)
-							   */
 };
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -110,7 +104,7 @@ int main()
 	Shader Modelshader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
-	Shader simpleDepthShader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
+	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
 	
 	//Model ourModel("Models/Nanosuit/nanosuit.obj");
 	Model ourModel("Models/OldMan/muro.obj");
@@ -129,63 +123,84 @@ int main()
 	GLuint floorTexture = TextureLoading::LoadTexture("Images/box.png");
 	GLuint floorTexSpec = TextureLoading::LoadTexture("Images/box_spec.png");
 
-	glm::mat4 FOV;
-	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
-	GLuint DPTex, DPFBO;
-	//TextureLoading::SetupDPMapTex(&DPFBO, &DPTex);
-	float roationangle = 0;
-	GLuint fbo;
+
+	GLuint cubeVBO, cubeVAO;
+	glGenBuffers(1, &cubeVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+
+	glGenVertexArrays(1, &cubeVAO);
+	glBindVertexArray(cubeVAO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), &base.vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
+	GLuint fbo, quadVAO, quadVBO;
+	glGenVertexArrays(1, &quadVAO);
+	glGenBuffers(1, &quadVBO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(base.quadVertices), &base.quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	screenShader.use();
+	screenShader.setInt("screenTexture", 0);
+
 	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	GLuint texColourBuffer;
+	glGenTextures(1, &texColourBuffer);
+	glBindTexture(GL_TEXTURE_2D, texColourBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColourBuffer, 0);
+
+	
+	
+	GLuint rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColourBuffer, 0);
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "Failed Renderbuffer" << endl;
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+
 	while (!glfwWindowShouldClose(window))
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		}
 		Tick();
 		//check for events/inputs
 		glfwPollEvents();
 		DoMovement();
 
-		/*
-		//ShadowMapPass
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
+								 // make sure we clear the framebuffer's content
+		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		float nearPlane = 1.0f, farPlane = 7.5;
-		glm::mat4 lightProj = glm::orthoLH(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
-		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f));
-		glm::mat4 lightSpace = lightProj * lightView;
-
-		simpleDepthShader.use();
-		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpace);
-
-		glViewport(0, 0, 1024, 1024);
-		glBindFramebuffer(GL_FRAMEBUFFER, DPFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glActiveTexture(GL_TEXTURE0);
-
-		glm::mat4 modelTransformation;
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0.0f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
-		DrawModel(&simpleDepthShader, &ourModel, modelTransformation, false);
-
-		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 1.75f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
-		modelTransformation = glm::rotate(modelTransformation, glm::degrees(80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		DrawModel(&simpleDepthShader, &deskModel, modelTransformation, false);
-
-		DrawBox(&simpleDepthShader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec, false);
-		*/
-
-
 
 		//RENDER
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		DrawSkybox(&skyboxShader, &cubemapTexture);
 		DrawLights(&lampShader);
@@ -201,10 +216,25 @@ int main()
 		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.3f), glm::vec3(0.0f, 1.0f, 0.0f));
 		DrawModel(&Modelshader, &deskModel, modelTransformation, false);
 
-		DrawBox(&Modelshader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec, false);
+		DrawBox(&Modelshader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
 
 
+		// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+		// clear all relevant buffers
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		screenShader.use();
+
+		glBindVertexArray(quadVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texColourBuffer);	// use the color attachment texture as the texture of the quad plane
+		hdr = true;
+		screenShader.setBool("hdr", hdr);
+		screenShader.setFloat("exposure", 1.0f);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
 		//swap screen buffers
@@ -379,27 +409,10 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool dep
 	ourModel->Draw(modelShader);
 }
 
-void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex, bool depthTest)
+void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO)
 {
 
 	floorShader->use();
-	GLuint VBO, VAO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), &base.vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-
 	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.diffuse"), 0);
 	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.specular"), 1);
 	floorShader->setFloat("material.shininess", 16.0f);
@@ -407,16 +420,19 @@ void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLui
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	floorShader->setMat4("projection", FOV);
-	//glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
 
 	glm::mat4 view = ourCamera.GetViewMatrix();
 	floorShader->setMat4("view", view);
-	//glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	
 	glm::mat4 model;
 	model = glm::mat4();
 	model = glm::scale(model, glm::vec3(10.0f, 0.5f, 10.0f));
 	model = glm::translate(model, Translation);
+
+	glBindVertexArray(*acubeVAO);
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, *difftex);
 
