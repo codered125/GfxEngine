@@ -134,9 +134,15 @@ int main()
 	GLuint DPTex, DPFBO;
 	//TextureLoading::SetupDPMapTex(&DPFBO, &DPTex);
 	float roationangle = 0;
-
+	GLuint fbo;
+	glGenFramebuffers(1, &fbo);
 	while (!glfwWindowShouldClose(window))
 	{
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
 		Tick();
 		//check for events/inputs
 		glfwPollEvents();
