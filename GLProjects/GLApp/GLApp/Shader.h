@@ -100,6 +100,8 @@ public:
 		{
 			glGetProgramInfoLog(this->shaderProgram, 512, NULL, infolog);
 			std::cout << "program  Fail\n" << infolog << std::endl;
+			std::cout << vertexPath << std::endl;
+			std::cout << fragmentPath << std::endl;
 		}
 
 		glDeleteShader(vertShader);
@@ -131,6 +133,16 @@ public:
 	void setMat4(const std::string &Accessor, const glm::mat4 &value)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, Accessor.c_str()), 1, GL_FALSE, &value[0][0]);
+	}
+
+	void setBool(const std::string &Accessor, bool value)
+	{
+		glUniform1i(glGetUniformLocation(shaderProgram, Accessor.c_str()), (int)value);
+	}
+
+	void setInt(const std::string &Accessor, int value)
+	{
+		glUniform1i(glGetUniformLocation(shaderProgram, Accessor.c_str()), value);
 	}
 };
 #endif

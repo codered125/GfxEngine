@@ -167,6 +167,8 @@
   <ItemGroup>
     <None Include="Shaders\core.vs" />
     <None Include="Shaders\frag.frag" />
+    <None Include="Shaders\framebuffersScreen.frag" />
+    <None Include="Shaders\framebuffersScreen.vs" />
     <None Include="Shaders\Lamp.frag" />
     <None Include="Shaders\Lamp.vs" />
     <None Include="Shaders\Lighting.frag" />
