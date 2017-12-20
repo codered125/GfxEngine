@@ -12,9 +12,9 @@
 #include "Light.h"
 #include "TextureLoading.h"
 
-	const GLint width = 1200, height = 800;
-
-void  GLFWInit();
+//const GLint width = 1200, height = 800;
+const GLint width = 1920, height = 1080;
+void GLFWSetUp();
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 void KeyCallback(GLFWwindow  * window, int key, int scancode, int action, int mode);
@@ -31,11 +31,12 @@ void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLui
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
-GLfloat deltaTime, SecondCounter,lastFrame = 0.0f;
+GLfloat deltaTime, SecondCounter, lastFrame = 0.0f;
 Cube base;
 bool Keys[1024];
 bool firstMouse = true;
 bool hdr = false;
+int AliasingCount = 16;
 glm::vec3 pointLightPositions[] =
 {
 	glm::vec3(2.0f, 0.0f, 3.0f), //yellow
@@ -57,9 +58,10 @@ glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 int main()
 {
 
-	GLFWInit();
+	GLFWSetUp();
 
 	//Creating window
+	
 
 	GLFWwindow *  window = glfwCreateWindow(width, height, "Moses Playboy Mansion", nullptr, nullptr);
 
@@ -105,9 +107,8 @@ int main()
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
-	
+
 	Model ourModel("Models/OldMan/muro.obj");
-	//Model ourModel("Models/Idle.fbx");
 	Model deskModel("Models/Desk/Obj/Greydon Desk.obj");
 
 
@@ -158,10 +159,11 @@ int main()
 	GLuint fbo;
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
 	GLuint texColourBuffer;
 	glGenTextures(1, &texColourBuffer);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColourBuffer);
-	glTexImage2D(GL_TEXTURE_2D_MULTISAMPLE, 0, GL_RGBA16F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, AliasingCount, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, GL_TRUE);
 	glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
@@ -173,7 +175,7 @@ int main()
 	GLuint rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, AliasingCount, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColourBuffer, 0);
@@ -195,7 +197,7 @@ int main()
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) std::cout << "Failed  intermediatte Renderbuffer" << endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
+
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 
 	screenShader.use();
@@ -229,7 +231,7 @@ int main()
 		DrawModel(&Modelshader, &deskModel, modelTransformation, false);
 
 		DrawBox(&Modelshader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
-		
+
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -241,14 +243,15 @@ int main()
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-		
+
 		screenShader.use();
+		screenShader.setInt("screenTexture", 0);
 		glBindVertexArray(quadVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, screenTexture);	// use the color attachment texture as the texture of the quad plane
-		hdr = true;
+		//hdr = true;
 		screenShader.setBool("hdr", hdr);
-		screenShader.setFloat("exposure", 1.0f);
+		screenShader.setFloat("exposure", 0.50f);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		//swap screen buffers
@@ -260,7 +263,7 @@ int main()
 	return EXIT_SUCCESS;
 }
 
-void  GLFWInit()
+void  GLFWSetUp()
 {
 	glfwInit();
 
@@ -273,7 +276,8 @@ void  GLFWInit()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	//Toggles Resizeability
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, AliasingCount);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glEnable(GL_MULTISAMPLE);
 }
 
@@ -327,7 +331,6 @@ void Tick()
 	lastFrame = currentFrame;
 	SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (deltaTime / 12);
 
-
 }
 
 void DrawLights(Shader * lampShader)
@@ -345,25 +348,24 @@ void DrawLights(Shader * lampShader)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glBindVertexArray(0);
 
-
 	glm::mat4 model;
+	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+	lampShader->setMat4("projection", FOV);
+	glm::mat4 view = ourCamera.GetViewMatrix();
+	lampShader->setMat4("view", view);
+	const float min = 0, max = 1;
+	float rotAngle = min + ((max - min) *SecondCounter);
 
-	glm::mat4 FOV;
-	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
-	glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
-
-	glm::mat4 view;
-	view = ourCamera.GetViewMatrix();
-	glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glBindVertexArray(lightVAO);
 	for (GLuint i = 0; i < 4; i++)
 	{
 		model = glm::mat4();
 		model = glm::translate(model, pointLightPositions[i]);
 		model = glm::scale(model, glm::vec3(0.2f));
+		//model = glm::rotate(model, 1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &pointLightColours[i][0]);
-		lampShader->setFloat("outTime", SecondCounter);
+		lampShader->setFloat("Time", SecondCounter);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 	glBindVertexArray(0);
@@ -387,7 +389,6 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
 
 
-
 	glDepthFunc(GL_LEQUAL);  // Change depth function so depth test passes when values are equal to depth buffer's content
 	glm::mat4 view = glm::mat4(glm::mat3(ourCamera.GetViewMatrix()));	// Remove any translation component of the view matrix
 	glUniformMatrix4fv(glGetUniformLocation(skyboxShaderRef->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -409,10 +410,8 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 
 void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool depthTest)
 {
-
 	modelShader->use();
 	modelShader->setFloat("Time", SecondCounter);
-
 
 	glm::mat4 FOV;
 	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
@@ -427,28 +426,25 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool dep
 
 void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO)
 {
-
 	floorShader->use();
 	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.diffuse"), 0);
 	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.specular"), 1);
 	floorShader->setFloat("material.shininess", 16.0f);
 	floorShader->setFloat("Time", SecondCounter);
-	glm::mat4 FOV;
-	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	floorShader->setMat4("projection", FOV);
 	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
 
 	glm::mat4 view = ourCamera.GetViewMatrix();
 	floorShader->setMat4("view", view);
 	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	
-	glm::mat4 model;
-	model = glm::mat4();
+
+	glm::mat4 model = glm::mat4();
 	model = glm::scale(model, glm::vec3(10.0f, 0.5f, 10.0f));
 	model = glm::translate(model, Translation);
 
 	glBindVertexArray(*acubeVAO);
-	
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, *difftex);
 
@@ -481,6 +477,7 @@ void initialiseLights(Shader * lightShader)
 	Light Point0 = PointLight(lightShader, "pointLights[0]");
 	Point0.diffuse = glm::vec3(pointLightColours[0].x, pointLightColours[0].y, pointLightColours[0].z);
 	Point0.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
+	Point0.specular = Point0.diffuse;
 	Point0.setUpShader();
 
 
@@ -488,18 +485,21 @@ void initialiseLights(Shader * lightShader)
 	Light Point1 = PointLight(lightShader, "pointLights[1]");
 	Point1.diffuse = glm::vec3(pointLightColours[1].x, pointLightColours[1].y, pointLightColours[1].z);
 	Point1.position = glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+	Point1.specular = Point1.diffuse;
 	Point1.setUpShader();
 
 	// Point light 3
 	Light Point2 = PointLight(lightShader, "pointLights[2]");
 	Point2.diffuse = glm::vec3(pointLightColours[2].x, pointLightColours[2].y, pointLightColours[2].z);
 	Point2.position = glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+	Point2.specular = Point2.diffuse;
 	Point2.setUpShader();
 
 	// Point light 4
 	Light Point3 = PointLight(lightShader, "pointLights[3]");
 	Point3.diffuse = glm::vec3(pointLightColours[3].x, pointLightColours[3].y, pointLightColours[3].z);
 	Point3.position = glm::vec3(pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
+	Point3.specular = Point3.diffuse;
 	Point3.setUpShader();
 
 
@@ -512,6 +512,6 @@ void initialiseLights(Shader * lightShader)
 	CameraSpot.specular = glm::vec3(1.0f);
 	CameraSpot.setUpShader();
 
-	
+
 
 }
