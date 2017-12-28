@@ -1,7 +1,4 @@
-﻿  Model.cpp
-  Generating Code...
-  Compiling...
-  main.cpp
+﻿  main.cpp
 d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(305): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
 d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(312): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
 d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(313): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
@@ -11,6 +8,5 @@ d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(320): warning C424
 d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(321): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
 d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(337): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
 d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(348): warning C4101: 'lightVBO': unreferenced local variable
-  Generating Code...
   GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
   GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.pdb (Partial PDB)

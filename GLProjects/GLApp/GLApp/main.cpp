@@ -115,12 +115,12 @@ int main()
 
 	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
-	faces.push_back("Images/HRSkybox/right.png");
-	faces.push_back("Images/HRSkybox/left.png");
-	faces.push_back("Images/HRSkybox/top.png");
-	faces.push_back("Images/HRSkybox/bottom.png");
-	faces.push_back("Images/HRSkybox/back.png");
-	faces.push_back("Images/HRSkybox/front.png");
+	faces.push_back("Images/GitSkybox/right.jpg");
+	faces.push_back("Images/GitSkybox/left.jpg");
+	faces.push_back("Images/GitSkybox/top.jpg");
+	faces.push_back("Images/GitSkybox/bottom.jpg");
+	faces.push_back("Images/GitSkybox/back.jpg");
+	faces.push_back("Images/GitSkybox/front.jpg");
 	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
 	GLuint floorTexture = TextureLoading::LoadTexture("Images/WoodPlanks_a_BaseColor.png");
 	GLuint floorTexSpec = TextureLoading::LoadTexture("Images/box_spec.png");
