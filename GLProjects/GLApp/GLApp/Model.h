@@ -106,6 +106,20 @@ private:
 				vertex.TexCoord = glm::vec2(0.0f, 0.0f);
 			}
 
+			if (mesh->mTangents != nullptr)
+			{
+				vector.x = mesh->mTangents[i].x;
+				vector.y = mesh->mTangents[i].y;
+				vector.z = mesh->mTangents[i].z;
+				vertex.Tangent = vector;
+			}
+			// bitangent
+			if (mesh->mBitangents != nullptr) {
+				vector.x = mesh->mBitangents[i].x;
+				vector.y = mesh->mBitangents[i].y;
+				vector.z = mesh->mBitangents[i].z;
+				vertex.Bitanget = vector;
+			}
 			vertices.push_back(vertex);
 
 		}
@@ -129,6 +143,11 @@ private:
 
 			vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+			vector<Texture> normalMaps = this->loadMaterialTextures(material, aiTextureType_HEIGHT, "material.texture_normal");
+			textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+
+			vector<Texture> heightMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "material.texture_height");
 		}
 
 		return Mesh(vertices, indices, textures);
