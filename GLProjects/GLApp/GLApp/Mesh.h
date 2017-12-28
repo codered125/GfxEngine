@@ -21,6 +21,8 @@ struct  Vertex
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoord;
+	glm::vec3 Tangent;
+	glm::vec3 Bitanget;
 };
 
 struct Texture
@@ -50,6 +52,8 @@ public:
 	{
 		GLuint diffuseNr = 1;
 		GLuint specularNR = 1;
+		GLuint normalNR = 1;
+		GLuint heightNR = 1;
 
 		for (GLuint i = 0; i < this->textures.size(); i++)
 		{
@@ -66,6 +70,15 @@ public:
 			else if ("material.texture_specular" == name)
 			{
 				ss << specularNR++;
+			}
+			else if ("material.texture_normal" == name)
+			{
+				ss << normalNR++;
+			}
+
+			else if ("material.texture_height" == name)
+			{
+				ss << heightNR++;
 			}
 
 			number = ss.str();
@@ -114,7 +127,15 @@ private:
 
 		//Vertex texture coordinates
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, TexCoord));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, TexCoord));
+
+		//Vertex tanget
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, Tangent));
+
+		//Vertext bitangent
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, Tangent));
 
 		glBindVertexArray(0);
 

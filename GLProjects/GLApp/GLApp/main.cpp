@@ -108,7 +108,8 @@ int main()
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
 
-	Model ourModel("Models/OldMan/muro.obj");
+	Model oldMan("Models/OldMan/muro.obj");
+	Model Nanosuit("Models/Nanosuit/nanosuit.obj");
 	Model deskModel("Models/Desk/Obj/Greydon Desk.obj");
 
 
@@ -222,7 +223,14 @@ int main()
 		glm::mat4 modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
-		DrawModel(&Modelshader, &ourModel, modelTransformation, false);
+		DrawModel(&Modelshader, &oldMan, modelTransformation, false);
+
+
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(1.0f, -1.75f, -1.50f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.125f, 0.125f, 0.125f));
+		DrawModel(&Modelshader, &Nanosuit, modelTransformation, false);
+
 
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 3.75f));
@@ -329,7 +337,8 @@ void Tick()
 	GLfloat currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-	SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (deltaTime / 12);
+	SecondCounter = 1;
+	//SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (deltaTime / 12);
 
 }
 
