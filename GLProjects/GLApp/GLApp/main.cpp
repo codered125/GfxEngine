@@ -115,14 +115,15 @@ int main()
 
 	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
-	faces.push_back("Images/GitSkybox/right.jpg");
-	faces.push_back("Images/GitSkybox/left.jpg");
-	faces.push_back("Images/GitSkybox/top.jpg");
-	faces.push_back("Images/GitSkybox/bottom.jpg");
-	faces.push_back("Images/GitSkybox/back.jpg");
-	faces.push_back("Images/GitSkybox/front.jpg");
+	faces.push_back("Images/HRSkybox/right.png");
+	faces.push_back("Images/HRSkybox/left.png");
+	faces.push_back("Images/HRSkybox/top.png");
+	faces.push_back("Images/HRSkybox/bottom.png");
+	faces.push_back("Images/HRSkybox/back.png");
+	faces.push_back("Images/HRSkybox/front.png");
 	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
 	GLuint floorTexture = TextureLoading::LoadTexture("Images/WoodPlanks_a_BaseColor.png");
+	//GLuint floorTexture = TextureLoading::LoadTexture("Images/wood.jpg");
 	GLuint floorTexSpec = TextureLoading::LoadTexture("Images/box_spec.png");
 
 
@@ -337,8 +338,8 @@ void Tick()
 	GLfloat currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-	SecondCounter = 1;
-	//SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (deltaTime / 12);
+	//SecondCounter = 1;
+	SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (deltaTime / 12);
 
 }
 
