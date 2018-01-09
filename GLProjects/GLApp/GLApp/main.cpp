@@ -4,6 +4,7 @@
 #include <SOIL2\src\SOIL2\SOIL2.h>
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
+#include <gtx\matrix_decompose.hpp>
 #include <gtc\type_ptr.hpp>
 #include "Shader.h"
 #include "Cube.h"
@@ -27,7 +28,10 @@ void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
 void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool depthTest);
-void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
+void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
+void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
+void SetCubexVertUp(GLuint * cubeVAO, GLuint * cubeVBO);
+
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
@@ -128,34 +132,10 @@ int main()
 
 
 	GLuint cubeVBO, cubeVAO;
-	glGenBuffers(1, &cubeVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-
-	glGenVertexArrays(1, &cubeVAO);
-	glBindVertexArray(cubeVAO);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), &base.vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
+	SetCubexVertUp(&cubeVAO, &cubeVBO);
 
 	GLuint quadVAO, quadVBO;
-	glGenVertexArrays(1, &quadVAO);
-	glGenBuffers(1, &quadVBO);
-	glBindVertexArray(quadVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(base.quadVertices), &base.quadVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-
+	SetQuadUp(&quadVAO, &quadVBO);
 
 
 	GLuint fbo;
@@ -239,7 +219,20 @@ int main()
 		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.3f), glm::vec3(0.0f, 1.0f, 0.0f));
 		DrawModel(&Modelshader, &deskModel, modelTransformation, false);
 
-		DrawBox(&Modelshader, glm::vec3(0.0f, -4.0f, 0.05), &floorTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
+
+		modelTransformation = glm::mat4();
+
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(10.0f, 0.5f, 10.0f));
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -4.0f, 0.05));
+		DrawBox(&Modelshader, modelTransformation, &floorTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
+
+
+		modelTransformation = glm::mat4();
+	//	modelTransformation = glm::rotate(modelTransformation, 70.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -4.0f, 0.05));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 10.0f, 10.0f));
+		DrawBox(&Modelshader, modelTransformation, &floorTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
+
 
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
@@ -434,7 +427,7 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool dep
 	ourModel->Draw(modelShader);
 }
 
-void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO)
+void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO)
 {
 	floorShader->use();
 	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.diffuse"), 0);
@@ -449,10 +442,6 @@ void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLui
 	floorShader->setMat4("view", view);
 	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-	glm::mat4 model = glm::mat4();
-	model = glm::scale(model, glm::vec3(10.0f, 0.5f, 10.0f));
-	model = glm::translate(model, Translation);
-
 	glBindVertexArray(*acubeVAO);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -460,9 +449,44 @@ void DrawBox(Shader * floorShader, glm::vec3 Translation, GLuint * difftex, GLui
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, *spectex);
-	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(Transformation));
 	initialiseLights(floorShader);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO)
+{
+	glGenVertexArrays(1, quadVAO);
+	glGenBuffers(1, quadVBO);
+	glBindVertexArray(*quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, *quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(base.quadVertices), &base.quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+}
+
+void SetCubexVertUp(GLuint * cubeVAO, GLuint * cubeVBO)
+{
+	glGenBuffers(1, cubeVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, *cubeVBO);
+
+	glGenVertexArrays(1, cubeVAO);
+	glBindVertexArray(*cubeVAO);
+
+	//vert data
+	glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), &base.vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	//normal data
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	//tex coord data
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 }
 
 void initialiseLights(Shader * lightShader)
