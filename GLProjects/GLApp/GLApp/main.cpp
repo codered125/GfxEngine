@@ -127,7 +127,7 @@ int main()
 	faces.push_back("Images/HRSkybox/front.png");
 	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
 	GLuint floorTexture = TextureLoading::LoadTexture("Images/WoodPlanks_a_BaseColor.png");
-	//GLuint floorTexture = TextureLoading::LoadTexture("Images/wood.jpg");
+	GLuint wallTexture = TextureLoading::LoadTexture("Images/Brick.jpg");
 	GLuint floorTexSpec = TextureLoading::LoadTexture("Images/box_spec.png");
 
 
@@ -221,17 +221,15 @@ int main()
 
 
 		modelTransformation = glm::mat4();
-
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -2.0f, 0.05));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(10.0f, 0.5f, 10.0f));
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -4.0f, 0.05));
 		DrawBox(&Modelshader, modelTransformation, &floorTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
 
 
 		modelTransformation = glm::mat4();
-	//	modelTransformation = glm::rotate(modelTransformation, 70.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -4.0f, 0.05));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 10.0f, 10.0f));
-		DrawBox(&Modelshader, modelTransformation, &floorTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(-5.25f, 0.75f, 0.0));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 5.0f, 10.0f));
+		DrawBox(&Modelshader, modelTransformation, &wallTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
 
 
 
