@@ -39,6 +39,7 @@ GLfloat deltaTime, SecondCounter, lastFrame = 0.0f;
 Cube base;
 bool Keys[1024];
 bool firstMouse = true;
+bool lightDirection = true;
 bool hdr = false;
 int AliasingCount = 16;
 glm::vec3 pointLightPositions[] =
@@ -51,10 +52,10 @@ glm::vec3 pointLightPositions[] =
 glm::vec3 pointLightColours[] =
 {
 
-	glm::vec3(1.0f, 1.0f, 0.0f),//Yellow
-	glm::vec3(0.0f, 1.0f, 0.0f),//Green
-	glm::vec3(1.0f, 0.0f, 0.0f),//Red
-	glm::vec3(0.0f, 0.0f, 1.0f)//Blue
+	glm::vec3(1.0f, 1.0f, 1.0f),//Yellow
+	glm::vec3(1.0f, 1.0f, 1.0f),//Green
+	glm::vec3(1.0f, 1.0f, 1.0f),//Red
+	glm::vec3(1.0f, 1.0f, 1.0f)//Blue
 };
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -348,7 +349,11 @@ void Tick()
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 	//SecondCounter = 1;
-	SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (deltaTime / 12);
+	const GLfloat cuurrentDelt = lightDirection ? deltaTime : deltaTime * -1;
+	if (SecondCounter > 1) lightDirection = false;
+	if (SecondCounter < 0) lightDirection = true; 
+	SecondCounter += (cuurrentDelt / 6);
+	//SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (cuurrentDelt / 12);
 
 }
 
