@@ -127,9 +127,9 @@ int main()
 	faces.push_back("Images/HRSkybox/front.png");
 	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
 	GLuint floorTexture = TextureLoading::LoadTexture("Images/WoodPlanks_a_BaseColor.png");
-	GLuint wallTexture = TextureLoading::LoadTexture("Images/Brick.jpg");
-	GLuint floorTexSpec = TextureLoading::LoadTexture("Images/box_spec.png");
-
+	GLuint floorTexSpec = TextureLoading::LoadTexture("Images/WoodPlanks_a_Normal.png");
+	GLuint wallTexture = TextureLoading::LoadTexture("Images/box.png");
+	GLuint wallTextureSpec = TextureLoading::LoadTexture("Images/box_spec.png");
 
 	GLuint cubeVBO, cubeVAO;
 	SetCubexVertUp(&cubeVAO, &cubeVBO);
@@ -200,38 +200,56 @@ int main()
 		//RENDER
 		DrawSkybox(&skyboxShader, &cubemapTexture);
 		DrawLights(&lampShader);
-
+		
 		glm::mat4 modelTransformation = glm::mat4();
+		
+		//Old Man
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
 		DrawModel(&Modelshader, &oldMan, modelTransformation, false);
 
-
+		//Crysis Nanosuit
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(1.0f, -1.75f, -1.50f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.125f, 0.125f, 0.125f));
 		DrawModel(&Modelshader, &Nanosuit, modelTransformation, false);
 
-
+		//Desk Model
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 3.75f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
 		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.3f), glm::vec3(0.0f, 1.0f, 0.0f));
 		DrawModel(&Modelshader, &deskModel, modelTransformation, false);
 
-
+		//Floor
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -2.0f, 0.05));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(10.0f, 0.5f, 10.0f));
 		DrawBox(&Modelshader, modelTransformation, &floorTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
 
-
+		//Left Wall
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(-5.25f, 0.75f, 0.0));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 5.0f, 10.0f));
-		DrawBox(&Modelshader, modelTransformation, &wallTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
+		DrawBox(&Modelshader, modelTransformation, &wallTexture, &wallTextureSpec, false, &cubeVBO, &cubeVAO);
 
+		//RightWall
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(5.25f, 0.75f, 0.0));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 5.0f, 10.0f));
+		DrawBox(&Modelshader, modelTransformation, &wallTexture, &wallTextureSpec, false, &cubeVBO, &cubeVAO);
 
+		//Backwall
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 0.75f, 5.25f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(10.0f, 5.0f, 0.5f));
+		DrawBox(&Modelshader, modelTransformation, &wallTexture, &wallTextureSpec, false, &cubeVBO, &cubeVAO);
+
+		//Frontwall
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 0.74f, -5.24f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(10.0f, 5.0f, 0.5f));
+		DrawBox(&Modelshader, modelTransformation, &wallTexture, &wallTextureSpec, false, &cubeVBO, &cubeVAO);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -363,7 +381,7 @@ void DrawLights(Shader * lampShader)
 		model = glm::mat4();
 		model = glm::translate(model, pointLightPositions[i]);
 		model = glm::scale(model, glm::vec3(0.2f));
-		//model = glm::rotate(model, 1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &pointLightColours[i][0]);
 		lampShader->setFloat("Time", SecondCounter);
