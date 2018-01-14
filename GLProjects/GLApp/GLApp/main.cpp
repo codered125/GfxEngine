@@ -44,8 +44,8 @@ bool hdr = false;
 int AliasingCount = 16;
 glm::vec3 pointLightPositions[] =
 {
-	glm::vec3(2.0f, 0.0f, 3.0f), //yellow
-	glm::vec3(2.0f, 0.0f, -2.0f), //Greeb
+	glm::vec3(1.0f, 0.0f, 3.0f), //yellow
+	glm::vec3(1.0f, 0.0f, -2.0f), //Greeb
 	glm::vec3(-2.0f, 0.0f, -2.0f), //Red
 	glm::vec3(-2.0f, 0.0f, 3.0f) //Blue
 };
@@ -115,7 +115,7 @@ int main()
 
 	Model oldMan("Models/OldMan/muro.obj");
 	Model Nanosuit("Models/Nanosuit/nanosuit.obj");
-	Model deskModel("Models/Desk/Obj/Greydon Desk.obj");
+	Model deskModel("Models/Room/Room.obj");
 
 
 	// Cubemap (Skybox)
@@ -203,54 +203,15 @@ int main()
 		DrawLights(&lampShader);
 		
 		glm::mat4 modelTransformation = glm::mat4();
-		
-		//Old Man
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0.0f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
-		DrawModel(&Modelshader, &oldMan, modelTransformation, false);
-
-		//Crysis Nanosuit
-		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(1.0f, -1.75f, -1.50f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.125f, 0.125f, 0.125f));
-		DrawModel(&Modelshader, &Nanosuit, modelTransformation, false);
 
 		//Desk Model
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 3.75f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.01f));
-		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.3f), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
+		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.625f), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 0.5f, 0.5f));
 		DrawModel(&Modelshader, &deskModel, modelTransformation, false);
 
-		//Floor
-		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -2.0f, 0.05));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(10.0f, 0.5f, 10.0f));
-		DrawBox(&Modelshader, modelTransformation, &floorTexture, &floorTexSpec, false, &cubeVBO, &cubeVAO);
 
-		//Left Wall
-		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(-5.25f, 0.75f, 0.0));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 5.0f, 10.0f));
-		DrawBox(&Modelshader, modelTransformation, &wallTexture, &wallTextureSpec, false, &cubeVBO, &cubeVAO);
-
-		//RightWall
-		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(5.25f, 0.75f, 0.0));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 5.0f, 10.0f));
-		DrawBox(&Modelshader, modelTransformation, &wallTexture, &wallTextureSpec, false, &cubeVBO, &cubeVAO);
-
-		//Backwall
-		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 0.75f, 5.25f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(10.0f, 5.0f, 0.5f));
-		DrawBox(&Modelshader, modelTransformation, &wallTexture, &wallTextureSpec, false, &cubeVBO, &cubeVAO);
-
-		//Frontwall
-		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 0.74f, -5.24f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(10.0f, 5.0f, 0.5f));
-		DrawBox(&Modelshader, modelTransformation, &wallTexture, &wallTextureSpec, false, &cubeVBO, &cubeVAO);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -348,11 +309,11 @@ void Tick()
 	GLfloat currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-	//SecondCounter = 1;
+	SecondCounter = 1;
 	const GLfloat cuurrentDelt = lightDirection ? deltaTime : deltaTime * -1;
-	if (SecondCounter > 1) lightDirection = false;
-	if (SecondCounter < 0) lightDirection = true; 
-	SecondCounter += (cuurrentDelt / 6);
+//	if (SecondCounter > 1) lightDirection = false;
+	//if (SecondCounter < 0) lightDirection = true; 
+	//SecondCounter += (cuurrentDelt / 3);
 	//SecondCounter = SecondCounter >= 1 ? 0 : SecondCounter + (cuurrentDelt / 12);
 
 }
