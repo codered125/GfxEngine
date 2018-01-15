@@ -41,12 +41,9 @@ bool Keys[1024];
 bool firstMouse = true;
 bool lightDirection = true;
 bool hdr = false;
-int AliasingCount = 16;
+int AliasingCount = 16, NumberofLights = 4;
 glm::vec3 pointLightPositions[] =
 {
-	glm::vec3(1.0f, 2.0f, 3.0f), //yellow
-	glm::vec3(1.0f, 2.0f, 3.0f),
-	glm::vec3(1.0f, 2.0f, 3.0f),
 	glm::vec3(1.0f, 2.0f, 3.0f)
 //	glm::vec3(1.0f, 0.0f, -2.0f), //Greeb
 //	glm::vec3(-2.0f, 0.0f, -2.0f), //Red
@@ -232,7 +229,7 @@ int main()
 		glBindVertexArray(quadVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, screenTexture);	// use the color attachment texture as the texture of the quad plane
-		//hdr = true;
+		hdr = true;
 		screenShader.setBool("hdr", hdr);
 		screenShader.setFloat("exposure", 0.50f);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -355,7 +352,7 @@ void DrawLights(Shader * lampShader)
 	for (GLuint i = 0; i < 4; i++)
 	{
 		model = glm::mat4();
-		model = glm::translate(model, pointLightPositions[i]);
+		model = glm::translate(model, pointLightPositions[0]);
 		model = glm::scale(model, glm::vec3(0.2f));
 		model = glm::rotate(model, deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
@@ -510,21 +507,21 @@ void initialiseLights(Shader * lightShader)
 	// Point light 2
 	Light Point1 = PointLight(lightShader, "pointLights[1]");
 	Point1.diffuse = glm::vec3(pointLightColours[1].x, pointLightColours[1].y, pointLightColours[1].z);
-	Point1.position = glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+	Point1.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 	Point1.specular = Point1.diffuse;
 	Point1.setUpShader();
 
 	// Point light 3
 	Light Point2 = PointLight(lightShader, "pointLights[2]");
 	Point2.diffuse = glm::vec3(pointLightColours[2].x, pointLightColours[2].y, pointLightColours[2].z);
-	Point2.position = glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+	Point2.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 	Point2.specular = Point2.diffuse;
 	Point2.setUpShader();
 
 	// Point light 4
 	Light Point3 = PointLight(lightShader, "pointLights[3]");
 	Point3.diffuse = glm::vec3(pointLightColours[3].x, pointLightColours[3].y, pointLightColours[3].z);
-	Point3.position = glm::vec3(pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
+	Point3.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 	Point3.specular = Point3.diffuse;
 	Point3.setUpShader();
 
