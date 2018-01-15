@@ -88,7 +88,7 @@ public:
 
 		}
 
-		glUniform1f(glGetUniformLocation(shader->shaderProgram, "material.shininess"), 16.0f);
+		glUniform1f(glGetUniformLocation(shader->shaderProgram, "material.shininess"), 32.0f);
 
 		glBindVertexArray(this->VAO);
 		glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);

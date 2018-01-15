@@ -60,9 +60,9 @@ struct Light
 			ShaderRef->setVec3(ambi, ambient);
 			ShaderRef->setVec3(diff, diffuse);
 			ShaderRef->setVec3(spec, specular);
-			ShaderRef->setFloat(cons, constant);
-			ShaderRef->setFloat(lin, linear);
-			ShaderRef->setFloat(quad, quadratic);
+			ShaderRef->setFloat(cons, constant );
+			ShaderRef->setFloat(lin, linear );
+			ShaderRef->setFloat(quad, quadratic  );
 			break;
 
 		case Directional:

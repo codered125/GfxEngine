@@ -79,10 +79,9 @@ void main ()
     }
     result += CalcSpotLight( spotLight, norm, FragPos, viewDir );
 
-	//vec3 Reflective = refract(viewDir, norm, 1.0/ 1.52);
-	//result += texture(skybox, Reflective).rgb;
+
 	color = vec4( result, 1.0 );
-   //color = vec4(texture(skybox, Reflective).rgb, 1.0);
+
 };
 
 
@@ -115,6 +114,7 @@ vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir )
 // Calculates the color when using a point light.
 vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
 {
+	bool  blin = false;
     vec3 lightDir = normalize( light.position - fragPos );
     
     // Diffuse shading
@@ -122,8 +122,18 @@ vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     
     // Specular shading (BlinPhong)
     vec3 reflectDir = reflect( -lightDir, normal );
-    float spec = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.shininess );
-    
+
+	float spec = 0;
+	if (blin)
+	{
+		vec3 halfWayDir = normalize(lightDir + viewDir);
+		spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+    }
+
+	else
+	{
+		spec = pow( max( dot( viewDir, reflectDir ), 0.0 ), material.shininess );
+	}
     // Attenuation
     float distance = length( light.position - fragPos );
     float attenuation = 1.0f / ( light.constant + light.linear * distance + light.quadratic * ( distance * distance ) );
