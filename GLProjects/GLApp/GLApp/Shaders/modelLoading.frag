@@ -1,5 +1,5 @@
 #version 330 core
-#define NUMBER_OF_POINT_LIGHTS 4
+#define NUMBER_OF_POINT_LIGHTS 1
 
 struct Material
 {
@@ -59,7 +59,7 @@ uniform SpotLight spotLight;
 uniform Material material;
 uniform samplerCube skybox;
 uniform float Time;
-
+bool  blin = false;
 vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir );
 vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir );
 vec3 CalcSpotLight( SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir );
@@ -96,13 +96,12 @@ vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir )
     float diff = max( dot( normal, lightDir ), 0.0 );
     
     // Specular shading (BlinPhong)
-	bool  blin = true;
     vec3 reflectDir = reflect( -lightDir, normal );
 	float spec = 0;
 	if (blin)
 	{
 		vec3 halfWayDir = normalize(lightDir + viewDir);
-		spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+		spec = pow(max(dot(normal, halfWayDir), 0.0f), material.shininess);
     }
 
 	else
@@ -131,13 +130,13 @@ vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     float diff = max( dot( normal, lightDir ), 0.0 );
     
     // Specular shading (BlinPhong)
-	bool  blin = true;
+	
     vec3 reflectDir = reflect( -lightDir, normal );
 	float spec = 0;
 	if (blin)
 	{
 		vec3 halfWayDir = normalize(lightDir + viewDir);
-		spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+		spec = pow(max(dot(normal, halfWayDir), 0.0f), material.shininess);
     }
 
 	else
@@ -147,13 +146,13 @@ vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     // Attenuation
     float distance = length( light.position - fragPos );
     float attenuation = 1.0f / ( light.constant + light.linear * distance + light.quadratic * ( distance * distance ) );
+	attenuation *= 3;
     
     // Combine results
     vec3 ambient = light.ambient * vec3( texture( material.texture_diffuse, TexCoords ) );
     vec3 diffuse = light.diffuse * diff * vec3( texture( material.texture_diffuse, TexCoords ) );
     vec3 specular = light.specular * spec * vec3( texture( material.texture_specular, TexCoords ) );
     
-	attenuation *= 2.0f;
 
     ambient *= attenuation;
     diffuse *= attenuation;
@@ -179,13 +178,12 @@ vec3 CalcSpotLight( SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     float diff = max( dot( normal, lightDir ), 0.0 );
     
     // Specular shading (BlinPhong)
-	bool  blin = true;
     vec3 reflectDir = reflect( -lightDir, normal );
 	float spec = 0;
 	if (blin)
 	{
 		vec3 halfWayDir = normalize(lightDir + viewDir);
-		spec = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+			spec = pow(max(dot(normal, halfWayDir), 0.0f), material.shininess);
     }
 
 	else

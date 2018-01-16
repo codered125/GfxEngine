@@ -48,7 +48,7 @@ public:
 		this->SetupMesh();
 	}
 
-	void Draw(Shader * shader)
+	void Draw(Shader * shader, float Shine)
 	{
 		GLuint diffuseNr = 1;
 		GLuint specularNR = 1;
@@ -88,7 +88,7 @@ public:
 
 		}
 
-		glUniform1f(glGetUniformLocation(shader->shaderProgram, "material.shininess"), 32.0f);
+		glUniform1f(glGetUniformLocation(shader->shaderProgram, "material.shininess"), Shine);
 
 		glBindVertexArray(this->VAO);
 		glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
