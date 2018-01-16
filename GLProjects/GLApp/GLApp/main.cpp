@@ -27,7 +27,7 @@ void Tick();
 void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
-void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool depthTest);
+void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float shine);
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
 void SetCubexVertUp(GLuint * cubeVAO, GLuint * cubeVBO);
@@ -44,18 +44,14 @@ bool hdr = false;
 int AliasingCount = 16, NumberofLights = 4;
 glm::vec3 pointLightPositions[] =
 {
-	glm::vec3(1.0f, 2.0f, 3.0f)
+	glm::vec3(0.8f, 5.0f, 2.7f)
 //	glm::vec3(1.0f, 0.0f, -2.0f), //Greeb
-//	glm::vec3(-2.0f, 0.0f, -2.0f), //Red
-//	glm::vec3(-2.0f, 0.0f, 3.0f) //Blue
 };
 glm::vec3 pointLightColours[] =
 {
 
-	glm::vec3(0.4f, 0.4f, 0.4f),//Yellow
-	glm::vec3(0.4f, 0.4f, 0.4f),//Green
-	glm::vec3(0.4f, 0.4f, 0.4f),//Red
-	glm::vec3(0.4f, 0.4f, 0.4f)//Blue
+	glm::vec3(1.0f, 1.0f, 1.0f)//Yellow
+//	glm::vec3(0.0f, 0.0f, 0.0f),//Green
 };
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -107,15 +103,16 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_MULTISAMPLE);
-
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
+	//glFrontFace(GL_CW);
 	Shader Modelshader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
 
 	Model oldMan("Models/OldMan/muro.obj");
-	Model Nanosuit("Models/Nanosuit/nanosuit.obj");
-	Model deskModel("Models/Room/Room.obj");
+	Model roomModel("Models/Room/Room.obj");
 
 
 	// Cubemap (Skybox)
@@ -209,9 +206,13 @@ int main()
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
 		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.625f), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 0.5f, 0.5f));
-		DrawModel(&Modelshader, &deskModel, modelTransformation, false);
+		DrawModel(&Modelshader, &roomModel, modelTransformation, 1.0f);
 
-
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
+		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.625f), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.02f, 0.02f, 0.02f));
+		DrawModel(&Modelshader, &oldMan, modelTransformation, 16.0f);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -226,12 +227,12 @@ int main()
 
 		screenShader.use();
 		screenShader.setInt("screenTexture", 0);
+		screenShader.setBool("hdr", hdr);
+		screenShader.setFloat("exposure", 0.50f);
+
 		glBindVertexArray(quadVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, screenTexture);	// use the color attachment texture as the texture of the quad plane
-		hdr = true;
-		screenShader.setBool("hdr", hdr);
-		screenShader.setFloat("exposure", 0.50f);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		//swap screen buffers
@@ -314,15 +315,16 @@ void Tick()
 		SecondCounter = 1;
 		lightDirection = false;
 	}
-	if (SecondCounter <= 0)
+	if (SecondCounter <= 0.0)
 	{
-		SecondCounter = 0;
+		SecondCounter = 0.0;
 		lightDirection = true;
 	}
 	const GLfloat cuurrentDelt = lightDirection ? deltaTime : deltaTime * -1;
 	SecondCounter += (cuurrentDelt / 6);
 
-
+	std::cout << "Position " << ourCamera.getPosition().x <<", "<< ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
+	//std::cout << "Front " << ourCamera.getFront().x << ourCamera.getFront().y << ourCamera.getFront().z << std::endl;
 }
 
 void DrawLights(Shader * lampShader)
@@ -349,7 +351,7 @@ void DrawLights(Shader * lampShader)
 	float rotAngle = min + ((max - min) *SecondCounter);
 
 	glBindVertexArray(lightVAO);
-	for (GLuint i = 0; i < 4; i++)
+	for (GLuint i = 0; i < 1; i++)
 	{
 		model = glm::mat4();
 		model = glm::translate(model, pointLightPositions[0]);
@@ -400,20 +402,18 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 
 }
 
-void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, bool depthTest)
+void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float shine)
 {
 	modelShader->use();
 	modelShader->setFloat("Time", SecondCounter);
 
-	glm::mat4 FOV;
-	FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
-
+	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	glm::mat4 view = ourCamera.GetViewMatrix();
 	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
 	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	initialiseLights(modelShader);
-	ourModel->Draw(modelShader);
+	ourModel->Draw(modelShader, shine);
 }
 
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO)
@@ -425,7 +425,7 @@ void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, G
 	floorShader->setFloat("Time", SecondCounter);
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	floorShader->setMat4("projection", FOV);
-	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+//	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
 
 	glm::mat4 view = ourCamera.GetViewMatrix();
 	floorShader->setMat4("view", view);
@@ -500,36 +500,27 @@ void initialiseLights(Shader * lightShader)
 	Light Point0 = PointLight(lightShader, "pointLights[0]");
 	Point0.diffuse = glm::vec3(pointLightColours[0].x, pointLightColours[0].y, pointLightColours[0].z);
 	Point0.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-	Point0.specular = Point0.diffuse;
+	Point0.ambient = glm::vec3(0.0f);
+	Point0.specular = glm::vec3(0.0f);
 	Point0.setUpShader();
 
 
 	// Point light 2
-	Light Point1 = PointLight(lightShader, "pointLights[1]");
-	Point1.diffuse = glm::vec3(pointLightColours[1].x, pointLightColours[1].y, pointLightColours[1].z);
-	Point1.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-	Point1.specular = Point1.diffuse;
-	Point1.setUpShader();
+//	Light Point1 = PointLight(lightShader, "pointLights[1]");
+//	Point1.diffuse = glm::vec3(pointLightColours[1].x, pointLightColours[1].y, pointLightColours[1].z);
+//	Point1.diffuse = glm::vec3(pointLightColours[0].x, pointLightColours[0].y, pointLightColours[0].z);
+//	Point1.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
+//	Point1.specular = Point1.diffuse / 2.0f;
+//	Point1.setUpShader();
 
-	// Point light 3
-	Light Point2 = PointLight(lightShader, "pointLights[2]");
-	Point2.diffuse = glm::vec3(pointLightColours[2].x, pointLightColours[2].y, pointLightColours[2].z);
-	Point2.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-	Point2.specular = Point2.diffuse;
-	Point2.setUpShader();
-
-	// Point light 4
-	Light Point3 = PointLight(lightShader, "pointLights[3]");
-	Point3.diffuse = glm::vec3(pointLightColours[3].x, pointLightColours[3].y, pointLightColours[3].z);
-	Point3.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-	Point3.specular = Point3.diffuse;
-	Point3.setUpShader();
 
 
 	// SpotLight
 	Light CameraSpot = SpotLight(lightShader, "spotLight");
 	CameraSpot.position = ourCamera.getPosition();
 	CameraSpot.direction = ourCamera.getFront();
+	//CameraSpot.position = glm::vec3(-2.46, 3.38, -1.28);
+	//CameraSpot.direction = glm::vec3(-0.24, -0.90, 0.35);
 	CameraSpot.ambient = glm::vec3(0.0f);
 	CameraSpot.diffuse = glm::vec3(1.0f);
 	CameraSpot.specular = glm::vec3(1.0f);

@@ -29,11 +29,11 @@ public:
 		this->loadModel(inpath);
 	}
 
-	void Draw(Shader *shader)
+	void Draw(Shader *shader, float shine)
 	{
 		for (GLuint i = 0; i < this->meshes.size(); i++)
 		{
-			this->meshes[i].Draw(shader);
+			this->meshes[i].Draw(shader, shine);
 		}
 	}
 
