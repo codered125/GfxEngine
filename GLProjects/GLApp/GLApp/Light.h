@@ -23,8 +23,8 @@ struct Light
 	float cutOff = glm::cos(glm::radians(7.5f));
 	float outerCutOff = glm::cos(glm::radians(11.0f));
 	float constant = 1.0f; // keep at one stops denominator dropping below 1 in the equation
-	float linear = 0.0014; //multiplied with the distance and decreases intensity in a linear fashion
-	float quadratic = 0.000007;
+	float linear = 0.0014f; //multiplied with the distance and decreases intensity in a linear fashion
+	float quadratic = 0.000007f;
 
 	glm::vec3 position;
 	glm::vec3 direction;
