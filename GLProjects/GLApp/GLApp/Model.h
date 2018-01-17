@@ -105,7 +105,8 @@ private:
 			{
 				vertex.TexCoord = glm::vec2(0.0f, 0.0f);
 			}
-
+			
+			//tangents
 			if (mesh->mTangents != nullptr)
 			{
 				vector.x = mesh->mTangents[i].x;

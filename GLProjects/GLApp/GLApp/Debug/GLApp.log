@@ -1,14 +1,3 @@
 ﻿  main.cpp
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\light.h(26): warning C4305: 'initializing': truncation from 'double' to 'float'
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\light.h(27): warning C4305: 'initializing': truncation from 'double' to 'float'
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(278): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(285): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(286): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(290): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(291): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(293): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(294): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(310): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(333): warning C4101: 'lightVBO': unreferenced local variable
   GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
   GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.pdb (Partial PDB)

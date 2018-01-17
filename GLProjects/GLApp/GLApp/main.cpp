@@ -113,7 +113,9 @@ int main()
 
 	Model oldMan("Models/OldMan/muro.obj");
 	Model roomModel("Models/Room/Room.obj");
-
+//	Model FloorModel("Models/Room/MayaFiles/Fllor.obj");
+//	Model roomModel("Models/Room/Room.obj");
+//	Model roomModel("Models/Room/Room.obj");
 
 	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
@@ -275,23 +277,23 @@ void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mod
 
 void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset)
 {
-	ourCamera.ProessMouseSroll(yOffset);
+	ourCamera.ProessMouseSroll((GLfloat)yOffset);
 }
 
 void MouseCallback(GLFWwindow * window, double xPos, double yPos)
 {
 	if (firstMouse)
 	{
-		lastX = xPos;
-		lastY = yPos;
+		lastX = (GLfloat)xPos;
+		lastY = (GLfloat) yPos;
 		firstMouse = false;
 	}
 
-	GLfloat xOffset = xPos - lastX;
-	GLfloat yOffset = lastY - yPos; //this is reverse because opengl Y coords start from bottom left and go reverse
+	GLfloat xOffset = (GLfloat)xPos - lastX;
+	GLfloat yOffset = lastY - (GLfloat)yPos; //this is reverse because opengl Y coords start from bottom left and go reverse
 
-	lastX = xPos;
-	lastY = yPos;
+	lastX = (GLfloat)xPos;
+	lastY = (GLfloat)yPos;
 	ourCamera.ProcessMouseMovement(xOffset, yOffset);
 }
 
@@ -307,7 +309,7 @@ void DoMovement()
 void Tick()
 {
 	//Calculate framedata
-	GLfloat currentFrame = glfwGetTime();
+	GLfloat currentFrame = (GLfloat)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 	if (SecondCounter >= 1) 
@@ -330,7 +332,7 @@ void Tick()
 void DrawLights(Shader * lampShader)
 {
 	lampShader->use();
-	GLuint lightVAO, lightVBO;
+	GLuint lightVAO;
 
 	//glGenBuffers(1, &lightVBO);
 	//glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
