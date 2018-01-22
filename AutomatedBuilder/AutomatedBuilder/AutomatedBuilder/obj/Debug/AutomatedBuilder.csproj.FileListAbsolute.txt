@@ -1,0 +1,13 @@
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\bin\Debug\AutomatedBuilder.exe.config
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\bin\Debug\AutomatedBuilder.exe
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\bin\Debug\AutomatedBuilder.pdb
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\obj\Debug\AutomatedBuilder.csprojResolveAssemblyReference.cache
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\obj\Debug\AutomatedBuilder.Form1.resources
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\obj\Debug\AutomatedBuilder.Properties.Resources.resources
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\obj\Debug\AutomatedBuilder.csproj.GenerateResource.Cache
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\obj\Debug\AutomatedBuilder.exe
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\obj\Debug\AutomatedBuilder.pdb
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\bin\Debug\AutomatedBuilder.exe.manifest
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\bin\Debug\AutomatedBuilder.application
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\obj\Debug\AutomatedBuilder.exe.manifest
+D:\Moman\AutomatedBuilder\AutomatedBuilder\AutomatedBuilder\obj\Debug\AutomatedBuilder.application
