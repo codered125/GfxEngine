@@ -1,0 +1,40 @@
+Build Lighting:
+
+Commandlet (Executed from CMD)
+D:\Epic\UE_4.16\Engine\Binaries\Win64\UE4Editor.exe 
+
+"Absolute Project url goes here" -run=resavepackages -buildlighting -allowcommandletrendering -map="Mapname.Map"
+Example:
+"D:\Moman\UnrealEngineProjects\UAT\UAT.uproject" -run=resavepackages -buildlighting -allowcommandletrendering -map="lvl3.umap" -map="lvl4.umap" -map="lvl5.umap" -map="lvl6.umap"
+
+Package Project:
+Some points:
+
+If you use unreferenced blueprints/objects, you should add them a) using command line or b) by creating a level with all the objects you need to publish in your game (not recomended)
+Cooking is the proccess of removing unwanted files from your final build
+You can choose to Pak (like zip) all your content into a single file
+If you are building a dedicated server, you need to have the compiled version of Unreal or will not work.
+You will find the RunUAT at UnrealEngine/Engine/Build/BatchFiles
+Add the command -build if you're using Source Version from Github
+If the -allmaps flag is used, [AllMaps] with valid +Map=\Game\Maps\Map.umap syntax should be added to DefaultEditor.ini
+Specific maps can be built (must remove -allmaps flag) using the -maps=Map1+Map2+Map3
+
+
+Command Line Argument
+D:\Epic\UE_4.16\Engine\Binaries\DotNET\AutomationTool
+
+BuildCookRun -project="Absolute Project url goes here" -noP4 -platform=Win64 -clientconfig=Development -serverconfig=Development -cook -allmaps -build -stage -pak -archive -archivedirectory="Output Directory"
+
+Example:
+BuildCookRun -project="D:\Moman\UnrealEngineProjects\UAT\UAT.uproject" -noP4 -platform=Win64 -clientconfig=Development -serverconfig=Development -cook -allmaps -build -stage -pak -archive -archivedirectory="D:\Moman\Unreal Engine Projects"
+
+
+
+
+Maps
+MAP_LEVEL1_EP2
+MAP_LEVEL2_EP2
+MAP_LEVEL3_EP2
+MAP_LEVEL4_EP2
+MAP_LEVEL5_EP2
+MAP_LEVEL6_EP2
