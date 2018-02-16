@@ -1,4 +1,4 @@
-# GfxEngine / Rendering Engine
+# OpenGL GfxEngine / Rendering Engine
 
 Decided to make this public, this is my current project and it is still ongoing.
 
@@ -8,9 +8,8 @@ The Graphics Engine currently has the following features implemented:
 - [x] Mesh importing (currently best supporting obj)
 - [x] Texture Loading (best supporting mtls)
 - [x] Frame buffers / Post Processing effects
-- [x] Fragment / Vertex shader importing
+- [x] GLSL Fragment / Vertex shader importing
 - [x] Multisample anti-aliasing (4-16)
-
 - [ ] Physics Based Rendering (PBR) - in progress
 
 
