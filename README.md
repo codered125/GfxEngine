@@ -1,9 +1,8 @@
-# GfxEngine
+# GfxEngine / Rendering Engine
 
-Decided to make this public, currently my ongoing project.
+Decided to make this public, this is my current project and it is still ongoing.
 
-Engine is currently has the following features implemented:
-
+The Graphics Engine currently has the following features implemented:
 - [x] HDR
 - [x] Directional, Point, and Spot lighting (Blinn/Phong)
 - [x] Mesh importing (currently best supporting obj)
@@ -13,3 +12,11 @@ Engine is currently has the following features implemented:
 - [x] Multisample anti-aliasing (4-16)
 
 - [ ] The next feature i'm working on is the conversion to Physics Based Rendering (PBR);
+
+
+The Graphics Engine currently utalises the current libraries:
+- [x] ASSIMP
+- [x] GLEW
+- [x] GLFW
+- [x] GLM
+- [x] SOIL2
