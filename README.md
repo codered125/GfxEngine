@@ -1,14 +1,15 @@
 # GfxEngine
 
-Decided to make this public, currently my ongoing project
+Decided to make this public, currently my ongoing project.
+
 Engine is currently has the following features implemented:
 
-HDR
-Directional, Point, and Spot lighting (Blinn/Phong)
-Mesh importing (currently best supporting obj)
-Texture Loading (best supporting mtls)
-Frame buffers / Post Processing effects
-Fragment / Vertex shader importing
-Multisample anti-aliasing (4-16)
+- [x] HDR
+- [x] Directional, Point, and Spot lighting (Blinn/Phong)
+- [x] Mesh importing (currently best supporting obj)
+- [x] Texture Loading (best supporting mtls)
+- [x] Frame buffers / Post Processing effects
+- [x] Fragment / Vertex shader importing
+- [x] Multisample anti-aliasing (4-16)
 
-The next feature i'm working on is the conversion to Physics Based Rendering (PBR);
+- [ ] The next feature i'm working on is the conversion to Physics Based Rendering (PBR);
