@@ -11,7 +11,7 @@ The Graphics Engine currently has the following features implemented:
 - [x] Fragment / Vertex shader importing
 - [x] Multisample anti-aliasing (4-16)
 
-- [ ] The next feature i'm working on is the conversion to Physics Based Rendering (PBR);
+- [ ] Physics Based Rendering (PBR) - in progress
 
 
 The Graphics Engine currently utalises the current libraries:
