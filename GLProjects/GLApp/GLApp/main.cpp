@@ -13,6 +13,13 @@
 #include "Light.h"
 #include "TextureLoading.h"
 
+
+enum EffectTypes
+{
+	None, InvertColour
+};
+
+
 //const GLint width = 1200, height = 800;
 const GLint width = 1920, height = 1080;
 void GLFWSetUp();
@@ -31,7 +38,7 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
 void SetCubexVertUp(GLuint * cubeVAO, GLuint * cubeVBO);
-
+void togglePostProcessEffects(int effectNumber);
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
@@ -41,6 +48,7 @@ bool Keys[1024];
 bool firstMouse = true;
 bool lightDirection = true;
 bool hdr = false;
+EffectTypes currentPostProcessEffect = None;
 int AliasingCount = 16, NumberofLights = 4;
 glm::vec3 pointLightPositions[] =
 {
@@ -205,7 +213,7 @@ int main()
 
 		//Desk Model
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -10.75f, 4.0f));
 		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.625f), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 0.5f, 0.5f));
 		DrawModel(&Modelshader, &roomModel, modelTransformation, 1.0f);
@@ -231,6 +239,7 @@ int main()
 		screenShader.setInt("screenTexture", 0);
 		screenShader.setBool("hdr", hdr);
 		screenShader.setFloat("exposure", 0.50f);
+		screenShader.setInt("Effect", currentPostProcessEffect);
 
 		glBindVertexArray(quadVAO);
 		glActiveTexture(GL_TEXTURE0);
@@ -303,6 +312,7 @@ void DoMovement()
 	if (Keys[GLFW_KEY_S] || Keys[GLFW_KEY_DOWN]) ourCamera.ProcessKeyboard(EBackward, deltaTime);
 	if (Keys[GLFW_KEY_A] || Keys[GLFW_KEY_LEFT]) ourCamera.ProcessKeyboard(ELeft, deltaTime);
 	if (Keys[GLFW_KEY_D] || Keys[GLFW_KEY_RIGHT]) ourCamera.ProcessKeyboard(ERight, deltaTime);
+	if (Keys[GLFW_KEY_1]) togglePostProcessEffects(1);
 
 }
 
@@ -530,4 +540,16 @@ void initialiseLights(Shader * lightShader)
 
 
 
+}
+
+void togglePostProcessEffects(int effectNumber)
+{
+	switch (effectNumber)
+	{
+	default:
+		break;
+	case 1:
+		currentPostProcessEffect = currentPostProcessEffect == None ? EffectTypes::InvertColour : EffectTypes::None;
+		break;
+	}
 }
