@@ -20,7 +20,7 @@ enum EffectStatus
 
 struct PostProcessSettings
 {
-	EffectStatus InvertedColours, HDR, AntiAliasing = EffectStatus::UnActive;
+	EffectStatus InvertedColours, HDR, AntiAliasing, ColourGrading  = EffectStatus::UnActive;
 };
 enum EffectTypes
 {
@@ -51,10 +51,8 @@ Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
 GLfloat deltaTime, SecondCounter, lastFrame = 0.0f;
-Cube base;
 bool Keys[1024];
-bool firstMouse = true;
-bool lightDirection = true;
+bool firstMouse , lightDirection = true;
 bool hdr = false;
 EffectTypes currentPostProcessEffect = None;
 int AliasingCount = 16, NumberofLights = 4;
@@ -358,7 +356,7 @@ void DrawLights(Shader * lampShader)
 	glBindVertexArray(lightVAO);
 
 	glEnableVertexAttribArray(0);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), base.vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(StaticVertices::vertices), StaticVertices::vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glBindVertexArray(0);
 
@@ -398,7 +396,7 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
 	glGenVertexArrays(1, &skyboxVAO);
 	glBindVertexArray(skyboxVAO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(base.skyboxVertices), &base.skyboxVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(StaticVertices::skyboxVertices), &StaticVertices::skyboxVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
 
@@ -469,7 +467,7 @@ void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO)
 	glGenBuffers(1, quadVBO);
 	glBindVertexArray(*quadVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, *quadVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(base.quadVertices), &base.quadVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(StaticVertices::quadVertices), &StaticVertices::quadVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
@@ -485,7 +483,7 @@ void SetCubexVertUp(GLuint * cubeVAO, GLuint * cubeVBO)
 	glBindVertexArray(*cubeVAO);
 
 	//vert data
-	glBufferData(GL_ARRAY_BUFFER, sizeof(base.vertices), &base.vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(StaticVertices::vertices), &StaticVertices::vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
