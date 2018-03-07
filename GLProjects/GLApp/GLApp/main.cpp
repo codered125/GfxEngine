@@ -13,7 +13,15 @@
 #include "Light.h"
 #include "TextureLoading.h"
 
+enum EffectStatus
+{
+	Active, UnActive
+};
 
+struct PostProcessSettings
+{
+	EffectStatus InvertedColours, HDR, AntiAliasing = EffectStatus::UnActive;
+};
 enum EffectTypes
 {
 	None, InvertColour
@@ -53,7 +61,7 @@ int AliasingCount = 16, NumberofLights = 4;
 glm::vec3 pointLightPositions[] =
 {
 	glm::vec3(0.8f, 5.0f, 2.7f)
-//	glm::vec3(1.0f, 0.0f, -2.0f), //Greeb
+	//	glm::vec3(1.0f, 0.0f, -2.0f), //Greeb
 };
 glm::vec3 pointLightColours[] =
 {
@@ -70,7 +78,7 @@ int main()
 	GLFWSetUp();
 
 	//Creating window
-	
+
 
 	GLFWwindow *  window = glfwCreateWindow(width, height, "Moses Playboy Mansion", nullptr, nullptr);
 
@@ -121,11 +129,11 @@ int main()
 
 	Model oldMan("Models/OldMan/muro.obj");
 	Model roomModel("Models/Room/Room.obj");
-//	Model FloorModel("Models/Room/MayaFiles/Fllor.obj");
-//	Model roomModel("Models/Room/Room.obj");
-//	Model roomModel("Models/Room/Room.obj");
+	//	Model FloorModel("Models/Room/MayaFiles/Fllor.obj");
+	//	Model roomModel("Models/Room/Room.obj");
+	//	Model roomModel("Models/Room/Room.obj");
 
-	// Cubemap (Skybox)
+		// Cubemap (Skybox)
 	vector<const GLchar*> faces;
 	faces.push_back("Images/HRSkybox/right.png");
 	faces.push_back("Images/HRSkybox/left.png");
@@ -208,12 +216,12 @@ int main()
 		//RENDER
 		DrawSkybox(&skyboxShader, &cubemapTexture);
 		DrawLights(&lampShader);
-		
+
 		glm::mat4 modelTransformation = glm::mat4();
 
-		//Desk Model
+		//Room Model
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -10.75f, 4.0f));
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
 		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.625f), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 0.5f, 0.5f));
 		DrawModel(&Modelshader, &roomModel, modelTransformation, 1.0f);
@@ -294,7 +302,7 @@ void MouseCallback(GLFWwindow * window, double xPos, double yPos)
 	if (firstMouse)
 	{
 		lastX = (GLfloat)xPos;
-		lastY = (GLfloat) yPos;
+		lastY = (GLfloat)yPos;
 		firstMouse = false;
 	}
 
@@ -322,7 +330,7 @@ void Tick()
 	GLfloat currentFrame = (GLfloat)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-	if (SecondCounter >= 1) 
+	if (SecondCounter >= 1)
 	{
 		SecondCounter = 1;
 		lightDirection = false;
@@ -335,7 +343,7 @@ void Tick()
 	const GLfloat cuurrentDelt = lightDirection ? deltaTime : deltaTime * -1;
 	SecondCounter += (cuurrentDelt / 6);
 
-	std::cout << "Position " << ourCamera.getPosition().x <<", "<< ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
+	//std::cout << "Position " << ourCamera.getPosition().x << ", " << ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
 	//std::cout << "Front " << ourCamera.getFront().x << ourCamera.getFront().y << ourCamera.getFront().z << std::endl;
 }
 
@@ -437,7 +445,7 @@ void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, G
 	floorShader->setFloat("Time", SecondCounter);
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	floorShader->setMat4("projection", FOV);
-//	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+	//	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
 
 	glm::mat4 view = ourCamera.GetViewMatrix();
 	floorShader->setMat4("view", view);
