@@ -4,14 +4,9 @@
 #include <GL\glew.h>
 
 
-class Cube {
-public:
-	Cube() {};
-
-	GLfloat size;
-	GLfloat originPoint;
+namespace StaticVertices {
 	//SmoothShading
-	const GLfloat vertices[288] = {
+	const  GLfloat vertices[288] = {
 		//Front, back, left, right, down , up??
 			//xyz tex coord
 			// Positions            // Normals              // Texture Coords
