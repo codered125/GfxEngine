@@ -22,10 +22,6 @@ struct PostProcessSettings
 {
 	EffectStatus InvertedColours, HDR, AntiAliasing, ColourGrading  = EffectStatus::UnActive;
 };
-enum EffectTypes
-{
-	None, InvertColour
-};
 
 
 //const GLint width = 1200, height = 800;
@@ -45,7 +41,6 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
 void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float shine);
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
-void SetCubexVertUp(GLuint * cubeVAO, GLuint * cubeVBO);
 void togglePostProcessEffects(int effectNumber);
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
@@ -53,8 +48,7 @@ GLfloat lastY = height / 2.0f;
 GLfloat deltaTime, SecondCounter, lastFrame = 0.0f;
 bool Keys[1024];
 bool firstMouse , lightDirection = true;
-bool hdr = false;
-EffectTypes currentPostProcessEffect = None;
+PostProcessSettings currentPostProcessSettings;
 int AliasingCount = 16, NumberofLights = 4;
 glm::vec3 pointLightPositions[] =
 {
@@ -117,9 +111,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_MULTISAMPLE);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
-	//glFrontFace(GL_CW);
+
 	Shader Modelshader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
@@ -127,11 +119,8 @@ int main()
 
 	Model oldMan("Models/OldMan/muro.obj");
 	Model roomModel("Models/Room/Room.obj");
-	//	Model FloorModel("Models/Room/MayaFiles/Fllor.obj");
-	//	Model roomModel("Models/Room/Room.obj");
-	//	Model roomModel("Models/Room/Room.obj");
 
-		// Cubemap (Skybox)
+	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
 	faces.push_back("Images/HRSkybox/right.png");
 	faces.push_back("Images/HRSkybox/left.png");
@@ -140,13 +129,7 @@ int main()
 	faces.push_back("Images/HRSkybox/back.png");
 	faces.push_back("Images/HRSkybox/front.png");
 	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
-	GLuint floorTexture = TextureLoading::LoadTexture("Images/WoodPlanks_a_BaseColor.png");
-	GLuint floorTexSpec = TextureLoading::LoadTexture("Images/WoodPlanks_a_Normal.png");
-	GLuint wallTexture = TextureLoading::LoadTexture("Images/box.png");
 	GLuint wallTextureSpec = TextureLoading::LoadTexture("Images/box_spec.png");
-
-	GLuint cubeVBO, cubeVAO;
-	SetCubexVertUp(&cubeVAO, &cubeVBO);
 
 	GLuint quadVAO, quadVBO;
 	SetQuadUp(&quadVAO, &quadVBO);
@@ -243,9 +226,9 @@ int main()
 
 		screenShader.use();
 		screenShader.setInt("screenTexture", 0);
-		screenShader.setBool("hdr", hdr);
+		screenShader.setBool("currentPostProcessEffect.HDR", currentPostProcessSettings.HDR);
 		screenShader.setFloat("exposure", 0.50f);
-		screenShader.setInt("Effect", currentPostProcessEffect);
+		screenShader.setInt("currentPostProcessEffect.Invert", currentPostProcessSettings.InvertedColours);
 
 		glBindVertexArray(quadVAO);
 		glActiveTexture(GL_TEXTURE0);
@@ -319,6 +302,7 @@ void DoMovement()
 	if (Keys[GLFW_KEY_A] || Keys[GLFW_KEY_LEFT]) ourCamera.ProcessKeyboard(ELeft, deltaTime);
 	if (Keys[GLFW_KEY_D] || Keys[GLFW_KEY_RIGHT]) ourCamera.ProcessKeyboard(ERight, deltaTime);
 	if (Keys[GLFW_KEY_1]) togglePostProcessEffects(1);
+	if (Keys[GLFW_KEY_2]) togglePostProcessEffects(2);
 
 }
 
@@ -342,7 +326,6 @@ void Tick()
 	SecondCounter += (cuurrentDelt / 6);
 
 	//std::cout << "Position " << ourCamera.getPosition().x << ", " << ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
-	//std::cout << "Front " << ourCamera.getFront().x << ourCamera.getFront().y << ourCamera.getFront().z << std::endl;
 }
 
 void DrawLights(Shader * lampShader)
@@ -474,27 +457,6 @@ void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-void SetCubexVertUp(GLuint * cubeVAO, GLuint * cubeVBO)
-{
-	glGenBuffers(1, cubeVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, *cubeVBO);
-
-	glGenVertexArrays(1, cubeVAO);
-	glBindVertexArray(*cubeVAO);
-
-	//vert data
-	glBufferData(GL_ARRAY_BUFFER, sizeof(StaticVertices::vertices), &StaticVertices::vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	//normal data
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-	//tex coord data
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (GLvoid *)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-}
 
 void initialiseLights(Shader * lightShader)
 {
@@ -503,7 +465,6 @@ void initialiseLights(Shader * lightShader)
 	// the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
 	// by defining light types as classes and set their values in there, or by using a more efficient uniform approach
 	// by using 'Uniform buffer objects', but that is something we discuss in the 'Advanced GLSL' tutorial.
-
 
 	// Directional light
 	Light Directional0 = DirectionalLight(lightShader, "dirLight");
@@ -523,29 +484,14 @@ void initialiseLights(Shader * lightShader)
 	Point0.setUpShader();
 
 
-	// Point light 2
-//	Light Point1 = PointLight(lightShader, "pointLights[1]");
-//	Point1.diffuse = glm::vec3(pointLightColours[1].x, pointLightColours[1].y, pointLightColours[1].z);
-//	Point1.diffuse = glm::vec3(pointLightColours[0].x, pointLightColours[0].y, pointLightColours[0].z);
-//	Point1.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-//	Point1.specular = Point1.diffuse / 2.0f;
-//	Point1.setUpShader();
-
-
-
 	// SpotLight
 	Light CameraSpot = SpotLight(lightShader, "spotLight");
 	CameraSpot.position = ourCamera.getPosition();
 	CameraSpot.direction = ourCamera.getFront();
-	//CameraSpot.position = glm::vec3(-2.46, 3.38, -1.28);
-	//CameraSpot.direction = glm::vec3(-0.24, -0.90, 0.35);
 	CameraSpot.ambient = glm::vec3(0.0f);
 	CameraSpot.diffuse = glm::vec3(1.0f);
 	CameraSpot.specular = glm::vec3(1.0f);
 	CameraSpot.setUpShader();
-
-
-
 }
 
 void togglePostProcessEffects(int effectNumber)
@@ -555,7 +501,11 @@ void togglePostProcessEffects(int effectNumber)
 	default:
 		break;
 	case 1:
-		currentPostProcessEffect = currentPostProcessEffect == None ? EffectTypes::InvertColour : EffectTypes::None;
+		currentPostProcessSettings.InvertedColours = currentPostProcessSettings.InvertedColours == EffectStatus::Active ? EffectStatus::UnActive : EffectStatus::Active;
 		break;
+	case 2:
+		currentPostProcessSettings.HDR = currentPostProcessSettings.HDR == EffectStatus::Active ? EffectStatus::UnActive : EffectStatus::Active;
+		break;
+
 	}
 }
