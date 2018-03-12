@@ -7,7 +7,7 @@
 #include <gtx\matrix_decompose.hpp>
 #include <gtc\type_ptr.hpp>
 #include "Shader.h"
-#include "Cube.h"
+#include "StaticVertices.h"
 #include "Model.h"
 #include "Camera.h"
 #include "Light.h"
