@@ -1,12 +1,22 @@
 #version 330 core
 out vec4 FragColor;
-  
+ 
+ struct PostProcessEffects
+ {
+ int Invert;
+ int ColourGradiant;
+ bool HDR;
+ };
+ 
+
+
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
-uniform bool hdr;
 uniform float exposure;
-uniform int Effect;
+uniform PostProcessEffects currentPostProcessEffect;
+
+
 vec3 PostProcessEffect(vec3 untouchedColour);
 
 void main()
@@ -14,7 +24,7 @@ void main()
 //const float gamma = 2.2;
 const float gamma = 1.0f;
     vec3 hdrColor = texture(screenTexture, TexCoords).rgb;
-    if(hdr)
+    if(currentPostProcessEffect.HDR)
     {
         //vec3 result =  hdrColor / (hdrColor + vec3(1.0)); // reinhard
 		vec3 result = vec3(1.0) - exp(-hdrColor * exposure); // exposure
@@ -31,16 +41,9 @@ const float gamma = 1.0f;
 
 vec3 PostProcessEffect(vec3 untouchedColour)
 {
-	vec3 output = untouchedColour;
-	switch(Effect)
-	{
-		case 0: 
-			break;
-		case 1:
-			output = 1 - untouchedColour;
-			break;
-		default:
-			break;
-	}
-	return output;
+	vec3 colourOutput = untouchedColour;
+	colourOutput = currentPostProcessEffect.Invert ==0? colourOutput : colourOutput = 1 - untouchedColour;
+	colourOutput = currentPostProcessEffect.ColourGradiant ==0? colourOutput : colourOutput = 1 - untouchedColour;
+
+	return colourOutput;
 }
