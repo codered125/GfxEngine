@@ -324,7 +324,7 @@ void Tick()
 	}
 	const GLfloat cuurrentDelt = lightDirection ? deltaTime : deltaTime * -1;
 	SecondCounter += (cuurrentDelt / 6);
-
+	//std::cout << currentPostProcessSettings.InvertedColours << std::endl;
 	//std::cout << "Position " << ourCamera.getPosition().x << ", " << ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
 }
 
