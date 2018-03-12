@@ -1,8 +1,8 @@
 #version 330 core
 out vec4 FragColor;
  
- struct PostProcessEffects
- {
+struct PostProcessEffects
+{
  int Invert;
  int ColourGradiant;
  bool HDR;
@@ -42,8 +42,7 @@ const float gamma = 1.0f;
 vec3 PostProcessEffect(vec3 untouchedColour)
 {
 	vec3 colourOutput = untouchedColour;
-	colourOutput = currentPostProcessEffect.Invert ==0? colourOutput : colourOutput = 1 - untouchedColour;
-	colourOutput = currentPostProcessEffect.ColourGradiant ==0? colourOutput : colourOutput = 1 - untouchedColour;
+	colourOutput = currentPostProcessEffect.Invert ==0? colourOutput :  1 - colourOutput;
 
 	return colourOutput;
 }
