@@ -156,12 +156,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Cube.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="StaticVertices.h" />
     <ClInclude Include="TextureLoading.h" />
   </ItemGroup>
   <ItemGroup>
