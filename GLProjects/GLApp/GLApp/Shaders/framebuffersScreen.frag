@@ -43,7 +43,7 @@ vec3 PostProcessEffect(vec3 untouchedColour)
 {
 	vec3 colourOutput = untouchedColour;
 	colourOutput = currentPostProcessEffect.Invert ==0? colourOutput :  1 - colourOutput;
-	vec3 lerpedColour = (colourOutput.y > 0.7) && (colourOutput.z < 0.3)? colourOutput + ((vec3(0.5f, 0.0f, 0.0f) - colourOutput) * 0.5) : colourOutput;
+	vec3 lerpedColour = (colourOutput.y > colourOutput.x + 0.1) && (colourOutput.y > colourOutput.z + 0.1)? colourOutput + ((vec3(0.5f, 0.0f, 0.0f) - colourOutput) * 0.5) : colourOutput;
 	colourOutput = currentPostProcessEffect.ColourGradiant ==0? colourOutput : lerpedColour;
 	return colourOutput;
 }

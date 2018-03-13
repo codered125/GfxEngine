@@ -20,7 +20,7 @@ enum EffectStatus
 
 struct PostProcessSettings
 {
-	EffectStatus InvertedColours, HDR, AntiAliasing, ColourGrading  = EffectStatus::UnActive;
+	EffectStatus InvertedColours, HDR, AntiAliasing, ColourGrading, TimeBasedEffects  = EffectStatus::UnActive;
 };
 
 
@@ -45,7 +45,7 @@ void togglePostProcessEffects(int effectNumber);
 Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
-GLfloat deltaTime, SecondCounter, keyboardlockout, lastFrame = 0.0f;
+GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 0.8f;
 bool Keys[1024];
 bool firstMouse , lightDirection = true;
 PostProcessSettings currentPostProcessSettings;
@@ -331,7 +331,8 @@ void Tick()
 	}
 	const GLfloat cuurrentDelt = lightDirection ? deltaTime : deltaTime * -1;
 	keyboardlockout = keyboardlockout > 0 ? keyboardlockout - deltaTime : 0;
-	SecondCounter += (cuurrentDelt / 6);
+	if (currentPostProcessSettings.TimeBasedEffects == EffectStatus::Active)SecondCounter += (cuurrentDelt / 6);
+
 	//std::cout << currentPostProcessSettings.InvertedColours << std::endl;
 	//std::cout << "Position " << ourCamera.getPosition().x << ", " << ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
 }
@@ -504,7 +505,7 @@ void initialiseLights(Shader * lightShader)
 
 void togglePostProcessEffects(int effectNumber)
 {
-	keyboardlockout = 0.1;
+	keyboardlockout = 0.1f;
 	switch (effectNumber)
 	{
 	default:
@@ -517,6 +518,9 @@ void togglePostProcessEffects(int effectNumber)
 		break;
 	case 3:
 		currentPostProcessSettings.ColourGrading = currentPostProcessSettings.ColourGrading == EffectStatus::Active ? EffectStatus::UnActive : EffectStatus::Active;
+		break;
+	case 4: 
+		currentPostProcessSettings.TimeBasedEffects = currentPostProcessSettings.TimeBasedEffects == EffectStatus::Active ? EffectStatus::UnActive : EffectStatus::Active;
 		break;
 	}
 
