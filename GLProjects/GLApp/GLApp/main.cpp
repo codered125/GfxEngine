@@ -10,18 +10,11 @@
 #include "StaticVertices.h"
 #include "Model.h"
 #include "Camera.h"
+#include "PostProcessing.h"
 #include "Light.h"
 #include "TextureLoading.h"
 
-enum EffectStatus
-{
-	UnActive, Active
-};
 
-struct PostProcessSettings
-{
-	EffectStatus InvertedColours, HDR, AntiAliasing, ColourGrading, TimeBasedEffects  = EffectStatus::UnActive;
-};
 
 
 //const GLint width = 1200, height = 800;
@@ -48,32 +41,26 @@ GLfloat lastY = height / 2.0f;
 GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 0.8f;
 bool Keys[1024];
 bool firstMouse , lightDirection = true;
-PostProcessSettings currentPostProcessSettings;
+PostProcessing::PostProcessSettings currentPostProcessSettings;
 int AliasingCount = 16, NumberofLights = 4;
 glm::vec3 pointLightPositions[] =
 {
 	glm::vec3(0.8f, 5.0f, 2.7f)
-	//	glm::vec3(1.0f, 0.0f, -2.0f), //Greeb
 };
 glm::vec3 pointLightColours[] =
 {
-
 	glm::vec3(1.0f, 1.0f, 1.0f)//Yellow
-//	glm::vec3(0.0f, 0.0f, 0.0f),//Green
 };
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 
 int main()
 {
-
 	GLFWSetUp();
-
 	//Creating window
 
 
 	GLFWwindow *  window = glfwCreateWindow(width, height, "Moses Playboy Mansion", nullptr, nullptr);
-
 	//Going to get the real size and height of the screen and store it to our storage
 	//helps with high density displays. Will use it when creating viewport
 
@@ -92,7 +79,6 @@ int main()
 	glfwSetKeyCallback(window, KeyCallback);
 	glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetScrollCallback(window, ScrollCallback);
-
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//Tells glew to use a modern approach to retrieving function pointers and extensions
@@ -223,13 +209,8 @@ int main()
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+		PostProcessing::ApplyEffects(&screenShader, currentPostProcessSettings);
 
-		screenShader.use();
-		screenShader.setInt("screenTexture", 0);
-		screenShader.setBool("currentPostProcessEffect.HDR", currentPostProcessSettings.HDR);
-		screenShader.setFloat("exposure", 0.50f);
-		screenShader.setInt("currentPostProcessEffect.Invert", currentPostProcessSettings.InvertedColours);
-		screenShader.setInt("currentPostProcessEffect.ColourGradiant", currentPostProcessSettings.ColourGrading);
 
 		glBindVertexArray(quadVAO);
 		glActiveTexture(GL_TEXTURE0);
@@ -331,7 +312,7 @@ void Tick()
 	}
 	const GLfloat cuurrentDelt = lightDirection ? deltaTime : deltaTime * -1;
 	keyboardlockout = keyboardlockout > 0 ? keyboardlockout - deltaTime : 0;
-	if (currentPostProcessSettings.TimeBasedEffects == EffectStatus::Active)SecondCounter += (cuurrentDelt / 6);
+	if (currentPostProcessSettings.TimeBasedEffects == PostProcessing::EffectStatus::Active)SecondCounter += (cuurrentDelt / 6);
 
 	//std::cout << currentPostProcessSettings.InvertedColours << std::endl;
 	//std::cout << "Position " << ourCamera.getPosition().x << ", " << ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
@@ -508,19 +489,17 @@ void togglePostProcessEffects(int effectNumber)
 	keyboardlockout = 0.1f;
 	switch (effectNumber)
 	{
-	default:
-		break;
 	case 1:
-		currentPostProcessSettings.InvertedColours = currentPostProcessSettings.InvertedColours == EffectStatus::Active ? EffectStatus::UnActive : EffectStatus::Active;
+		currentPostProcessSettings.InvertedColours =  static_cast<PostProcessing::EffectStatus>( currentPostProcessSettings.InvertedColours == 1 ? 0 : 1);
 		break;
 	case 2:
-		currentPostProcessSettings.HDR = currentPostProcessSettings.HDR == EffectStatus::Active ? EffectStatus::UnActive : EffectStatus::Active;
+		currentPostProcessSettings.HDR = static_cast<PostProcessing::EffectStatus>(currentPostProcessSettings.HDR ==  1 ? 0 : 1);
 		break;
 	case 3:
-		currentPostProcessSettings.ColourGrading = currentPostProcessSettings.ColourGrading == EffectStatus::Active ? EffectStatus::UnActive : EffectStatus::Active;
+		currentPostProcessSettings.ColourGrading = static_cast<PostProcessing::EffectStatus>(currentPostProcessSettings.ColourGrading == 1 ? 0 : 1);
 		break;
 	case 4: 
-		currentPostProcessSettings.TimeBasedEffects = currentPostProcessSettings.TimeBasedEffects == EffectStatus::Active ? EffectStatus::UnActive : EffectStatus::Active;
+		currentPostProcessSettings.TimeBasedEffects = static_cast<PostProcessing::EffectStatus>(currentPostProcessSettings.TimeBasedEffects == 1 ? 0 : 1);
 		break;
 	}
 
