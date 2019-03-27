@@ -1,4 +1,1 @@
-﻿  main.cpp
-d:\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\postprocessing.h(15): warning C4091: 'static ': ignored on left of 'PostProcessing::PostProcessSettings' when no variable is declared
-  GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
-  GLApp.vcxproj -> D:\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.pdb (Partial PDB)
+﻿  GLApp.vcxproj -> D:\Documents\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe

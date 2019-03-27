@@ -159,6 +159,7 @@ vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
 
 	vec3 returnValue = ambient + diffuse + specular;
 	vec3 zero = vec3(0.0f, 0.0f, 0.0f);
+	//float TimeRemaining = frac(Time);
 	returnValue = zero + ((returnValue - zero) * Time);
     
     return (returnValue);

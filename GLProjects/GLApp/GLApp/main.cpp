@@ -226,6 +226,33 @@ int main()
 	return EXIT_SUCCESS;
 }
 
+
+void Tick()
+{
+	//Calculate framedata
+	GLfloat currentFrame = (GLfloat)glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+	if (SecondCounter >= 1)
+	{
+		SecondCounter = 1;
+		lightDirection = false;
+	}
+	if (SecondCounter <= 0.0)
+	{
+		SecondCounter = 0.0;
+		lightDirection = true;
+	}
+	const GLfloat currentDelt = lightDirection ? deltaTime : deltaTime * -1;
+	keyboardlockout = keyboardlockout > 0 ? keyboardlockout - deltaTime : 0;
+	if (currentPostProcessSettings.TimeBasedEffects == PostProcessing::EffectStatus::Active)
+	{
+		SecondCounter += (currentDelt / 6);
+	}
+
+	//std::cout << currentPostProcessSettings.InvertedColours << std::endl;
+	//std::cout << "Position " << ourCamera.getPosition().x << ", " << ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
+}
 void  GLFWSetUp()
 {
 	glfwInit();
@@ -294,29 +321,7 @@ void DoMovement()
 	if (Keys[GLFW_KEY_6]) togglePostProcessEffects(6);
 }
 
-void Tick()
-{
-	//Calculate framedata
-	GLfloat currentFrame = (GLfloat)glfwGetTime();
-	deltaTime = currentFrame - lastFrame;
-	lastFrame = currentFrame;
-	if (SecondCounter >= 1)
-	{
-		SecondCounter = 1;
-		lightDirection = false;
-	}
-	if (SecondCounter <= 0.0)
-	{
-		SecondCounter = 0.0;
-		lightDirection = true;
-	}
-	const GLfloat cuurrentDelt = lightDirection ? deltaTime : deltaTime * -1;
-	keyboardlockout = keyboardlockout > 0 ? keyboardlockout - deltaTime : 0;
-	if (currentPostProcessSettings.TimeBasedEffects == PostProcessing::EffectStatus::Active)SecondCounter += (cuurrentDelt / 6);
 
-	//std::cout << currentPostProcessSettings.InvertedColours << std::endl;
-	//std::cout << "Position " << ourCamera.getPosition().x << ", " << ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
-}
 
 void DrawLights(Shader * lampShader)
 {
@@ -351,6 +356,7 @@ void DrawLights(Shader * lampShader)
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &pointLightColours[i][0]);
 		lampShader->setFloat("Time", SecondCounter);
+		lampShader->setFloat("TimeLapsed", glfwGetTime());
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 	glBindVertexArray(0);
@@ -397,6 +403,7 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 {
 	modelShader->use();
 	modelShader->setFloat("Time", SecondCounter);
+	modelShader->setFloat("TimeLapsed", glfwGetTime());
 
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	glm::mat4 view = ourCamera.GetViewMatrix();
