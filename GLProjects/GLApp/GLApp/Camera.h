@@ -2,7 +2,6 @@
 #include <vector>
 #define GLEW_STATIC
 #include <GL/glew.h>
-
 #include <glm.hpp>
 #include<gtc/matrix_transform.hpp>
 
@@ -17,6 +16,7 @@ enum Camera_Movement
 const GLfloat YAW = -90.0f;
 const GLfloat PITCH = 0.0f;
 const GLfloat SPEED = 6.0f;
+
 //Mousemovement sense
 const GLfloat SENSITIVTY = 0.15f;
 
@@ -25,8 +25,6 @@ const GLfloat ZOOM = 45.0f;
 
 class Camera 
 {
-
-
 private:
 	// Camera Attributes
 	glm::vec3 position;
@@ -43,9 +41,6 @@ private:
 	GLfloat movementSpeed;
 	GLfloat mouseSensitivity;
 	GLfloat zoom;
-
-
-
 
 	void updateCameraVectors()
 	{
@@ -80,8 +75,10 @@ public:
 		this->updateCameraVectors();
 	}
 
-
-	glm::mat4 GetViewMatrix() {	return glm::lookAt(this->position, this->position + this->front, this->up); }
+	glm::mat4 GetViewMatrix()
+	{	
+		return glm::lookAt(this->position, this->position + this->front, this->up); 
+	}
 
 	void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
 	{
@@ -92,8 +89,7 @@ public:
 		if (direction == ELeft)	this->position -= this->right * velocity;
 		if (direction == ERight)this->position += this->right * velocity;
 	}
-
-
+	
 	void ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true) 
 	{
 		xOffset *= this->mouseSensitivity;
@@ -109,8 +105,7 @@ public:
 		}
 		this->updateCameraVectors();
 	}
-
-
+	
 	void ProessMouseSroll(GLfloat yOffset)
 	{
 		if (this->zoom >= 1.0f && this->zoom <= 45.0f) this->zoom -= (yOffset / 5);
@@ -118,16 +113,15 @@ public:
 		if (this->zoom >= 45.0f) this->zoom = 45.0f;
 	}
 
-	GLfloat GetZoom() { return this->zoom; }
-	
-
-
+	GLfloat GetZoom() 
+	{ 
+		return this->zoom; 
+	}
 
 	glm::vec3 getPosition()
 	{
 		return this->position;
 	}
-
 
 	glm::vec3 getFront()
 	{

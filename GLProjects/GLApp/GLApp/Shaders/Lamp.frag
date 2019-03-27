@@ -2,6 +2,7 @@
 
 in vec3 Colour;
 uniform float Time;
+uniform float TimeLapsed;
 out vec4 color;
 
 void main ()

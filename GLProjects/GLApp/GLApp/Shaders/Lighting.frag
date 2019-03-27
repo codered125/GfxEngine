@@ -56,6 +56,7 @@ uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
 uniform float Time;
+uniform float TimeLapsed;
 
 // Function prototypes
 vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir );
@@ -129,6 +130,7 @@ vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     diffuse *= attenuation;
     specular *= attenuation;
 
+	float TimeRemaining = frac(Time);
 	vec3 zero = vec3(0.0f, 0.0f, 0.0f);
 	diffuse = zero + ((diffuse - zero) * Time);
     
