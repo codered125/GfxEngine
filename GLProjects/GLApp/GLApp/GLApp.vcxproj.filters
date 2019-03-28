@@ -97,6 +97,18 @@
     <None Include="Shaders\framebuffersScreen.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="Shaders\PBR.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\PBR.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\WaterShader.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\WaterShader.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc">
