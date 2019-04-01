@@ -54,6 +54,9 @@ public:
 		GLuint specularNR = 1;
 		GLuint normalNR = 1;
 		GLuint heightNR = 1;
+		GLuint roughnessNR = 1;
+		GLuint metallic = 1;
+		GLuint ao = 1;	
 
 		for (GLuint i = 0; i < this->textures.size(); i++)
 		{
@@ -62,15 +65,17 @@ public:
 			stringstream ss; 
 			string number;
 			string name = this->textures[i].type;
-
+			
 			if ("material.texture_diffuse" == name)
 			{
 				ss << diffuseNr++;
 			}
+
 			else if ("material.texture_specular" == name)
 			{
 				ss << specularNR++;
 			}
+
 			else if ("material.texture_normal" == name)
 			{
 				ss << normalNR++;
@@ -80,10 +85,27 @@ public:
 			{
 				ss << heightNR++;
 			}
+			else if ("material.texture_roughness" == name)
+			{
+				ss << roughnessNR++;
+			}
 
+			else if ("material.texture_ao" == name)
+			{
+				ss << ao++;
+			}
+
+			else if ("material.texture_metallic" == name)
+			{
+				ss << metallic++;
+			}
+
+
+			
 			number = ss.str();
-
-			glUniform1i(glGetUniformLocation(shader->shaderProgram, (name + number).c_str()), i);
+			//cout << (name + number) << endl;
+			glUniform1i(glGetUniformLocation(shader->shaderProgram, name.c_str()), i);
+			//glUniform1i(glGetUniformLocation(shader->shaderProgram, (name + number).c_str()), i);
 			glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
 
 		}

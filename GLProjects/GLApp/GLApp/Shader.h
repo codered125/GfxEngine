@@ -144,5 +144,9 @@ public:
 	{
 		glUniform1i(glGetUniformLocation(shaderProgram, Accessor.c_str()), value);
 	}
+
+
+
 };
+
 #endif

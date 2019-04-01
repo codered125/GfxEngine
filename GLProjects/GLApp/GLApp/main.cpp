@@ -45,11 +45,19 @@ PostProcessing::PostProcessSettings currentPostProcessSettings;
 int AliasingCount = 16, NumberofLights = 4;
 glm::vec3 pointLightPositions[] =
 {
-	glm::vec3(0.8f, 5.0f, 2.7f)
+	glm::vec3(0.8f, 0.0f, 2.7f),
+
+	glm::vec3(-0.8f, 5.0f, 2.7f),
+
+	glm::vec3(0.8f, 5.0f, -2.7f)
 };
 glm::vec3 pointLightColours[] =
 {
-	glm::vec3(1.0f, 1.0f, 1.0f)//Yellow
+	glm::vec3(1.0f, 1.0f, 1.0f),//Yellow,
+
+	glm::vec3(1.0f, 0.0f, 0.0f),//red
+
+	glm::vec3(0.0f, 0.0f, 1.0f)//blue
 };
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -99,6 +107,7 @@ int main()
 	glEnable(GL_MULTISAMPLE);
 
 	Shader Modelshader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
+	Shader PBRshader("Shaders/PBR.vs", "Shaders/PBR.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
@@ -191,13 +200,13 @@ int main()
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
 		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.625f), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 0.5f, 0.5f));
-		DrawModel(&Modelshader, &roomModel, modelTransformation, 1.0f);
+		DrawModel(&PBRshader, &roomModel, modelTransformation, 1.0f);
 
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
 		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.625f), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.02f, 0.02f, 0.02f));
-		DrawModel(&Modelshader, &oldMan, modelTransformation, 16.0f);
+		//DrawModel(&Modelshader, &oldMan, modelTransformation, 16.0f);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -347,10 +356,11 @@ void DrawLights(Shader * lampShader)
 	float rotAngle = min + ((max - min) *SecondCounter);
 
 	glBindVertexArray(lightVAO);
-	for (GLuint i = 0; i < 1; i++)
+	for (GLuint i = 0; i < pointLightPositions->length(); i++)
+	//for (GLuint i = 0; i < 1; i++)
 	{
 		model = glm::mat4();
-		model = glm::translate(model, pointLightPositions[0]);
+		model = glm::translate(model, pointLightPositions[i]);
 		model = glm::scale(model, glm::vec3(0.2f));
 		model = glm::rotate(model, deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
@@ -404,9 +414,12 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 	modelShader->use();
 	modelShader->setFloat("Time", SecondCounter);
 	modelShader->setFloat("TimeLapsed", glfwGetTime());
-
+	modelShader->setVec3("CamPos", ourCamera.getPosition());
+	//modelShader->set
+	//modelShader->setFloat("material.roughness", 0.6);
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	glm::mat4 view = ourCamera.GetViewMatrix();
+	
 	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
 	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
@@ -419,6 +432,7 @@ void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, G
 	floorShader->use();
 	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.diffuse"), 0);
 	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.specular"), 1);
+
 	floorShader->setFloat("material.shininess", 16.0f);
 	floorShader->setFloat("Time", SecondCounter);
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
@@ -479,6 +493,23 @@ void initialiseLights(Shader * lightShader)
 	Point0.ambient = glm::vec3(0.0f);
 	Point0.specular = glm::vec3(0.0f);
 	Point0.setUpShader();
+
+	// Point light 1
+	Light Point1 = PointLight(lightShader, "pointLights[1]");
+	Point1.diffuse = glm::vec3(pointLightColours[1].x, pointLightColours[1].y, pointLightColours[1].z);
+	Point1.position = glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+	Point1.ambient = glm::vec3(0.0f);
+	Point1.specular = glm::vec3(0.0f);
+	Point1.setUpShader();
+
+	// Point light 1
+	Light Point2 = PointLight(lightShader, "pointLights[2]");
+	Point2.diffuse = glm::vec3(pointLightColours[2].x, pointLightColours[2].y, pointLightColours[2].z);
+	Point2.position = glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+	Point2.ambient = glm::vec3(0.0f);
+	Point2.specular = glm::vec3(0.0f);
+	Point2.setUpShader();
+
 
 
 	// SpotLight

@@ -1,10 +1,10 @@
 ﻿  main.cpp
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\mesh.h(94): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\postprocessing.h(15): warning C4091: 'static ': ignored on left of 'PostProcessing::PostProcessSettings' when no variable is declared
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(359): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(406): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\github\gfxengine\glprojects\glapp\glapp\mesh.h(94): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+d:\documents\github\gfxengine\glprojects\glapp\glapp\postprocessing.h(15): warning C4091: 'static ': ignored on left of 'PostProcessing::PostProcessSettings' when no variable is declared
+d:\documents\github\gfxengine\glprojects\glapp\glapp\main.cpp(359): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\github\gfxengine\glprojects\glapp\glapp\main.cpp(406): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   Model.cpp
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\mesh.h(94): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+d:\documents\github\gfxengine\glprojects\glapp\glapp\mesh.h(94): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
   Generating Code...
 main.obj : error LNK2019: unresolved external symbol __imp_glewInit referenced in function main
 main.obj : error LNK2019: unresolved external symbol glfwInit referenced in function "void __cdecl GLFWSetUp(void)" (?GLFWSetUp@@YAXXZ)
@@ -67,8 +67,8 @@ main.obj : error LNK2001: unresolved external symbol __imp___glewTexImage2DMulti
 main.obj : error LNK2001: unresolved external symbol __imp___glewBindVertexArray
 main.obj : error LNK2001: unresolved external symbol __imp___glewGenVertexArrays
 main.obj : error LNK2001: unresolved external symbol __imp_glewExperimental
-D:\Documents\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\\..\External Libraries\GLEW\lib\Release\Win32\glew32.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
-D:\Documents\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\\..\External Libraries\GLFW\lib-vc2015\glfw3.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
-D:\Documents\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\\..\External Libraries\SOIL2\SOIL2\lib\windows\soil2-debug.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
-D:\Documents\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\\..\External Libraries\ASSIMP\lib\assimp-vc140-mt.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
-D:\Documents\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\x64\Debug\GLApp.exe : fatal error LNK1120: 61 unresolved externals
+D:\Documents\GitHub\GfxEngine\GLProjects\GLApp\\..\External Libraries\GLEW\lib\Release\Win32\glew32.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+D:\Documents\GitHub\GfxEngine\GLProjects\GLApp\\..\External Libraries\GLFW\lib-vc2015\glfw3.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+D:\Documents\GitHub\GfxEngine\GLProjects\GLApp\\..\External Libraries\SOIL2\SOIL2\lib\windows\soil2-debug.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+D:\Documents\GitHub\GfxEngine\GLProjects\GLApp\\..\External Libraries\ASSIMP\lib\assimp-vc140-mt.lib : warning LNK4272: library machine type 'x86' conflicts with target machine type 'x64'
+D:\Documents\GitHub\GfxEngine\GLProjects\GLApp\x64\Debug\GLApp.exe : fatal error LNK1120: 61 unresolved externals

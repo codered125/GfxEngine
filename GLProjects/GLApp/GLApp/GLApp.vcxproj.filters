@@ -109,6 +109,12 @@
     <None Include="Shaders\WaterShader.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="Shaders\PBRPrimative.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\PBRPrimative.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc">

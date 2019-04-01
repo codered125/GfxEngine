@@ -1,1 +1,6 @@
-﻿  GLApp.vcxproj -> D:\Documents\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
+﻿  main.cpp
+d:\documents\github\gfxengine\glprojects\glapp\glapp\postprocessing.h(15): warning C4091: 'static ': ignored on left of 'PostProcessing::PostProcessSettings' when no variable is declared
+d:\documents\github\gfxengine\glprojects\glapp\glapp\main.cpp(359): warning C4018: '<': signed/unsigned mismatch
+d:\documents\github\gfxengine\glprojects\glapp\glapp\main.cpp(369): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\github\gfxengine\glprojects\glapp\glapp\main.cpp(416): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  GLApp.vcxproj -> D:\Documents\GitHub\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe

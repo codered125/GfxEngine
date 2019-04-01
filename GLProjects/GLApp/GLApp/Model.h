@@ -138,19 +138,30 @@ private:
 		if (mesh->mMaterialIndex >= 0)
 		{
 			aiMaterial * material = scene->mMaterials[mesh->mMaterialIndex];
+
 			vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "material.texture_diffuse");
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-
-			vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_specular");
-			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+			//vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_specular");
+			vector<Texture> metalicMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_metallic");
+			textures.insert(textures.end(), metalicMaps.begin(), metalicMaps.end());
 
 			vector<Texture> normalMaps = this->loadMaterialTextures(material, aiTextureType_HEIGHT, "material.texture_normal");
 			textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 
-			vector<Texture> heightMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "material.texture_height");
-		}
+			vector<Texture> roughnessMaps = this->loadMaterialTextures(material, aiTextureType_SHININESS, "material.texture_roughness");
+			textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
+			
+			vector<Texture> aoMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "material.texture_ao");
+			textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
 
+			//cout << "size = " + metalicMaps.size() << endl;
+
+			//vector<Texture> metallicMaps = this->loadMaterialTextures(material, aitexturety, "material.texture_ao");
+			//textures.insert(textures.end(), ao.begin(), ao.end());
+
+
+		}
 		return Mesh(vertices, indices, textures);
 	}
 
@@ -161,6 +172,7 @@ private:
 		{
 			aiString str;
 			mat->GetTexture(type, i, &str);
+
 			GLboolean skip = false; 
 
 			for (GLuint j = 0; j < textures_loaded.size(); j++)
@@ -177,7 +189,9 @@ private:
 			{
 				Texture texture; 
 				texture.id = TextureFromFile(str.C_Str(), this->directory);
+
 				texture.type = typeName; 
+				
 				texture.path = str;
 				textures.push_back(texture);
 				this->textures_loaded.push_back(texture);

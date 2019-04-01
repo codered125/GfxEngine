@@ -178,6 +178,8 @@
     <None Include="Shaders\modelLoading.vs" />
     <None Include="Shaders\PBR.frag" />
     <None Include="Shaders\PBR.vs" />
+    <None Include="Shaders\PBRPrimative.frag" />
+    <None Include="Shaders\PBRPrimative.vs" />
     <None Include="Shaders\ShadowMapping.frag" />
     <None Include="Shaders\ShadowMapping.vs" />
     <None Include="Shaders\Skybox.frag" />
