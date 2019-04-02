@@ -11,6 +11,8 @@ struct light
 
 struct DirLight 
 {
+	float intensity;
+
 	vec3 direction;
 	vec3 ambient;
 	vec3 diffuse;
@@ -21,6 +23,7 @@ struct PointLight
 {
     float constant;
     float linear;
+	float intensity;
     float quadratic;
 
 	vec3 position;
@@ -36,6 +39,7 @@ struct SpotLight
     float constant;
     float linear;
     float quadratic;
+	float intensity;
     
 	vec3 position;
     vec3 direction;
@@ -68,6 +72,7 @@ uniform SpotLight spotLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 
 uniform vec3 CamPos;
+uniform vec3 CamDir;
 bool  blin = false;
 
 float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
@@ -141,9 +146,9 @@ void main()
 	//we normalise this result before returning it
 	vec3 Norm = getNormalFromMap();
 	vec3 View = normalize(CamPos - WorldPos);
-
-	float roughness =  pow(texture(material.texture_roughness, TexCoords).rgba, vec4(2.2)).r;
-	float metallic  =  pow(texture(material.texture_metallic, TexCoords).rgba, vec4(2.2)).r;
+	float RnMPow = 2.2;
+	float roughness =  pow(texture(material.texture_roughness, TexCoords).rgba, vec4(RnMPow)).r;
+	float metallic  =  pow(texture(material.texture_metallic, TexCoords).rgba, vec4(RnMPow)).r;
     float ao =  pow(texture(material.texture_ao, TexCoords).rgba, vec4(2.2)).r;
 	vec3 diffuse = pow(texture(material.texture_diffuse, TexCoords).rgba, vec4(2.2)).rgb;
 
@@ -177,7 +182,7 @@ void main()
 		kD *= 1.0f - metallic;
 
 		float NdotL = saturate(dot(Norm, L));
-		L0 += 5 * ( (kD * diffuse / M_PI + specular ) * radiance * NdotL);
+		L0 += pointLights[i].intensity * ( (kD * diffuse / M_PI + specular ) * radiance * NdotL);
 	}
 
 	vec3 ambient = vec3(0.03) * diffuse * ao;
