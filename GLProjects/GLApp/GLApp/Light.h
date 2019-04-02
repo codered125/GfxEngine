@@ -25,6 +25,7 @@ struct Light
 	float constant = 1.0f; // keep at one stops denominator dropping below 1 in the equation
 	float linear = 0.0014f; //multiplied with the distance and decreases intensity in a linear fashion
 	float quadratic = 0.000007f;
+	float intensity = 5.0f;
 
 	glm::vec3 position;
 	glm::vec3 direction;
@@ -33,9 +34,9 @@ struct Light
 	glm::vec3 specular = glm::vec3(1.0f);
 
 	LightType ltype = LightType::nulls;
-	std::string accessor, pos, dir, ambi, diff, spec, cutff, outCutOff, cons, lin, quad = "";
+	std::string accessor, pos, dir, ambi, diff, spec, cutff, outCutOff, cons, lin, quad , intense= "";
 
-	Light(Shader * inShader, LightType inType, std::string inAccessor) : ltype(inType), ShaderRef(inShader) , accessor(inAccessor)
+	Light(Shader * inShader, LightType inType, std::string inAccessor) : ltype(inType), ShaderRef(inShader) , accessor(inAccessor) 
 	{
 		accessor = inAccessor;
 		pos = inAccessor + ".position";
@@ -48,6 +49,7 @@ struct Light
 		cons = inAccessor + ".constant";
 		lin = inAccessor + ".linear";
 		quad = inAccessor + ".quadratic";
+		intense = inAccessor + ".intensity";
 	};
 
 	void setUpShader()
@@ -63,6 +65,7 @@ struct Light
 			ShaderRef->setFloat(cons, constant );
 			ShaderRef->setFloat(lin, linear );
 			ShaderRef->setFloat(quad, quadratic  );
+			ShaderRef->setFloat(intense, intensity);
 			break;
 
 		case Directional:
@@ -70,6 +73,7 @@ struct Light
 			ShaderRef->setVec3(ambi, ambient);
 			ShaderRef->setVec3(diff, diffuse);
 			ShaderRef->setVec3(spec, specular);
+			ShaderRef->setFloat(intense, intensity);
 			break;
 
 		case Spot:
@@ -83,6 +87,7 @@ struct Light
 			ShaderRef->setFloat(quad, quadratic);
 			ShaderRef->setFloat(cutff, cutOff);
 			ShaderRef->setFloat(outCutOff, outerCutOff);
+			ShaderRef->setFloat(intense, intensity);
 			break;
 
 		}

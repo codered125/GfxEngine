@@ -106,13 +106,15 @@ int main()
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_MULTISAMPLE);
 
-	Shader Modelshader("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
+	Shader BlinnPhong("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
+	Shader WaterShader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag");
 	Shader PBRshader("Shaders/PBR.vs", "Shaders/PBR.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
 
-	Model oldMan("Models/OldMan/muro.obj");
+	//Model oldMan("Models/OldMan/muro.obj");
+	Model waterModel("Models/WaterBlock/SM_waterBlock.FBX");
 	Model roomModel("Models/Room/Room.obj");
 
 	// Cubemap (Skybox)
@@ -198,15 +200,16 @@ int main()
 		//Room Model
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
-		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.625f), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelTransformation = glm::rotate(modelTransformation, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 0.5f, 0.5f));
 		DrawModel(&PBRshader, &roomModel, modelTransformation, 1.0f);
 
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
-		modelTransformation = glm::rotate(modelTransformation, glm::degrees(0.625f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.02f, 0.02f, 0.02f));
-		//DrawModel(&Modelshader, &oldMan, modelTransformation, 16.0f);
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
+		modelTransformation = glm::rotate(modelTransformation, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.001f));
+		DrawModel(&WaterShader, &waterModel, modelTransformation, 16.0f);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -415,6 +418,7 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 	modelShader->setFloat("Time", SecondCounter);
 	modelShader->setFloat("TimeLapsed", glfwGetTime());
 	modelShader->setVec3("CamPos", ourCamera.getPosition());
+	modelShader->setVec3("CamDir", ourCamera.getFront());
 	//modelShader->set
 	//modelShader->setFloat("material.roughness", 0.6);
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
