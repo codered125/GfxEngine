@@ -107,6 +107,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
+	//Dot product result between halfway  and view
 	return F0 + (1.0f - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
@@ -150,7 +151,7 @@ void main()
 	vec3 F0 = vec3(0.04);
 	F0 = mix(F0, diffuse, metallic);
 	
-    // reflectance equation
+    // reflectance equation (output)
     vec3 L0 = vec3(0.0);
 
 	for(int i = 0; i < NUMBER_OF_POINT_LIGHTS; i++)	
@@ -160,7 +161,7 @@ void main()
 		vec3 Halfway = normalize(View + L);
 		vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(WorldPos, pointLights[i].position);
 
-		//Cook-Torrance BRDF
+		//Cook-Torrance BRDF (NDF / (4 * dot(w0, n) * dot(wi, n))
 		float NormalDistributionFunction = DistributionGGX(Norm, Halfway, roughness);
 		float GeometryFunction = GeometrySmith(Norm, View, L, roughness);
 		vec3 Fresnel = fresnelSchlick(saturate(dot(Halfway, View)), F0);
@@ -176,7 +177,7 @@ void main()
 		kD *= 1.0f - metallic;
 
 		float NdotL = saturate(dot(Norm, L));
-		L0 += (kD * diffuse / M_PI + specular ) * radiance * NdotL;
+		L0 += 5 * ( (kD * diffuse / M_PI + specular ) * radiance * NdotL);
 	}
 
 	vec3 ambient = vec3(0.03) * diffuse * ao;
