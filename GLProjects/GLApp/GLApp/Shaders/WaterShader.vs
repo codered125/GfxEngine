@@ -15,23 +15,19 @@ uniform mat4 model; //converts local object coords to camera coords
 uniform mat4 view; //converts normalised coordinates to window coordinates, aka what your window is
 uniform mat4 projection; //converts those camera coordinates to normalised coordinates(0-1)
 uniform float TimeLapsed;
+uniform vec3 ActorPos;
+
 
 bool ripple = true;
 vec3 Wave(vec2 direct, float inwaves, vec2 inTexCoord, float inTime, float expo, float inheight);
 float UE4Sine(float x);
+float Bilerp(float T, float min, float max);
+float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
 
-void main()
+float Bilerp(float T, float min, float max)
 {
-FragPos = vec3(model * vec4(position, 1.0f));
-Normal = mat3(transpose(inverse(model))) * normal;
-TexCoords = texCoords;
-WorldPos = FragPos;
-vec3 offset = ripple == false? vec3(0) : Wave(vec2(0.6, 0.4), 4, texCoords, TimeLapsed, 8, 200);
-
-gl_Position =  projection * view * model * vec4 (position + offset, 1.0f);
-
-};
-
+	return (T - min) / (max - min);
+}
 
 float UE4Sine(float x)
 {
@@ -48,3 +44,18 @@ vec3 Wave(vec2 direct, float inwaves, vec2 inTexCoord, float inTime, float expo,
 	float normToRange = pow((applyTime +1) / 2 , expo);		
 	return vec3(0.0f, 0.0f, 1.0f) * normToRange * inheight;
 }
+
+
+void main()
+{
+FragPos = vec3(model * vec4(position, 1.0f));
+Normal = mat3(transpose(inverse(model))) * normal;
+TexCoords = texCoords;
+WorldPos = FragPos;
+
+float applyRat = saturate(Bilerp(position.z, ActorPos.z, ActorPos.z + 5));
+vec3 offset = applyRat *  Wave(vec2(1.0f, 0.5f), 4, texCoords, TimeLapsed, 8, 25);
+
+gl_Position =  projection * view * model * vec4 (position + offset, 1.0f);
+
+};
