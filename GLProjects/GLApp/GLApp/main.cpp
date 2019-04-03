@@ -32,6 +32,7 @@ void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
 void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float shine);
+void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model, GLuint * normalmaps);
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
 void togglePostProcessEffects(int effectNumber);
@@ -42,22 +43,22 @@ GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 0.8f;
 bool Keys[1024];
 bool firstMouse , lightDirection = true;
 PostProcessing::PostProcessSettings currentPostProcessSettings;
-int AliasingCount = 16, NumberofLights = 4;
+int AliasingCount = 4, NumberofLights = 4;
 glm::vec3 pointLightPositions[] =
 {
-	glm::vec3(0.8f, 0.0f, 2.7f),
+	glm::vec3(0.8f, 5, 2.7f),//white
 
-	glm::vec3(-0.8f, 5.0f, 2.7f),
+	//glm::vec3(5, 0, 0),//red
 
-	glm::vec3(0.8f, 5.0f, -2.7f)
+	//glm::vec3(0, 5.0, 0)//blue
 };
 glm::vec3 pointLightColours[] =
 {
-	glm::vec3(1.0f, 1.0f, 1.0f),//Yellow,
+	glm::vec3(1.0f, 1.0f, 1.0f),//White,
 
-	glm::vec3(1.0f, 0.0f, 0.0f),//red
+	//glm::vec3(1.0f, 0.0f, 0.0f),//red
 
-	glm::vec3(0.0f, 0.0f, 1.0f)//blue
+	//glm::vec3(0.0f, 0.0f, 1.0f)//blue
 };
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -198,18 +199,19 @@ int main()
 		glm::mat4 modelTransformation = glm::mat4();
 
 		//Room Model
+		//cout << ourCamera.getFront().x << ", " << ourCamera.getFront().y << ", "<< ourCamera.getFront().z  << endl;
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0));
 		modelTransformation = glm::rotate(modelTransformation, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 0.5f, 0.5f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(1.0f));
 		DrawModel(&PBRshader, &roomModel, modelTransformation, 1.0f);
 
-		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
-		modelTransformation = glm::rotate(modelTransformation, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.001f));
-		DrawModel(&WaterShader, &waterModel, modelTransformation, 16.0f);
+	//	modelTransformation = glm::mat4();
+	//	modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
+	//	modelTransformation = glm::rotate(modelTransformation, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//	modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	//	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.04f, 0.04f, 0.004f));
+		//DrawModel(&WaterShader, &waterModel, modelTransformation, 16.0f);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -359,8 +361,8 @@ void DrawLights(Shader * lampShader)
 	float rotAngle = min + ((max - min) *SecondCounter);
 
 	glBindVertexArray(lightVAO);
-	for (GLuint i = 0; i < pointLightPositions->length(); i++)
-	//for (GLuint i = 0; i < 1; i++)
+	//for (GLuint i = 0; i < pointLightPositions->length(); i++)
+	for (GLuint i = 0; i < 1; i++)
 	{
 		model = glm::mat4();
 		model = glm::translate(model, pointLightPositions[i]);
@@ -419,8 +421,7 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 	modelShader->setFloat("TimeLapsed", glfwGetTime());
 	modelShader->setVec3("CamPos", ourCamera.getPosition());
 	modelShader->setVec3("CamDir", ourCamera.getFront());
-	//modelShader->set
-	//modelShader->setFloat("material.roughness", 0.6);
+	
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	glm::mat4 view = ourCamera.GetViewMatrix();
 	
@@ -430,6 +431,35 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 	initialiseLights(modelShader);
 	ourModel->Draw(modelShader, shine);
 }
+
+void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model, GLuint * normalmaps)
+{
+	modelShader->use();
+	modelShader->setFloat("Time", SecondCounter);
+	modelShader->setFloat("TimeLapsed", glfwGetTime());
+	modelShader->setVec3("CamPos", ourCamera.getPosition());
+	modelShader->setVec3("CamDir", ourCamera.getFront());
+
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(model, scale, rotation, translation, skew, perspective);
+	modelShader->setVec3("ActorPos", translation);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, *normalmaps);
+	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+	glm::mat4 view = ourCamera.GetViewMatrix();
+
+	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
+	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	initialiseLights(modelShader);
+	ourModel->Draw(modelShader, 0);
+}
+
 
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO)
 {
@@ -483,10 +513,11 @@ void initialiseLights(Shader * lightShader)
 
 	// Directional light
 	Light Directional0 = DirectionalLight(lightShader, "dirLight");
-	Directional0.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+	Directional0.direction = glm::vec3(0.0, 0.0, 1.0);
 	Directional0.ambient = glm::vec3(0.05f);
-	Directional0.diffuse = glm::vec3(0.4f);
+	Directional0.diffuse = glm::vec3( 0.1, 0.1, 0.0f);
 	Directional0.specular = glm::vec3(0.5f, 0.5f, 0.2f);
+	Directional0.intensity = 5;
 	Directional0.setUpShader();
 
 
@@ -496,14 +527,17 @@ void initialiseLights(Shader * lightShader)
 	Point0.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 	Point0.ambient = glm::vec3(0.0f);
 	Point0.specular = glm::vec3(0.0f);
+	Point0.intensity = 25;
 	Point0.setUpShader();
 
+	/*
 	// Point light 1
 	Light Point1 = PointLight(lightShader, "pointLights[1]");
 	Point1.diffuse = glm::vec3(pointLightColours[1].x, pointLightColours[1].y, pointLightColours[1].z);
 	Point1.position = glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
 	Point1.ambient = glm::vec3(0.0f);
 	Point1.specular = glm::vec3(0.0f);
+	Point1.intensity = 10.0f;
 	Point1.setUpShader();
 
 	// Point light 1
@@ -512,9 +546,10 @@ void initialiseLights(Shader * lightShader)
 	Point2.position = glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
 	Point2.ambient = glm::vec3(0.0f);
 	Point2.specular = glm::vec3(0.0f);
+	Point2.intensity = 7.5;
 	Point2.setUpShader();
 
-
+	*/
 
 	// SpotLight
 	Light CameraSpot = SpotLight(lightShader, "spotLight");
