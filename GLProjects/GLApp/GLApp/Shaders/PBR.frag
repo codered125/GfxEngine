@@ -1,6 +1,6 @@
 #version 330 core
 #define M_PI 3.14159265359
-#define NUMBER_OF_POINT_LIGHTS 3
+#define NUMBER_OF_POINT_LIGHTS 1
 
 struct light
 {
@@ -76,7 +76,6 @@ uniform vec3 CamDir;
 bool  blin = false;
 
 float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
-vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir );
 vec3 getNormalFromMap();
 float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
@@ -146,7 +145,7 @@ void main()
 	//we normalise this result before returning it
 	vec3 Norm = getNormalFromMap();
 	vec3 View = normalize(CamPos - WorldPos);
-	float RnMPow = 2.2;
+	float RnMPow = 1.0f;// 2.2;
 	float roughness =  pow(texture(material.texture_roughness, TexCoords).rgba, vec4(RnMPow)).r;
 	float metallic  =  pow(texture(material.texture_metallic, TexCoords).rgba, vec4(RnMPow)).r;
     float ao =  pow(texture(material.texture_ao, TexCoords).rgba, vec4(2.2)).r;
@@ -184,12 +183,33 @@ void main()
 		float NdotL = saturate(dot(Norm, L));
 		L0 += pointLights[i].intensity * ( (kD * diffuse / M_PI + specular ) * radiance * NdotL);
 	}
+	//Directional Lights
+	vec3 r = dirLight.diffuse;
+	vec3 L = -dirLight.direction;
+
+	vec3 Halfway = normalize(View + L);
+	
+	float NDF = DistributionGGX(Norm, Halfway, roughness);
+	float GF = GeometrySmith(Norm, View, L, roughness);
+	vec3 F = fresnelSchlick(saturate(dot(Halfway, View)), F0);
+	
+	vec3 NGF = NDF * GF * F;
+	float denom = 4.0 * saturate(dot(Norm, View)) * saturate(dot(Norm, L)) +  0.001;
+	vec3 specular = NGF / denom;
+	
+	vec3 kS = F;
+	vec3 kD = vec3(1.0f) - kS; // energy conservation
+	kD *= 1.0f - metallic;
+
+	float NdotL = saturate(dot(Norm, L));
+	L0 += dirLight.intensity * ( (kD * diffuse / M_PI + specular ) * r * NdotL);
+
 
 	vec3 ambient = vec3(0.03) * diffuse * ao;
     color = vec4(ambient + L0, 1.0);
 
 	color = color / (color + vec4(1.0));
-    color =  pow(color, vec4(1.0/2.2));  
+    color = pow(color, vec4(1.0/2.2));  
 	
 	//color = vec4(pow(texture(material.texture_roughness, TexCoords).rgba, vec4(2.2)).r);
 	//color = vec4(getNormalFromMap(), 1.0f);
