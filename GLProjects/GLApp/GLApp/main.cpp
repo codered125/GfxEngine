@@ -201,14 +201,13 @@ int main()
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 4.0f));
 		modelTransformation = glm::rotate(modelTransformation, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 0.5f, 0.5f));
+		//modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f, 0.5f, 0.5f));
 		DrawModel(&PBRshader, &roomModel, modelTransformation, 1.0f);
 
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
-		modelTransformation = glm::rotate(modelTransformation, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f, 0.01f, 0.001f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.04f, 0.04f, 0.015f));
 		DrawModel(&WaterShader, &waterModel, modelTransformation, 16.0f);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
@@ -419,6 +418,14 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 	modelShader->setFloat("TimeLapsed", glfwGetTime());
 	modelShader->setVec3("CamPos", ourCamera.getPosition());
 	modelShader->setVec3("CamDir", ourCamera.getFront());
+	glm::mat4 transformation; // your transformation matrix.
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(model, scale, rotation, translation, skew, perspective);
+	modelShader->setVec3("ActorPos", translation);
 	//modelShader->set
 	//modelShader->setFloat("material.roughness", 0.6);
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
