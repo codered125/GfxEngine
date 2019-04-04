@@ -60,6 +60,14 @@ struct Material
 	float shininess;
 };
 
+struct LinearMatVals
+{
+	float roughness;
+	float metallic;
+    float ao;
+	vec3 diffuse;
+};
+
 in vec2 TexCoords;
 in vec3 Normal;
 in vec3 WorldPos;
@@ -81,6 +89,7 @@ float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 Norm, vec3 View, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0, float roughness);
+vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals ToParse, float intensity);
 
 float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness)
 {
@@ -92,6 +101,7 @@ float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness)
 	denom = M_PI * denom * denom;
 	return a2 / denom;
 }
+
 float GeometrySmith(vec3 Norm, vec3 View, vec3 L, float roughness)
 {
     float NdotV = saturate(dot(Norm, View));
@@ -101,6 +111,7 @@ float GeometrySmith(vec3 Norm, vec3 View, vec3 L, float roughness)
 	
     return ggx1 * ggx2;
 }
+
 float GeometrySchlickGGX(float NdotV, float roughness)
 {
 	float r = (roughness + 1.0f);
@@ -139,17 +150,42 @@ vec3 getNormalFromMap()
     return normalize(TBN * tangentNormal);
 }
 
+vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals ToParse, float intensity)
+{
+	vec3 Halfway = normalize(View + L);
+	
+	//Metelic ratio
+	vec3 F0 = vec3(0.04);
+	F0 = mix(F0, ToParse.diffuse, ToParse.metallic);
+
+	float NDF = DistributionGGX(Norm, Halfway, ToParse.roughness);
+	float GF = GeometrySmith(Norm, View, L, ToParse.roughness);
+	vec3 F = fresnelSchlick(saturate(dot(Halfway, View)), F0);
+	
+	vec3 NGF = NDF * GF * F;
+	float denom = 4.0 * saturate(dot(Norm, View)) * saturate(dot(Norm, L)) +  0.001;
+	vec3 specular = NGF / denom;
+	
+	vec3 kS = F;
+	vec3 kD = vec3(1.0f) - kS; // energy conservation
+	kD *= 1.0f - ToParse.metallic;
+
+	float NdotL = saturate(dot(Norm, L));
+	return intensity * ( (kD * ToParse.diffuse / M_PI + specular ) * Radiance * NdotL);
+}
 
 void main()
 {
 	//we normalise this result before returning it
 	vec3 Norm = getNormalFromMap();
 	vec3 View = normalize(CamPos - WorldPos);
+
 	float RnMPow = 1.0f;// 2.2;
 	float roughness =  pow(texture(material.texture_roughness, TexCoords).rgba, vec4(RnMPow)).r;
 	float metallic  =  pow(texture(material.texture_metallic, TexCoords).rgba, vec4(RnMPow)).r;
     float ao =  pow(texture(material.texture_ao, TexCoords).rgba, vec4(2.2)).r;
 	vec3 diffuse = pow(texture(material.texture_diffuse, TexCoords).rgba, vec4(2.2)).rgb;
+	LinearMatVals parse = LinearMatVals(roughness, metallic, ao, diffuse);
 
 	//Metelic ratio
 	vec3 F0 = vec3(0.04);
@@ -163,55 +199,18 @@ void main()
 		//per light radiance
 		vec3 L = normalize(pointLights[i].position - WorldPos);
 		vec3 Halfway = normalize(View + L);
-		vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(WorldPos, pointLights[i].position);
-
-		//Cook-Torrance BRDF (NDF / (4 * dot(w0, n) * dot(wi, n))
-		float NormalDistributionFunction = DistributionGGX(Norm, Halfway, roughness);
-		float GeometryFunction = GeometrySmith(Norm, View, L, roughness);
-		vec3 Fresnel = fresnelSchlick(saturate(dot(Halfway, View)), F0);
-
-		vec3 numerator = NormalDistributionFunction * GeometryFunction * Fresnel;
-		float denom = 4.0 * saturate(dot(Norm, View)) * saturate(dot(Norm, L)) +  0.001;
-	
-		// cant divide by 0
-		vec3 specular = numerator / denom;
-
-		vec3 kS = Fresnel;
-		vec3 kD = vec3(1.0f) - kS; // energy conservation
-		kD *= 1.0f - metallic;
-
-		float NdotL = saturate(dot(Norm, L));
-		L0 += pointLights[i].intensity * ( (kD * diffuse / M_PI + specular ) * radiance * NdotL);
+		vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(WorldPos, pointLights[i].position);	
+		L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
 	}
+
 	//Directional Lights
 	vec3 r = dirLight.diffuse;
 	vec3 L = -dirLight.direction;
-
-	vec3 Halfway = normalize(View + L);
+	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
 	
-	float NDF = DistributionGGX(Norm, Halfway, roughness);
-	float GF = GeometrySmith(Norm, View, L, roughness);
-	vec3 F = fresnelSchlick(saturate(dot(Halfway, View)), F0);
-	
-	vec3 NGF = NDF * GF * F;
-	float denom = 4.0 * saturate(dot(Norm, View)) * saturate(dot(Norm, L)) +  0.001;
-	vec3 specular = NGF / denom;
-	
-	vec3 kS = F;
-	vec3 kD = vec3(1.0f) - kS; // energy conservation
-	kD *= 1.0f - metallic;
-
-	float NdotL = saturate(dot(Norm, L));
-	L0 += dirLight.intensity * ( (kD * diffuse / M_PI + specular ) * r * NdotL);
-
-
 	vec3 ambient = vec3(0.03) * diffuse * ao;
     color = vec4(ambient + L0, 1.0);
-
+	
 	color = color / (color + vec4(1.0));
     color = pow(color, vec4(1.0/2.2));  
-	
-	//color = vec4(pow(texture(material.texture_roughness, TexCoords).rgba, vec4(2.2)).r);
-	//color = vec4(getNormalFromMap(), 1.0f);
-
 }
