@@ -1,4 +1,17 @@
 #version 330 core
+
+struct Material
+{
+    sampler2D  texture_diffuse;
+    sampler2D  texture_specular;
+	sampler2D  texture_normal;
+	sampler2D  texture_height;
+	sampler2D  texture_roughness;
+	sampler2D  texture_metallic;
+	sampler2D  texture_ao;
+	float shininess;
+};
+
 in vec2 TexCoords;
 in vec3 FragPos;
 in vec3 Normal;
@@ -11,11 +24,21 @@ uniform vec3 CamPos;
 uniform vec3 CamDir;
 uniform float TimeLapsed;
 uniform samplerCube skybox;
+uniform Material material;
+uniform vec3 ActorPos;
 
 float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
 float UE4SphereMask(vec3 a, vec3 b, float Radius, float Hardness);
 vec3 getNormalFromMap();
+vec2 Panner(float XSpeed, float YSpeed);
 
+vec2 Panner(float XSpeed, float YSpeed)
+{
+	vec2 output;
+	output.x = TexCoords.x + ( XSpeed * TimeLapsed);
+	output.y = TexCoords.y + ( YSpeed * TimeLapsed);
+	return output;
+}
 vec3 getNormalFromMap()
 {
 	//normalise it to 0-1
@@ -50,8 +73,9 @@ void main()
 {	
 	vec3 colourA = vec3(0.02, 0.03, 0.03);
 	vec3 colourB = vec3(0.05, 0.07, 0.1);
-	float ratio = UE4SphereMask(CamDir,Normal, 1.5f, saturate(dot(CamDir, Normal))  );
+	float ratio = UE4SphereMask(CamDir,Normal, 15.5f, saturate(dot(CamDir, Normal)) );
 	vec3 output = mix (colourA, colourB, ratio);
 
     color = vec4( 10 * output, 1.0f);
+	//color = vec4(Normal, 1.0f);
 }
