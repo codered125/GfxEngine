@@ -2,12 +2,6 @@
 #define M_PI 3.14159265359
 #define NUMBER_OF_POINT_LIGHTS 1
 
-struct light
-{
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-};
 
 struct DirLight 
 {
@@ -84,12 +78,14 @@ uniform vec3 CamDir;
 bool  blin = false;
 
 float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
-vec3 getNormalFromMap();
+vec3 GetNormalFromMap();
 float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 Norm, vec3 View, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0, float roughness);
 vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals ToParse, float intensity);
+LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoords);
+
 
 float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness)
 {
@@ -132,7 +128,7 @@ float CalculateAttenuation(vec3 inFragPos, vec3 inLightPos)
 	return 1.0f / (distance * distance);
 }
 
-vec3 getNormalFromMap()
+vec3 GetNormalFromMap()
 {
 	//normalise it to 0-1
     vec3 tangentNormal = (texture(material.texture_normal, TexCoords).xyz * 2.0) - 1.0;
@@ -148,6 +144,15 @@ vec3 getNormalFromMap()
     mat3 TBN = mat3(T, B, N);
 
     return normalize(TBN * tangentNormal);
+}
+
+LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoords)
+{
+	float roughness =  pow(texture(mats.texture_roughness, TexCoords).rgba, vec4(Exponent)).r;
+	float metallic  =  pow(texture(mats.texture_metallic, TexCoords).rgba, vec4(Exponent)).r;
+    float ao =  pow(texture(mats.texture_ao, TexCoords).rgba, vec4(2.2)).r;
+	vec3 diffuse = pow(texture(mats.texture_diffuse, TexCoords).rgba, vec4(2.2)).rgb;
+	return  LinearMatVals(roughness, metallic, ao, diffuse);
 }
 
 vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals ToParse, float intensity)
@@ -177,19 +182,15 @@ vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals 
 void main()
 {
 	//we normalise this result before returning it
-	vec3 Norm = getNormalFromMap();
+	vec3 Norm = GetNormalFromMap();
 	vec3 View = normalize(CamPos - WorldPos);
 
-	float RnMPow = 1.0f;// 2.2;
-	float roughness =  pow(texture(material.texture_roughness, TexCoords).rgba, vec4(RnMPow)).r;
-	float metallic  =  pow(texture(material.texture_metallic, TexCoords).rgba, vec4(RnMPow)).r;
-    float ao =  pow(texture(material.texture_ao, TexCoords).rgba, vec4(2.2)).r;
-	vec3 diffuse = pow(texture(material.texture_diffuse, TexCoords).rgba, vec4(2.2)).rgb;
-	LinearMatVals parse = LinearMatVals(roughness, metallic, ao, diffuse);
+	float RnMPExponent = 1.0f;// 2.2;
+	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, TexCoords);
 
 	//Metelic ratio
 	vec3 F0 = vec3(0.04);
-	F0 = mix(F0, diffuse, metallic);
+	F0 = mix(F0, parse.diffuse, parse.metallic);
 	
     // reflectance equation (output)
     vec3 L0 = vec3(0.0);
@@ -208,9 +209,11 @@ void main()
 	vec3 L = -dirLight.direction;
 	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
 	
-	vec3 ambient = vec3(0.03) * diffuse * ao;
+	vec3 ambient = vec3(0.03) * parse.diffuse * parse.ao;
     color = vec4(ambient + L0, 1.0);
 	
-	color = color / (color + vec4(1.0));
-    color = pow(color, vec4(1.0/2.2));  
+	//color = color / (color + vec4(1.0));
+    //color = pow(color, vec4(1.0/2.2));  
+	color = vec4(GetNormalFromMap(), 1.0f);
 }
+
