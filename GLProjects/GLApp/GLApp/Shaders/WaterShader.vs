@@ -54,7 +54,7 @@ TexCoords = texCoords;
 WorldPos = FragPos;
 
 float applyRat = saturate(Bilerp(position.z, ActorPos.z, ActorPos.z + 5));
-vec3 offset = applyRat *  Wave(vec2(1.0f, 0.5f), 4, texCoords, TimeLapsed, 8, 25);
+vec3 offset = Wave(vec2(0.6f, 0.4f), 4, texCoords, TimeLapsed, 8, 50);
 
 gl_Position =  projection * view * model * vec4 (position + offset, 1.0f);
 

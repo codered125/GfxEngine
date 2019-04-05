@@ -115,7 +115,7 @@ int main()
 	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
 
 	//Model oldMan("Models/OldMan/muro.obj");
-	Model waterModel("Models/WaterBlock/SM_waterBlock.FBX");
+	Model waterModel("Models/WaterBlock/SM_waterBlockOBJ.obj");
 	Model roomModel("Models/Room/Room.obj");
 
 	// Cubemap (Skybox)
@@ -206,12 +206,11 @@ int main()
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(1.0f));
 		DrawModel(&PBRshader, &roomModel, modelTransformation, 1.0f);
 
-	//	modelTransformation = glm::mat4();
-	//	modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
-	//	modelTransformation = glm::rotate(modelTransformation, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//	modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	//	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.04f, 0.04f, 0.004f));
-		//DrawModel(&WaterShader, &waterModel, modelTransformation, 16.0f);
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
+		modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.04f, 0.04f, 0.004f));
+		DrawWater(&WaterShader, &waterModel, modelTransformation, GLint());
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -448,8 +447,7 @@ void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model, GLuint *
 	glm::decompose(model, scale, rotation, translation, skew, perspective);
 	modelShader->setVec3("ActorPos", translation);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, *normalmaps);
+
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	glm::mat4 view = ourCamera.GetViewMatrix();
 
