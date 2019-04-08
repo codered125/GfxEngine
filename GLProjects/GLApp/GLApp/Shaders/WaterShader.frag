@@ -50,6 +50,7 @@ vec3 getNormalFromMap();
 vec2 Panner(float XSpeed, float YSpeed);
 
 vec3 GetNormalFromMap();
+float Bilerp(float T, float min, float max);
 float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 Norm, vec3 View, vec3 L, float roughness);
@@ -64,16 +65,22 @@ vec2 Panner(float XSpeed, float YSpeed)
 	return output;
 }
 
+float Bilerp(float T, float min, float max)
+{
+	return saturate((T - min) / (max - min));
+}
+
 
 vec3 getNormalFromMap()
 {
+	vec2 localTexCoord =  dot (Normal, vec3(0.0f, 1.0f, 0.0f)) > 0.5f?  Panner(0.1, 0.05) : TexCoords;
 	//normalise it to 0-1
-    vec3 tangentNormal = (texture(material.texture_normal, Panner(0.25f, 0.0f)).xyz * 2.0) - 1.0;
+    vec3 tangentNormal = (texture(material.texture_normal, localTexCoord).xyz * 2.0) - 1.0;
 
     vec3 Q1  = dFdx(WorldPos);
     vec3 Q2  = dFdy(WorldPos);
-    vec2 st1 = dFdx(TexCoords);
-    vec2 st2 = dFdy(TexCoords);
+    vec2 st1 = dFdx(localTexCoord);
+    vec2 st2 = dFdy(localTexCoord);
 
     vec3 N   = normalize(Normal);
     vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
@@ -91,7 +98,7 @@ float UE4SphereMask(vec3 a, vec3 b, float Radius, float Hardness)
 	float invHardness = 1 / (1-Hardness);
 	float negNormDist = 1 - normDist;
 	float unclampedResult = invHardness * negNormDist;
-	return clamp(unclampedResult, 0, 1);
+	return max(min(unclampedResult, 1.0f), 0.0f); 
 	
 }
 
@@ -155,31 +162,42 @@ vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals 
 }
 LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoords)
 {
-	float roughness = mix(1, 0.002, dot(vec3(0, 0, 1), getNormalFromMap()));
+	vec3 Norm = getNormalFromMap();
+
+	float roughRat = saturate(Bilerp(WorldPos.y, ActorPos.y, ActorPos.y + 5));
+	float roughness = mix(1, 0.002, roughRat); //saturate(dot(vec3(0, 1 ,0 ), Norm)));
 	float metallic  = 0.5f;// pow(texture(mats.texture_metallic, TexCoords).rgba, vec4(Exponent)).r;
     float ao =  1;//pow(texture(mats.texture_ao, TexCoords).rgba, vec4(2.2)).r;
-
-	vec3 Norm = getNormalFromMap();
+	
+	vec3 localCamDir =  normalize(WorldPos - CamPos);
 	vec3 colourA = vec3(0.02, 0.03, 0.03);
 	vec3 colourB = vec3(0.05, 0.07, 0.1);
-	float ratio = UE4SphereMask(CamDir, Norm, 1.5f, saturate(dot(CamDir, Normal)) );
-	vec3 diffuse = mix (colourA, colourB, ratio);
+	float ratio = UE4SphereMask(localCamDir, Norm, 22.5f, saturate(dot(localCamDir, Norm)));
+	float fresnelExp2 = 0.344519;
+	ratio =pow(ratio,fresnelExp2 );
+	vec3 diffuse = mix(colourA, colourB, ratio);
 
-	return  LinearMatVals(roughness, metallic, ao, diffuse);
+	return  LinearMatVals(pow(roughness, 2.2), pow(metallic, 2.2), pow(ao, 2.2),  pow(20 *  diffuse, vec3(2.2)) );
 }
 
 void main()
 {	
-
-
 	vec3 Norm = getNormalFromMap();
 	//Directional Lights
-	vec3 r = dirLight.diffuse;
+	float instense = 5.5;
+
+
+	vec3 r = vec3(0.1f);
 	vec3 L = -dirLight.direction;
 	vec3 View = normalize(CamPos - WorldPos);
-	LinearMatVals parse = ConvertMapsToPBRValues(material, 1.0f, TexCoords);
-	vec3 L0 = ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity * 10);
-	
-    color = vec4(parse.diffuse + L0, 1.0f);
-	//color = vec4(Normal, 1.0f);
+
+	LinearMatVals parse = ConvertMapsToPBRValues(material, 2.2f, TexCoords);
+
+	vec3 L0 = ProgrammablePBR(Norm, View, r, L, parse, instense);
+	//float roughRat = saturate(Bilerp(WorldPos.y, ActorPos.y, ActorPos.y + 50));
+	vec3 ambient = vec3(0.03) * parse.diffuse * parse.ao;
+    color = vec4(ambient + L0 , 0.0f);
+	//color = vec4(roughRat);
 }
+
+	//vec3 up = vec3(dot (vec3(0.0f, 1.0f, 0.0f) , Normal));

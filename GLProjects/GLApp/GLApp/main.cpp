@@ -32,7 +32,7 @@ void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
 void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float shine);
-void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model, GLuint * normalmaps);
+void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model);
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
 void togglePostProcessEffects(int effectNumber);
@@ -135,6 +135,7 @@ int main()
 
 	GLuint fbo;
 	glGenFramebuffers(1, &fbo);
+	//cout << fbo << endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	GLuint texColourBuffer;
@@ -146,8 +147,12 @@ int main()
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texColourBuffer, 0);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 	GLuint rbo;
 	glGenRenderbuffers(1, &rbo);
@@ -208,9 +213,10 @@ int main()
 
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
-		modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.04f, 0.04f, 0.004f));
-		DrawWater(&WaterShader, &waterModel, modelTransformation, GLint());
+		//modelTransformation = glm::scale(modelTransformation, glm::vec3(0.05f, 0.1f, 0.05f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.1f));
+		modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		DrawWater(&WaterShader, &waterModel, modelTransformation);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -431,13 +437,13 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 	ourModel->Draw(modelShader, shine);
 }
 
-void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model, GLuint * normalmaps)
+void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model)
 {
 	modelShader->use();
 	modelShader->setFloat("Time", SecondCounter);
 	modelShader->setFloat("TimeLapsed", glfwGetTime());
 	modelShader->setVec3("CamPos", ourCamera.getPosition());
-	modelShader->setVec3("CamDir", ourCamera.getFront());
+	modelShader->setVec3("CamDir", ourCamera.getFront() - ourCamera.getPosition());
 
 	glm::vec3 scale;
 	glm::quat rotation;
