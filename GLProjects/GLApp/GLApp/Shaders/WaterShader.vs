@@ -26,7 +26,7 @@ float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
 
 float Bilerp(float T, float min, float max)
 {
-	return (T - min) / (max - min);
+	return saturate((T - min) / (max - min));
 }
 
 float UE4Sine(float x)
@@ -42,19 +42,22 @@ vec3 Wave(vec2 direct, float inwaves, vec2 inTexCoord, float inTime, float expo,
 	//Because ue4 sine is different to hlsl function
 	float applyTime = UE4Sine(dirAndWaves + inTime);
 	float normToRange = pow((applyTime +1) / 2 , expo);		
-	return vec3(0.0f, 0.0f, 1.0f) * normToRange * inheight;
+	return vec3(0.0f, 1.0f, 0.0f) * normToRange * inheight;
 }
 
 
 void main()
 {
-FragPos = vec3(model * vec4(position, 1.0f));
+
+float applyRat = saturate(Bilerp(position.y, ActorPos.y, ActorPos.y + 30));
+vec3 offset = applyRat * Wave(vec2(1.0f, 0.5f), 2, texCoords, TimeLapsed, 8, 25);
+
+
+FragPos = vec3(model * vec4(position + offset, 1.0f));
 Normal = mat3(transpose(inverse(model))) * normal;
 TexCoords = texCoords;
 WorldPos = FragPos;
 
-float applyRat = saturate(Bilerp(position.z, ActorPos.z, ActorPos.z + 5));
-vec3 offset = Wave(vec2(0.6f, 0.4f), 4, texCoords, TimeLapsed, 8, 50);
 
 gl_Position =  projection * view * model * vec4 (position + offset, 1.0f);
 

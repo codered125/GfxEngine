@@ -185,7 +185,7 @@ void main()
 	vec3 Norm = GetNormalFromMap();
 	vec3 View = normalize(CamPos - WorldPos);
 
-	float RnMPExponent = 1.0f;// 2.2;
+	float RnMPExponent = 2.2f;//1.0f;// 2.2;
 	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, TexCoords);
 
 	//Metelic ratio
@@ -212,8 +212,8 @@ void main()
 	vec3 ambient = vec3(0.03) * parse.diffuse * parse.ao;
     color = vec4(ambient + L0, 1.0);
 	
-	//color = color / (color + vec4(1.0));
-    //color = pow(color, vec4(1.0/2.2));  
-	color = vec4(GetNormalFromMap(), 1.0f);
+	color = color / (color + vec4(1.0));
+	color = pow(color, vec4(1.0/2.2));  
+	//color = vec4(GetNormalFromMap(), 1.0f);
 }
 
