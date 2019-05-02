@@ -36,31 +36,34 @@ void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model);
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
 void togglePostProcessEffects(int effectNumber);
-Camera ourCamera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+glm::vec3 MyLerp(glm::vec3 a, glm::vec3 b, float t);
+Camera ourCamera(glm::vec3(0.0f, 1.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
-GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 0.8f;
+
+GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 1.0f;
 bool Keys[1024];
 bool firstMouse , lightDirection = true;
 PostProcessing::PostProcessSettings currentPostProcessSettings;
 int AliasingCount = 4, NumberofLights = 4;
 glm::vec3 pointLightPositions[] =
 {
-	glm::vec3(0.8f, 5, 2.7f),//white
+	glm::vec3(0, 10, 0),//white
 
-	//glm::vec3(5, 0, 0),//red
+	glm::vec3(20, 5, 22),//red
 
-	//glm::vec3(0, 5.0, 0)//blue
+	glm::vec3(-20, 5, -22)//blue
 };
 glm::vec3 pointLightColours[] =
 {
 	glm::vec3(1.0f, 1.0f, 1.0f),//White,
 
-	//glm::vec3(1.0f, 0.0f, 0.0f),//red
+	glm::vec3(1.0f, 0.0f, 0.0f),//red
 
-	//glm::vec3(0.0f, 0.0f, 1.0f)//blue
+	glm::vec3(0.0f, 0.0f, 1.0f)//blue
 };
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 
 int main()
@@ -204,19 +207,17 @@ int main()
 		glm::mat4 modelTransformation = glm::mat4();
 
 		//Room Model
-		//cout << ourCamera.getFront().x << ", " << ourCamera.getFront().y << ", "<< ourCamera.getFront().z  << endl;
+		cout << ourCamera.getFront().x << ", " << ourCamera.getFront().y << ", "<< ourCamera.getFront().z  << endl;
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -1.75f, 0));
-		modelTransformation = glm::rotate(modelTransformation, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(1.0f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.50f));
 		DrawModel(&PBRshader, &roomModel, modelTransformation, 1.0f);
 
+
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
-		//modelTransformation = glm::scale(modelTransformation, glm::vec3(0.05f, 0.1f, 0.05f));
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.1f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.05f));
 		modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		DrawWater(&WaterShader, &waterModel, modelTransformation);
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
+		//DrawWater(&WaterShader, &waterModel, modelTransformation);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -362,17 +363,15 @@ void DrawLights(Shader * lampShader)
 	lampShader->setMat4("projection", FOV);
 	glm::mat4 view = ourCamera.GetViewMatrix();
 	lampShader->setMat4("view", view);
-	const float min = 0, max = 1;
-	float rotAngle = min + ((max - min) *SecondCounter);
 
 	glBindVertexArray(lightVAO);
 	//for (GLuint i = 0; i < pointLightPositions->length(); i++)
-	for (GLuint i = 0; i < 1; i++)
+	for (GLuint i = 0; i < 3; i++)
 	{
 		model = glm::mat4();
-		model = glm::translate(model, pointLightPositions[i]);
+		int lel = i + 1 == 3 ? 0 : 1 +i;
+		model = glm::translate(model, pointLightPositions[i]); //pointLightPositions[i]);
 		model = glm::scale(model, glm::vec3(0.2f));
-		model = glm::rotate(model, deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &pointLightColours[i][0]);
 		lampShader->setFloat("Time", SecondCounter);
@@ -506,7 +505,10 @@ void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-
+glm::vec3 MyLerp(glm::vec3 a, glm::vec3 b, float t)
+{
+	return a + ((b - a) * t);
+}
 void initialiseLights(Shader * lightShader)
 {
 
@@ -521,39 +523,39 @@ void initialiseLights(Shader * lightShader)
 	Directional0.ambient = glm::vec3(0.05f);
 	Directional0.diffuse = glm::vec3( 0.1, 0.1, 0.0f);
 	Directional0.specular = glm::vec3(0.5f, 0.5f, 0.2f);
-	Directional0.intensity = 5;
+	Directional0.intensity = 2;
 	Directional0.setUpShader();
 
-
+	
 	// Point light 1
 	Light Point0 = PointLight(lightShader, "pointLights[0]");
 	Point0.diffuse = glm::vec3(pointLightColours[0].x, pointLightColours[0].y, pointLightColours[0].z);
-	Point0.position = glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
+	Point0.position = pointLightPositions[0]; // MyLerp(pointLightPositions[1], pointLightPositions[0], SecondCounter); //glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 	Point0.ambient = glm::vec3(0.0f);
 	Point0.specular = glm::vec3(0.0f);
-	Point0.intensity = 25;
+	Point0.intensity = 50 * SecondCounter;
 	Point0.setUpShader();
 
-	/*
+	
 	// Point light 1
 	Light Point1 = PointLight(lightShader, "pointLights[1]");
 	Point1.diffuse = glm::vec3(pointLightColours[1].x, pointLightColours[1].y, pointLightColours[1].z);
-	Point1.position = glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+	Point1.position = pointLightPositions[1];//MyLerp(pointLightPositions[2], pointLightPositions[1], SecondCounter);//glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
 	Point1.ambient = glm::vec3(0.0f);
 	Point1.specular = glm::vec3(0.0f);
-	Point1.intensity = 10.0f;
+	Point1.intensity = 10.0f * SecondCounter;
 	Point1.setUpShader();
 
 	// Point light 1
 	Light Point2 = PointLight(lightShader, "pointLights[2]");
 	Point2.diffuse = glm::vec3(pointLightColours[2].x, pointLightColours[2].y, pointLightColours[2].z);
-	Point2.position = glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+	Point2.position = pointLightPositions[2];// MyLerp(pointLightPositions[0], pointLightPositions[1], SecondCounter); //glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
 	Point2.ambient = glm::vec3(0.0f);
 	Point2.specular = glm::vec3(0.0f);
-	Point2.intensity = 7.5;
+	Point2.intensity = 7.5 * SecondCounter;
 	Point2.setUpShader();
 
-	*/
+
 
 	// SpotLight
 	Light CameraSpot = SpotLight(lightShader, "spotLight");
