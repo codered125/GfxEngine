@@ -1,6 +1,6 @@
 #version 330 core
 #define M_PI 3.14159265359
-#define NUMBER_OF_POINT_LIGHTS 1
+#define NUMBER_OF_POINT_LIGHTS 3
 
 
 struct DirLight 
@@ -185,7 +185,7 @@ void main()
 	vec3 Norm = GetNormalFromMap();
 	vec3 View = normalize(CamPos - WorldPos);
 
-	float RnMPExponent = 2.2f;//1.0f;// 2.2;
+	float RnMPExponent =1.0f;// 2.2;
 	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, TexCoords);
 
 	//Metelic ratio
