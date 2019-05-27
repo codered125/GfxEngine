@@ -2,12 +2,11 @@
 #include <thread>
 #include <future>
 
-#include <gl/glew.h>
-
-#include <GLFW/glfw3.h>
-
 #include <SOIL2\src\SOIL2\SOIL2.h>
 
+
+#include <gl/glew.h>
+#include <GLFW/glfw3.h>
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
 #include <gtx\matrix_decompose.hpp>
@@ -18,10 +17,13 @@
 #include "Source/Public/Shader.h"
 #include "Source/Public/StaticVertices.h"
 #include "Source/Public/Model.h"
+#include "Source/Public/Inputs.h"
 #include "Source/Public/Camera.h"
 #include "Source/Public/PostProcessing.h"
 #include "Source/Public/Light.h"
 #include "Source/Public/TextureLoading.h"
+
+
 
 
 
@@ -30,14 +32,7 @@ const GLint width = 1920, height = 1080;
 void GLFWSetUp();
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
-void KeyCallback(GLFWwindow  * window, int key, int scancode, int action, int mode);
-void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset);
-void MouseCallback(GLFWwindow * window, double xPos, double yPos);
-void DoMovement();
 void Tick();
-Shader CreateShaders1(const GLchar *vertexPath, const GLchar *fragmentPath);
-
-
 void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
@@ -46,7 +41,9 @@ void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model);
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
 void togglePostProcessEffects(int effectNumber);
-
+void KeyCallback(GLFWwindow  * window, int key, int scancode, int action, int mode);
+void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset);
+void MouseCallback(GLFWwindow * window, double xPos, double yPos);
 
 Camera ourCamera(glm::vec3(0.0f, 1.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
@@ -54,26 +51,10 @@ GLfloat lastY = height / 2.0f;
 
 GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 1.0f;
 bool Keys[1024];
-bool firstMouse , lightDirection = true;
+bool firstMouse, lightDirection = true;
 PostProcessing::PostProcessSettings currentPostProcessSettings;
 int AliasingCount = 4, NumberofLights = 4;
-glm::vec3 pointLightPositions[] =
-{
-	glm::vec3(0, 10, 0),//white
 
-	glm::vec3(20, 5, 22),//red
-
-	glm::vec3(-20, 5, -22)//blue
-};
-glm::vec3 pointLightColours[] =
-{
-	glm::vec3(1.0f, 1.0f, 1.0f),//White,
-
-	glm::vec3(1.0f, 0.0f, 0.0f),//red
-
-	glm::vec3(0.0f, 0.0f, 1.0f)//blue
-};
-//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 
 int main()
@@ -120,14 +101,11 @@ int main()
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_MULTISAMPLE);
 
-	std::future<Shader> ret = std::async(&CreateShaders1, "Shaders/PBR.vs", "Shaders/PBR.frag");
-	std::future<Shader> ret2 = std::async(&CreateShaders1, "Shaders/Lamp.vs", "Shaders/Lamp.frag");
-	Shader BlinnPhong("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
+	Shader BlinnPhong("Shaders/BlinnPhong.vs", "Shaders/BlinnPhong.frag");
 	Shader WaterShader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag");
-	//Shader PBRshader("Shaders/PBR.vs", "Shaders/PBR.frag");
+	Shader PBRshader("Shaders/PBR.vs", "Shaders/PBR.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
-	//Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
-
+	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
 
 	//Model oldMan("Models/OldMan/muro.obj");
@@ -200,14 +178,13 @@ int main()
 
 	screenShader.use();
 	screenShader.setInt("screenTexture", 0);
-	Shader PBRshader = ret.get();
-	Shader lampShader = ret2.get();
+
 	while (!glfwWindowShouldClose(window))
 	{
 		Tick();
 		//check for events/inputs
 		glfwPollEvents();
-		DoMovement();
+		Input::DoMovement(deltaTime, &ourCamera, &Keys);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)							 
@@ -259,14 +236,6 @@ int main()
 	return EXIT_SUCCESS;
 }
 
-Shader CreateShaders1(const GLchar *vertexPath, const GLchar *fragmentPath)
-{
-	return Shader(vertexPath, fragmentPath);
-}
-
-
-
-
 
 void Tick()
 {
@@ -312,56 +281,6 @@ void  GLFWSetUp()
 	glEnable(GL_MULTISAMPLE);
 }
 
-void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)glfwSetWindowShouldClose(window, GL_TRUE);
-
-	if (key > 0 && key < 1024)
-	{
-		if (GLFW_PRESS == action) Keys[key] = true;
-		else if (GLFW_RELEASE == action)Keys[key] = false;
-	}
-}
-
-void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset)
-{
-	ourCamera.ProessMouseSroll((GLfloat)yOffset);
-}
-
-void MouseCallback(GLFWwindow * window, double xPos, double yPos)
-{
-	if (firstMouse)
-	{
-		lastX = (GLfloat)xPos;
-		lastY = (GLfloat)yPos;
-		firstMouse = false;
-	}
-
-	GLfloat xOffset = (GLfloat)xPos - lastX;
-	GLfloat yOffset = lastY - (GLfloat)yPos; //this is reverse because opengl Y coords start from bottom left and go reverse
-
-	lastX = (GLfloat)xPos;
-	lastY = (GLfloat)yPos;
-	ourCamera.ProcessMouseMovement(xOffset, yOffset);
-}
-
-void DoMovement()
-{
-	if (Keys[GLFW_KEY_W] || Keys[GLFW_KEY_UP]) ourCamera.ProcessKeyboard(EForward, deltaTime);
-	if (Keys[GLFW_KEY_S] || Keys[GLFW_KEY_DOWN]) ourCamera.ProcessKeyboard(EBackward, deltaTime);
-	if (Keys[GLFW_KEY_A] || Keys[GLFW_KEY_LEFT]) ourCamera.ProcessKeyboard(ELeft, deltaTime);
-	if (Keys[GLFW_KEY_D] || Keys[GLFW_KEY_RIGHT]) ourCamera.ProcessKeyboard(ERight, deltaTime);
-
-	
-	if (keyboardlockout > 0)return;
-	if (Keys[GLFW_KEY_1]) togglePostProcessEffects(1);
-	if (Keys[GLFW_KEY_2]) togglePostProcessEffects(2);
-	if (Keys[GLFW_KEY_3]) togglePostProcessEffects(3);
-	if (Keys[GLFW_KEY_4]) togglePostProcessEffects(4);
-	if (Keys[GLFW_KEY_5]) togglePostProcessEffects(5);
-	if (Keys[GLFW_KEY_6]) togglePostProcessEffects(6);
-}
-
 
 
 void DrawLights(Shader * lampShader)
@@ -391,10 +310,10 @@ void DrawLights(Shader * lampShader)
 	{
 		model = glm::mat4();
 		int lel = i + 1 == 3 ? 0 : 1 +i;
-		model = glm::translate(model, pointLightPositions[i]); //pointLightPositions[i]);
+		model = glm::translate(model, StaticVertices::pointLightPositions[i]); //pointLightPositions[i]);
 		model = glm::scale(model, glm::vec3(0.2f));
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &pointLightColours[i][0]);
+		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &StaticVertices::pointLightColours[i][0]);
 		lampShader->setFloat("Time", SecondCounter);
 		lampShader->setFloat("TimeLapsed", glfwGetTime());
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -547,8 +466,8 @@ void initialiseLights(Shader * lightShader)
 	
 	// Point light 1
 	Light Point0 = PointLight(lightShader, "pointLights[0]");
-	Point0.diffuse = glm::vec3(pointLightColours[0].x, pointLightColours[0].y, pointLightColours[0].z);
-	Point0.position = pointLightPositions[0]; // MyLerp(pointLightPositions[1], pointLightPositions[0], SecondCounter); //glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
+	Point0.diffuse = StaticVertices::pointLightColours[0];
+	Point0.position = StaticVertices::pointLightPositions[0]; // MyLerp(pointLightPositions[1], pointLightPositions[0], SecondCounter); //glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 	Point0.ambient = glm::vec3(0.0f);
 	Point0.specular = glm::vec3(0.0f);
 	Point0.intensity = 50 * SecondCounter;
@@ -557,8 +476,8 @@ void initialiseLights(Shader * lightShader)
 	
 	// Point light 1
 	Light Point1 = PointLight(lightShader, "pointLights[1]");
-	Point1.diffuse = glm::vec3(pointLightColours[1].x, pointLightColours[1].y, pointLightColours[1].z);
-	Point1.position = pointLightPositions[1];//MyLerp(pointLightPositions[2], pointLightPositions[1], SecondCounter);//glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+	Point1.diffuse = StaticVertices::pointLightColours[1];
+	Point1.position = StaticVertices::pointLightPositions[1];//MyLerp(pointLightPositions[2], pointLightPositions[1], SecondCounter);//glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
 	Point1.ambient = glm::vec3(0.0f);
 	Point1.specular = glm::vec3(0.0f);
 	Point1.intensity = 10.0f * SecondCounter;
@@ -566,8 +485,8 @@ void initialiseLights(Shader * lightShader)
 
 	// Point light 1
 	Light Point2 = PointLight(lightShader, "pointLights[2]");
-	Point2.diffuse = glm::vec3(pointLightColours[2].x, pointLightColours[2].y, pointLightColours[2].z);
-	Point2.position = pointLightPositions[2];// MyLerp(pointLightPositions[0], pointLightPositions[1], SecondCounter); //glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+	Point2.diffuse = StaticVertices::pointLightColours[2];
+	Point2.position = StaticVertices::pointLightPositions[2];// MyLerp(pointLightPositions[0], pointLightPositions[1], SecondCounter); //glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
 	Point2.ambient = glm::vec3(0.0f);
 	Point2.specular = glm::vec3(0.0f);
 	Point2.intensity = 7.5 * SecondCounter;
@@ -604,4 +523,19 @@ void togglePostProcessEffects(int effectNumber)
 		break;
 	}
 
+}
+
+void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode)
+{
+	Input::KeyCallback(window, key, scancode, action, mode, &ourCamera, Keys[key]);
+}
+
+void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset)
+{
+	Input::ScrollCallback(window, xOffset, yOffset, &ourCamera);
+}
+
+void MouseCallback(GLFWwindow * window, double xPos, double yPos)
+{
+	Input::MouseCallback(window, xPos, yPos, &ourCamera, lastX, lastY, firstMouse);
 }
