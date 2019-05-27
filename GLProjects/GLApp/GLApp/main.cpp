@@ -1,19 +1,27 @@
 #include <iostream>
+#include <thread>
+#include <future>
+
 #include <gl/glew.h>
+
 #include <GLFW/glfw3.h>
+
 #include <SOIL2\src\SOIL2\SOIL2.h>
+
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
 #include <gtx\matrix_decompose.hpp>
 #include <gtc\type_ptr.hpp>
-#include "Shader.h"
-#include "StaticVertices.h"
-#include "Model.h"
-#include "Camera.h"
-#include "PostProcessing.h"
-#include "Light.h"
-#include "TextureLoading.h"
 
+
+
+#include "Source/Public/Shader.h"
+#include "Source/Public/StaticVertices.h"
+#include "Source/Public/Model.h"
+#include "Source/Public/Camera.h"
+#include "Source/Public/PostProcessing.h"
+#include "Source/Public/Light.h"
+#include "Source/Public/TextureLoading.h"
 
 
 
@@ -27,6 +35,8 @@ void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset);
 void MouseCallback(GLFWwindow * window, double xPos, double yPos);
 void DoMovement();
 void Tick();
+Shader CreateShaders1(const GLchar *vertexPath, const GLchar *fragmentPath);
+
 
 void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
@@ -37,7 +47,7 @@ void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, G
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
 void togglePostProcessEffects(int effectNumber);
 
-glm::vec3 MyLerp(glm::vec3 a, glm::vec3 b, float t);
+
 Camera ourCamera(glm::vec3(0.0f, 1.0f, 3.0f));
 GLfloat lastX = width / 2.0f;
 GLfloat lastY = height / 2.0f;
@@ -110,11 +120,14 @@ int main()
 	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_MULTISAMPLE);
 
+	std::future<Shader> ret = std::async(&CreateShaders1, "Shaders/PBR.vs", "Shaders/PBR.frag");
+	std::future<Shader> ret2 = std::async(&CreateShaders1, "Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	Shader BlinnPhong("Shaders/modelLoading.vs", "Shaders/modelLoading.frag");
 	Shader WaterShader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag");
-	Shader PBRshader("Shaders/PBR.vs", "Shaders/PBR.frag");
+	//Shader PBRshader("Shaders/PBR.vs", "Shaders/PBR.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
-	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
+	//Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
+
 	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
 
 	//Model oldMan("Models/OldMan/muro.obj");
@@ -130,7 +143,7 @@ int main()
 	faces.push_back("Images/HRSkybox/back.png");
 	faces.push_back("Images/HRSkybox/front.png");
 	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
-	GLuint wallTextureSpec = TextureLoading::LoadTexture("Images/box_spec.png");
+	//GLuint wallTextureSpec = TextureLoading::LoadTexture("Images/box_spec.png");
 
 	GLuint quadVAO, quadVBO;
 	SetQuadUp(&quadVAO, &quadVBO);
@@ -187,7 +200,8 @@ int main()
 
 	screenShader.use();
 	screenShader.setInt("screenTexture", 0);
-
+	Shader PBRshader = ret.get();
+	Shader lampShader = ret2.get();
 	while (!glfwWindowShouldClose(window))
 	{
 		Tick();
@@ -207,7 +221,6 @@ int main()
 		glm::mat4 modelTransformation = glm::mat4();
 
 		//Room Model
-		cout << ourCamera.getFront().x << ", " << ourCamera.getFront().y << ", "<< ourCamera.getFront().z  << endl;
 		modelTransformation = glm::mat4();
 		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.50f));
 		DrawModel(&PBRshader, &roomModel, modelTransformation, 1.0f);
@@ -245,6 +258,14 @@ int main()
 	glfwTerminate();
 	return EXIT_SUCCESS;
 }
+
+Shader CreateShaders1(const GLchar *vertexPath, const GLchar *fragmentPath)
+{
+	return Shader(vertexPath, fragmentPath);
+}
+
+
+
 
 
 void Tick()
@@ -505,10 +526,7 @@ void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
-glm::vec3 MyLerp(glm::vec3 a, glm::vec3 b, float t)
-{
-	return a + ((b - a) * t);
-}
+
 void initialiseLights(Shader * lightShader)
 {
 
