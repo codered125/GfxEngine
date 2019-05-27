@@ -65,30 +65,15 @@
     <ClInclude Include="Source\Public\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Public\Inputs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\core.vs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="Shaders\frag.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="Shaders\Lighting.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="Shaders\Lighting.vs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
     <None Include="Shaders\Lamp.frag">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="Shaders\Lamp.vs">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="Shaders\modelLoading.frag">
-      <Filter>Source Files\Shaders</Filter>
-    </None>
-    <None Include="Shaders\modelLoading.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
     <None Include="Shaders\Skybox.frag">
@@ -127,6 +112,8 @@
     <None Include="Shaders\PBRPrimative.vs">
       <Filter>Source Files\Shaders</Filter>
     </None>
+    <None Include="Shaders\BlinnPhong.frag" />
+    <None Include="Shaders\BlinnPhong.vs" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc">

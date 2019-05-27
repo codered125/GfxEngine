@@ -9,7 +9,7 @@ public:
 		UnActive, Active
 	};
 
-	static struct PostProcessSettings
+	struct PostProcessSettings
 	{
 		EffectStatus InvertedColours, HDR, AntiAliasing, ColourGrading, TimeBasedEffects = EffectStatus::UnActive;
 	};

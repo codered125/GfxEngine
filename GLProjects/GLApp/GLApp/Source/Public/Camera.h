@@ -3,7 +3,6 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
 #include <glm.hpp>
-#include <thread>
 #include<gtc/matrix_transform.hpp>
 
 enum Camera_Movement

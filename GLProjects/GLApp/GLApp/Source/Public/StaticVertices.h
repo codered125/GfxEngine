@@ -1,5 +1,5 @@
 #pragma once
-
+#include<gtc/matrix_transform.hpp>
 #include <glm.hpp>
 #include <GL\glew.h>
 
@@ -121,5 +121,25 @@ namespace StaticVertices {
 		1.0f, -1.0f,  1.0f, 0.0f,
 		1.0f,  1.0f,  1.0f, 1.0f
 	};
+
+	glm::vec3 pointLightPositions[] =
+	{
+		glm::vec3(0, 10, 0),//white
+
+		glm::vec3(20, 5, 22),//red
+
+		glm::vec3(-20, 5, -22)//blue
+	};
+
+	glm::vec3 pointLightColours[] =
+	{
+		glm::vec3(1.0f, 1.0f, 1.0f),//White,
+
+		glm::vec3(1.0f, 0.0f, 0.0f),//red
+
+		glm::vec3(0.0f, 0.0f, 1.0f)//blue
+	};
+//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
 
 };
