@@ -1,7 +1,7 @@
 ﻿  main.cpp
-d:\documents\github\gfxengine\glprojects\glapp\glapp\postprocessing.h(15): warning C4091: 'static ': ignored on left of 'PostProcessing::PostProcessSettings' when no variable is declared
-d:\documents\github\gfxengine\glprojects\glapp\glapp\main.cpp(378): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-d:\documents\github\gfxengine\glprojects\glapp\glapp\main.cpp(425): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-d:\documents\github\gfxengine\glprojects\glapp\glapp\main.cpp(443): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-d:\documents\github\gfxengine\glprojects\glapp\glapp\main.cpp(555): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  GLApp.vcxproj -> D:\Documents\GitHub\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\source\public\postprocessing.h(15): warning C4091: 'static ': ignored on left of 'PostProcessing::PostProcessSettings' when no variable is declared
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(399): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(446): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(464): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(573): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  GLApp.vcxproj -> D:\Documents\Development\GitHub\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe

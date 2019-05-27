@@ -16,41 +16,53 @@
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{c2d2bf0a-73cc-420b-886c-97e8e6aaea7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Source">
+      <UniqueIdentifier>{c7470028-472c-45d1-88b6-db36d4da1cfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Source\Public">
+      <UniqueIdentifier>{b700a7cd-a449-489b-b4c0-d8d29c765fe6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Source\Private">
+      <UniqueIdentifier>{e6f048f5-47d6-4de2-b93e-d2b1b96408d4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Private\Model.cpp">
+      <Filter>Source Files\Source\Private</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Shader.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Source\Public\Camera.h">
+      <Filter>Source Files\Source\Public</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Public\Light.h">
+      <Filter>Source Files\Source\Public</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Public\Mesh.h">
+      <Filter>Source Files\Source\Public</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Public\Model.h">
+      <Filter>Source Files\Source\Public</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Public\PostProcessing.h">
+      <Filter>Source Files\Source\Public</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Public\resource.h">
+      <Filter>Source Files\Source\Public</Filter>
     </ClInclude>
-    <ClInclude Include="TextureLoading.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Public\StaticVertices.h">
+      <Filter>Source Files\Source\Public</Filter>
     </ClInclude>
-    <ClInclude Include="StaticVertices.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Source\Public\TextureLoading.h">
+      <Filter>Source Files\Source\Public</Filter>
     </ClInclude>
-    <ClInclude Include="PostProcessing.h">
+    <ClInclude Include="Source\Public\Shader.h">
+      <Filter>Source Files\Source\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

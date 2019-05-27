@@ -152,18 +152,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="Source\Private\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="PostProcessing.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="StaticVertices.h" />
-    <ClInclude Include="TextureLoading.h" />
+    <ClInclude Include="Source\Public\Camera.h" />
+    <ClInclude Include="Source\Public\Light.h" />
+    <ClInclude Include="Source\Public\Math.h" />
+    <ClInclude Include="Source\Public\Mesh.h" />
+    <ClInclude Include="Source\Public\Model.h">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </ClInclude>
+    <ClInclude Include="Source\Public\PostProcessing.h" />
+    <ClInclude Include="Source\Public\resource.h" />
+    <ClInclude Include="Source\Public\Shader.h" />
+    <ClInclude Include="Source\Public\StaticVertices.h" />
+    <ClInclude Include="Source\Public\TextureLoading.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\core.vs" />
