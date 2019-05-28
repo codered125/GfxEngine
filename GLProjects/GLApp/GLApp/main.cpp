@@ -22,10 +22,7 @@
 #include "Source/Public/PostProcessing.h"
 #include "Source/Public/Light.h"
 #include "Source/Public/TextureLoading.h"
-
-
-
-
+#include "Source/Public/Math.h"
 
 //const GLint width = 1200, height = 800;
 const GLint width = 1920, height = 1080;
@@ -53,20 +50,19 @@ GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 1.0f;
 bool Keys[1024];
 bool firstMouse, lightDirection = true;
 PostProcessing::PostProcessSettings currentPostProcessSettings;
-int AliasingCount = 4, NumberofLights = 4;
+std::map<int, int> InputMap;
 
+int AliasingCount = 4, NumberofLights = 4;
 
 
 int main()
 {
 	GLFWSetUp();
 	//Creating window
-
-
 	GLFWwindow *  window = glfwCreateWindow(width, height, "Moses Playboy Mansion", nullptr, nullptr);
+
 	//Going to get the real size and height of the screen and store it to our storage
 	//helps with high density displays. Will use it when creating viewport
-
 	glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
 
 	if (window == nullptr)
@@ -87,6 +83,8 @@ int main()
 	//Tells glew to use a modern approach to retrieving function pointers and extensions
 	glewExperimental = GL_TRUE;
 	glewInit();
+
+
 	//inline initiation and safety check
 	if (GLEW_OK != glewInit())
 	{
@@ -178,13 +176,14 @@ int main()
 
 	screenShader.use();
 	screenShader.setInt("screenTexture", 0);
+	Input::InitializeInputMap(InputMap);
 
 	while (!glfwWindowShouldClose(window))
 	{
 		Tick();
 		//check for events/inputs
 		glfwPollEvents();
-		Input::DoMovement(deltaTime, &ourCamera, &Keys);
+		Input::DoMovement(deltaTime, &ourCamera, Keys, keyboardlockout, &currentPostProcessSettings, InputMap);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)							 
@@ -243,20 +242,15 @@ void Tick()
 	GLfloat currentFrame = (GLfloat)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-	if (SecondCounter >= 1)
-	{
-		SecondCounter = 1;
-		lightDirection = false;
-	}
-	if (SecondCounter <= 0.0)
-	{
-		SecondCounter = 0.0;
-		lightDirection = true;
-	}
-	const GLfloat currentDelt = lightDirection ? deltaTime : deltaTime * -1;
+	
+	SecondCounter = MoMath::MoSaturate(SecondCounter);
+
+	lightDirection = (SecondCounter >= 1 || SecondCounter <= 0.0) ? !lightDirection : lightDirection;
 	keyboardlockout = keyboardlockout > 0 ? keyboardlockout - deltaTime : 0;
+
 	if (currentPostProcessSettings.TimeBasedEffects == PostProcessing::EffectStatus::Active)
 	{
+		const GLfloat currentDelt = lightDirection ? deltaTime : deltaTime * -1;
 		SecondCounter += (currentDelt / 6);
 	}
 
@@ -287,9 +281,6 @@ void DrawLights(Shader * lampShader)
 {
 	lampShader->use();
 	GLuint lightVAO;
-
-	//glGenBuffers(1, &lightVBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, lightVBO);
 	glGenVertexArrays(1, &lightVAO);
 	glBindVertexArray(lightVAO);
 
@@ -354,8 +345,6 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS); // Set depth function back to default
-
-
 }
 
 void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float shine)
@@ -391,8 +380,7 @@ void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model)
 	glm::vec4 perspective;
 	glm::decompose(model, scale, rotation, translation, skew, perspective);
 	modelShader->setVec3("ActorPos", translation);
-
-
+	
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	glm::mat4 view = ourCamera.GetViewMatrix();
 
@@ -504,30 +492,9 @@ void initialiseLights(Shader * lightShader)
 	CameraSpot.setUpShader();
 }
 
-void togglePostProcessEffects(int effectNumber)
-{
-	keyboardlockout = 0.1f;
-	switch (effectNumber)
-	{
-	case 1:
-		currentPostProcessSettings.InvertedColours =  static_cast<PostProcessing::EffectStatus>( currentPostProcessSettings.InvertedColours == 1 ? 0 : 1);
-		break;
-	case 2:
-		currentPostProcessSettings.HDR = static_cast<PostProcessing::EffectStatus>(currentPostProcessSettings.HDR ==  1 ? 0 : 1);
-		break;
-	case 3:
-		currentPostProcessSettings.ColourGrading = static_cast<PostProcessing::EffectStatus>(currentPostProcessSettings.ColourGrading == 1 ? 0 : 1);
-		break;
-	case 4: 
-		currentPostProcessSettings.TimeBasedEffects = static_cast<PostProcessing::EffectStatus>(currentPostProcessSettings.TimeBasedEffects == 1 ? 0 : 1);
-		break;
-	}
-
-}
-
 void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode)
 {
-	Input::KeyCallback(window, key, scancode, action, mode, &ourCamera, Keys[key]);
+	Input::KeyCallback(window, key, scancode, action, mode, &ourCamera, Keys);
 }
 
 void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset)

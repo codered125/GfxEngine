@@ -24,5 +24,23 @@ public:
 		FBShader->setInt("currentPostProcessEffect.ColourGradiant", PPS.ColourGrading);
 	};
 
-
+	static void TogglePostProcessEffects(int effectNumber, PostProcessSettings * PPS, GLfloat & keyboardlockout)
+	{
+		keyboardlockout = 0.1f;
+		switch (effectNumber)
+		{
+		case 1:
+			PPS->InvertedColours = static_cast<PostProcessing::EffectStatus>(PPS->InvertedColours == 1 ? 0 : 1);
+			break;
+		case 2:
+			PPS->HDR = static_cast<PostProcessing::EffectStatus>(PPS->HDR == 1 ? 0 : 1);
+			break;
+		case 3:
+			PPS->ColourGrading = static_cast<PostProcessing::EffectStatus>(PPS->ColourGrading == 1 ? 0 : 1);
+			break;
+		case 4:
+			PPS->TimeBasedEffects = static_cast<PostProcessing::EffectStatus>(PPS->TimeBasedEffects == 1 ? 0 : 1);
+			break;
+		}
+	}
 };
