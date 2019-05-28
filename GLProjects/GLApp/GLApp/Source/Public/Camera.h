@@ -7,10 +7,10 @@
 
 enum Camera_Movement
 {
-	EForward, 
-	EBackward,
-	ELeft,
-	ERight
+	EForward = 1, 
+	EBackward = -1,
+	ELeft = 1,
+	ERight = -1
 };
 
 const GLfloat YAW = -90.0f;
@@ -82,12 +82,17 @@ public:
 
 	void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
 	{
-		GLfloat velocity = this->movementSpeed * deltaTime;
+		GLfloat velocity = (this->movementSpeed * deltaTime) * direction;
+
+		(direction == Camera_Movement::EForward || direction  == Camera_Movement::EBackward)?	
+			this->position += this->front * velocity : this->position += this->right * velocity ;
+		/*
 
 		if (direction == EForward) this->position  += this->front * velocity;
 		if (direction == EBackward)	this->position -=  this->front * velocity;
 		if (direction == ELeft)	this->position -= this->right * velocity;
 		if (direction == ERight)this->position += this->right * velocity;
+		*/
 	}
 	
 	void ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true) 
