@@ -109,7 +109,7 @@ int main()
 	//Model oldMan("Models/OldMan/muro.obj");
 	Model waterModel("Models/WaterBlock/SM_waterBlockOBJ.obj");
 	Model roomModel("Models/Room/Room.obj");
-
+	Model GizMo("Models/Gizmo/GizmoForMo.obj");
 	// Cubemap (Skybox)
 	vector<const GLchar*> faces;
 	faces.push_back("Images/HRSkybox/right.png");
@@ -203,9 +203,10 @@ int main()
 
 
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.05f));
-		modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
+		DrawModel(&PBRshader, &GizMo, modelTransformation, 1.0f);
+		//modelTransformation = glm::scale(modelTransformation, glm::vec3(0.05f));
+		//modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
 		//DrawWater(&WaterShader, &waterModel, modelTransformation);
 
 		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
@@ -300,7 +301,6 @@ void DrawLights(Shader * lampShader)
 	for (GLuint i = 0; i < 3; i++)
 	{
 		model = glm::mat4();
-		int lel = i + 1 == 3 ? 0 : 1 +i;
 		model = glm::translate(model, StaticVertices::pointLightPositions[i]); //pointLightPositions[i]);
 		model = glm::scale(model, glm::vec3(0.2f));
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
@@ -468,7 +468,7 @@ void initialiseLights(Shader * lightShader)
 	Point1.position = StaticVertices::pointLightPositions[1];//MyLerp(pointLightPositions[2], pointLightPositions[1], SecondCounter);//glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
 	Point1.ambient = glm::vec3(0.0f);
 	Point1.specular = glm::vec3(0.0f);
-	Point1.intensity = 10.0f * SecondCounter;
+	Point1.intensity = 10.0f; //* SecondCounter;
 	Point1.setUpShader();
 
 	// Point light 1
@@ -477,7 +477,7 @@ void initialiseLights(Shader * lightShader)
 	Point2.position = StaticVertices::pointLightPositions[2];// MyLerp(pointLightPositions[0], pointLightPositions[1], SecondCounter); //glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
 	Point2.ambient = glm::vec3(0.0f);
 	Point2.specular = glm::vec3(0.0f);
-	Point2.intensity = 7.5 * SecondCounter;
+	Point2.intensity = 7.5;//* SecondCounter;
 	Point2.setUpShader();
 
 

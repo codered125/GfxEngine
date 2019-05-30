@@ -71,3 +71,4 @@ Temporary Items
 *.ipch
 *.ipch
 GLProjects/GLApp/.vs/GLApp/v15/ipch/AutoPCH/9873283e6ebf7d41/MAIN.ipch
+*.ipch

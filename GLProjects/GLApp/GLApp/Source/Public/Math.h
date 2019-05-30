@@ -29,4 +29,9 @@ public:
 	{
 		return fmax(fmin(T, 1), 0);
 	}
+
+	static float MoSign(float T)
+	{
+		return (T > 0) - (T < 0);
+	}
 };

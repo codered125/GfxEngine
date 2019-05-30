@@ -65,10 +65,22 @@ public:
 
 	static void DoMovement(float deltaTime, Camera * Cam, bool Keys[], GLfloat & KeyboardLockout, PostProcessing::PostProcessSettings * PPS , std::map<int, int> & InputMap)
 	{
-		if (Keys[GLFW_KEY_W] || Keys[GLFW_KEY_UP]) Cam->ProcessKeyboard(EForward, deltaTime);
-		if (Keys[GLFW_KEY_S] || Keys[GLFW_KEY_DOWN]) Cam->ProcessKeyboard(EBackward, deltaTime);
-		if (Keys[GLFW_KEY_A] || Keys[GLFW_KEY_LEFT]) Cam->ProcessKeyboard(ELeft, deltaTime);
-		if (Keys[GLFW_KEY_D] || Keys[GLFW_KEY_RIGHT]) Cam->ProcessKeyboard(ERight, deltaTime);
+		if (Keys[GLFW_KEY_W] || Keys[GLFW_KEY_UP])
+		{
+			Cam->ProcessKeyboard(EForward, deltaTime);
+		}
+		if (Keys[GLFW_KEY_S] || Keys[GLFW_KEY_DOWN])
+		{
+			Cam->ProcessKeyboard(EBackward, deltaTime);
+		}
+		if (Keys[GLFW_KEY_A] || Keys[GLFW_KEY_LEFT])
+		{
+			Cam->ProcessKeyboard(ELeft, deltaTime);
+		}
+		if (Keys[GLFW_KEY_D] || Keys[GLFW_KEY_RIGHT])
+		{
+			Cam->ProcessKeyboard(ERight, deltaTime);
+		}
 
 		
 		if (KeyboardLockout > 0)
