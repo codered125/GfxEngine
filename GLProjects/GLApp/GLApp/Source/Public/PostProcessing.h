@@ -6,7 +6,7 @@ public:
 
 	enum EffectStatus
 	{
-		UnActive, Active
+		UnActive = 0, Active = 1
 	};
 
 	struct PostProcessSettings
@@ -30,16 +30,16 @@ public:
 		switch (effectNumber)
 		{
 		case 1:
-			PPS->InvertedColours = static_cast<PostProcessing::EffectStatus>(PPS->InvertedColours == 1 ? 0 : 1);
+			PPS->InvertedColours = static_cast<PostProcessing::EffectStatus>(!PPS->InvertedColours == 1);
 			break;
 		case 2:
-			PPS->HDR = static_cast<PostProcessing::EffectStatus>(PPS->HDR == 1 ? 0 : 1);
+			PPS->HDR = static_cast<PostProcessing::EffectStatus>(!PPS->HDR == 1); 
 			break;
 		case 3:
-			PPS->ColourGrading = static_cast<PostProcessing::EffectStatus>(PPS->ColourGrading == 1 ? 0 : 1);
+			PPS->ColourGrading = static_cast<PostProcessing::EffectStatus>(!PPS->ColourGrading == 1);
 			break;
 		case 4:
-			PPS->TimeBasedEffects = static_cast<PostProcessing::EffectStatus>(PPS->TimeBasedEffects == 1 ? 0 : 1);
+			PPS->TimeBasedEffects = static_cast<PostProcessing::EffectStatus>(!PPS->TimeBasedEffects == 1);
 			break;
 		}
 	}

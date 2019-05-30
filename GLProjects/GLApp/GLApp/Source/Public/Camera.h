@@ -1,16 +1,17 @@
 #pragma once
-#include <vector>
 #define GLEW_STATIC
+#include <vector>
 #include <GL/glew.h>
 #include <glm.hpp>
-#include<gtc/matrix_transform.hpp>
+#include <gtc/matrix_transform.hpp>
+#include "Math.h"
 
 enum Camera_Movement
 {
 	EForward = 1, 
 	EBackward = -1,
-	ELeft = 1,
-	ERight = -1
+	ELeft = -2,
+	ERight = 2
 };
 
 const GLfloat YAW = -90.0f;
@@ -82,12 +83,12 @@ public:
 
 	void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
 	{
-		GLfloat velocity = (this->movementSpeed * deltaTime) * direction;
+		GLfloat velocity = (this->movementSpeed * deltaTime) * MoMath::MoSign(direction);
+		
+		(direction == Camera_Movement::EForward || direction == Camera_Movement::EBackward) ?
+			this->position += this->front * (velocity) : this->position += this->right * (velocity);
 
-		(direction == Camera_Movement::EForward || direction  == Camera_Movement::EBackward)?	
-			this->position += this->front * velocity : this->position += this->right * velocity ;
 		/*
-
 		if (direction == EForward) this->position  += this->front * velocity;
 		if (direction == EBackward)	this->position -=  this->front * velocity;
 		if (direction == ELeft)	this->position -= this->right * velocity;

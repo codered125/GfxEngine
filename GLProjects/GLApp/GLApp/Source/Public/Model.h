@@ -88,10 +88,13 @@ private:
 			vector.z = mesh->mVertices[i].z;
 			vertex.Position = vector;
 
-			vector.x = mesh->mNormals[i].x;
-			vector.y = mesh->mNormals[i].y;
-			vector.z = mesh->mNormals[i].z;
-			vertex.Normal = vector;
+			if (mesh->HasNormals())
+			{
+				vector.x = mesh->mNormals[i].x;
+				vector.y = mesh->mNormals[i].y;
+				vector.z = mesh->mNormals[i].z;
+				vertex.Normal = vector;
+			}
 
 			if (mesh->mTextureCoords[0])
 			{
@@ -155,10 +158,6 @@ private:
 			vector<Texture> aoMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "material.texture_ao");
 			textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
 
-			//cout << "size = " + metalicMaps.size() << endl;
-
-			//vector<Texture> metallicMaps = this->loadMaterialTextures(material, aitexturety, "material.texture_ao");
-			//textures.insert(textures.end(), ao.begin(), ao.end());
 
 
 		}
