@@ -15,7 +15,7 @@ $RECYCLE.BIN/
 *ShaderCache*
 *PCTOC*
 *.log
-*.obj
+
 *IphoneTOC*
 *.dmp
 *.u
@@ -70,5 +70,5 @@ Temporary Items
 *.opendb
 *.ipch
 *.ipch
-GLProjects/GLApp/.vs/GLApp/v15/ipch/AutoPCH/9873283e6ebf7d41/MAIN.ipch
-*.ipch
+
+
