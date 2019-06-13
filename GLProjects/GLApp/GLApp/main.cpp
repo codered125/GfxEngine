@@ -101,6 +101,7 @@ int main()
 
 	Shader BlinnPhong("Shaders/BlinnPhong.vs", "Shaders/BlinnPhong.frag");
 	Shader WaterShader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag");
+	Shader UnlitShader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 	Shader PBRshader("Shaders/PBR.vs", "Shaders/PBR.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	Shader lampShader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
@@ -203,7 +204,8 @@ int main()
 
 
 		modelTransformation = glm::mat4();
-		DrawModel(&PBRshader, &GizMo, modelTransformation, 1.0f);
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.25f));
+		DrawModel(&UnlitShader, &GizMo, modelTransformation, 1.0f);
 		//modelTransformation = glm::scale(modelTransformation, glm::vec3(0.05f));
 		//modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		//modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));

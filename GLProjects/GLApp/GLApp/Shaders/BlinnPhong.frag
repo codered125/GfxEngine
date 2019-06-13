@@ -70,6 +70,10 @@ void main ()
     // Properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize( viewPos - FragPos );
+    if(material.shininess == 0)
+    {
+         material.shininess = 16
+    }
 	 
     vec3 result;
 	result += CalcDirLight( dirLight, norm, viewDir );    

@@ -114,6 +114,8 @@
     </None>
     <None Include="Shaders\BlinnPhong.frag" />
     <None Include="Shaders\BlinnPhong.vs" />
+    <None Include="Shaders\Unlit.frag" />
+    <None Include="Shaders\Unlit.vs" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc">
