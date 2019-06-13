@@ -20,7 +20,9 @@ uniform vec3 ActorPos;
 
 bool ripple = true;
 vec3 Wave(vec2 direct, float inwaves, vec2 inTexCoord, float inTime, float expo, float inheight);
+vec3 GertsnerWave(vec2 Direction, vec2 worldSpaceXY, float len, float time, float speed, float height, float steepness);
 float UE4Sine(float x);
+float UE4Cos(float x);
 float Bilerp(float T, float min, float max);
 float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
 
@@ -35,6 +37,15 @@ float UE4Sine(float x)
 	result = sin(result);
 	return clamp(result, -1.f, 1.f);
 }
+
+float UE4Cos(float x)
+{
+	float result = x * M_PI * 2;
+	result = cos(result);
+	return clamp(result, -1.f, 1.f);
+}
+
+
 	
 vec3 Wave(vec2 direct, float inwaves, vec2 inTexCoord, float inTime, float expo, float inheight)
 {
@@ -45,11 +56,23 @@ vec3 Wave(vec2 direct, float inwaves, vec2 inTexCoord, float inTime, float expo,
 	return vec3(0.0f, 1.0f, 0.0f) * normToRange * inheight;
 }
 
+vec3 GertsnerWave(vec2 Direction, vec2 worldSpaceXY, float len, float time, float speed, float height, float steepness)
+{
+	vec3 result;
+	float w = ((2 * M_PI) / len);
+	float pC = speed * ((2 * M_PI) / len);
+	float Qi = steepness / ( w * height);
+
+	result.x = Qi * height2 * (dir.x * (UE4Cos(w * dot(dir, texcoord) + (pC * Time2))));
+	result.y = Qi * height2 * (dir.y * (UE4Cos(w * dot(dir, texcoord) + (pC * Time2))));
+	result.z = height2 * (UE4Sine(w * dot(dir, texcoord) + (pC * Time2)));
+}
+
 
 void main()
 {
 
-float applyRat = saturate(Bilerp(position.y, ActorPos.y, ActorPos.y + 30));
+//float applyRat = saturate(Bilerp(position.y, ActorPos.y, ActorPos.y + 30));
 vec3 offset = applyRat * Wave(vec2(1.0f, 0.5f), 2, texCoords, TimeLapsed, 8, 25);
 
 
@@ -62,3 +85,6 @@ WorldPos = FragPos;
 gl_Position =  projection * view * model * vec4 (position + offset, 1.0f);
 
 };
+
+
+

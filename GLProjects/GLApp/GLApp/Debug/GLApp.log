@@ -1,13 +1,9 @@
-﻿  Model.cpp
-  main.cpp
-d:\documents\development\github\gfxengine\glprojects\glapp\glapp\source\public\math.h(37): warning C4091: 'static ': ignored on left of 'MoMath' when no variable is declared
-d:\documents\development\github\gfxengine\glprojects\glapp\glapp\source\public\math.h(30): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-d:\documents\development\github\gfxengine\glprojects\glapp\glapp\source\public\math.h(35): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
-d:\documents\development\github\gfxengine\glprojects\glapp\glapp\source\public\camera.h(86): warning C4244: 'argument': conversion from 'Camera_Movement' to 'float', possible loss of data
-d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(309): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(354): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(372): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
-  LINK : D:\Documents\Development\GitHub\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe not found or not built by the last incremental link; performing full link
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-  GLApp.vcxproj -> D:\Documents\Development\GitHub\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
+﻿  main.cpp
+d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\source\public\math.h(37): warning C4091: 'static ': ignored on left of 'MoMath' when no variable is declared
+d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\source\public\math.h(30): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\source\public\math.h(35): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
+d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\source\public\camera.h(86): warning C4244: 'argument': conversion from 'Camera_Movement' to 'float', possible loss of data
+d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(311): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(356): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(374): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  GLApp.vcxproj -> D:\Documents\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
