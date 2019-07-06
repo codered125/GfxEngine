@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 #define NUMBER_OF_POINT_LIGHTS 1
 
 struct Material
@@ -70,11 +70,7 @@ void main ()
     // Properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize( viewPos - FragPos );
-    if(material.shininess == 0)
-    {
-         material.shininess = 16
-    }
-	 
+ 	 
     vec3 result;
 	result += CalcDirLight( dirLight, norm, viewDir );    
     for ( int i = 0; i < NUMBER_OF_POINT_LIGHTS; i++ )

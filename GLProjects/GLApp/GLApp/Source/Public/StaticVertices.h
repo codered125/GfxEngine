@@ -133,11 +133,11 @@ namespace StaticVertices {
 
 	glm::vec3 pointLightColours[] =
 	{
-		glm::vec3(1.0f, 1.0f, 1.0f),//White,
+		glm::vec3(1.0f),//White,
 
-		glm::vec3(1.0f, 0.0f, 0.0f),//red
+		glm::vec3(1.50f, 0.0f, 0.0f),//red
 
-		glm::vec3(0.0f, 0.0f, 1.0f)//blue
+		glm::vec3(0.0f, 0.0f, 1.50f)//blue
 	};
 //glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 

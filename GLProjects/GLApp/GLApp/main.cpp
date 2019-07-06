@@ -33,7 +33,7 @@ void Tick();
 void initialiseLights(Shader * lightShader);
 void DrawLights(Shader * lampShader);
 void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef);
-void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float shine);
+void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float shine = 16);
 void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model);
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
@@ -57,6 +57,7 @@ int AliasingCount = 4, NumberofLights = 4;
 
 int main()
 {
+	currentPostProcessSettings.HDR = PostProcessing::EffectStatus::Active;
 	GLFWSetUp();
 	//Creating window
 	GLFWwindow *  window = glfwCreateWindow(width, height, "Moses Playboy Mansion", nullptr, nullptr);
@@ -100,7 +101,7 @@ int main()
 	glEnable(GL_MULTISAMPLE);
 
 	Shader BlinnPhong("Shaders/BlinnPhong.vs", "Shaders/BlinnPhong.frag");
-	Shader WaterShader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag");
+	//Shader WaterShader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag");
 	Shader UnlitShader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 	Shader PBRshader("Shaders/PBR.vs", "Shaders/PBR.frag");
 	Shader skyboxShader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
@@ -108,7 +109,7 @@ int main()
 	Shader screenShader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
 
 	//Model oldMan("Models/OldMan/muro.obj");
-	Model waterModel("Models/WaterBlock/SM_waterBlockOBJ.obj");
+	//Model waterModel("Models/WaterBlock/SM_waterBlockOBJ.obj");
 	Model roomModel("Models/Room/Room.obj");
 	Model GizMo("Models/Gizmo/GizmoForMo.obj");
 	// Cubemap (Skybox)
@@ -125,20 +126,30 @@ int main()
 	GLuint quadVAO, quadVBO;
 	SetQuadUp(&quadVAO, &quadVBO);
 
-
+	//Creating our framebuffer pointer
 	GLuint fbo;
 	glGenFramebuffers(1, &fbo);
-	//cout << fbo << endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	GLuint texColourBuffer;
-	glGenTextures(1, &texColourBuffer);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColourBuffer);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, AliasingCount, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, GL_TRUE);
-	glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texColourBuffer, 0);
+	//Create a colour buffer 
+	GLuint texColourBuffer[2];
+	glGenTextures(2, texColourBuffer);
+	for (GLuint i = 0; i < 2; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColourBuffer[i]);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, AliasingCount, GL_RGBA16F, SCREEN_WIDTH, SCREEN_HEIGHT, GL_TRUE);
+		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		// we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D_MULTISAMPLE, texColourBuffer[i], 0);
+	}
+
+	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, attachments);
+	
+
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
@@ -147,17 +158,22 @@ int main()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
+	//Creating our render buffer object (RBO are write-only)
+	//possible type of framebuffer attachments,
+	//These things are quite to copy information from and put
+	//stores its data in OpenGL's native rendering format making it optimized for off-screen rendering to a framebuffer
 	GLuint rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 	glRenderbufferStorageMultisample(GL_RENDERBUFFER, AliasingCount, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColourBuffer, 0);
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColourBuffer[0], 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// configure second post-processing framebuffer
+	//configure second post-processing framebuffer
+	//Pushes our texture into our 
 	GLuint intermediateFBO;
 	glGenFramebuffers(1, &intermediateFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
@@ -165,12 +181,16 @@ int main()
 	GLuint screenTexture;
 	glGenTextures(1, &screenTexture);
 	glBindTexture(GL_TEXTURE_2D, screenTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
+	
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) std::cout << "Failed  intermediatte Renderbuffer" << endl;
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "Failed  intermediatte Renderbuffer" << endl;
+	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glm::mat4 FOV = glm::perspective(ourCamera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
@@ -211,24 +231,33 @@ int main()
 		//modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
 		//DrawWater(&WaterShader, &waterModel, modelTransformation);
 
-		//Blit multisampled buffer(s) to normal colorbuffer of intermediate FBO.Image is stored in screenTexture
+		//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
+		//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
-		glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+   		glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+
 		// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
 		// clear all relevant buffers
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+
+		currentPostProcessSettings.HDR = PostProcessing::EffectStatus::Active;
 		PostProcessing::ApplyEffects(&screenShader, currentPostProcessSettings);
 
 
 		glBindVertexArray(quadVAO);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, screenTexture);	// use the color attachment texture as the texture of the quad plane
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, screenTexture[1]);
 
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
 		//swap screen buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -265,7 +294,7 @@ void  GLFWSetUp()
 	glfwInit();
 
 	//Setting the version of our glfw window. Different versions have things like immediate mode removed ( 3.3)
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	//Doesnt care for backwards compatibility
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -448,9 +477,9 @@ void initialiseLights(Shader * lightShader)
 	Light Directional0 = DirectionalLight(lightShader, "dirLight");
 	Directional0.direction = glm::vec3(0.0, 0.0, 1.0);
 	Directional0.ambient = glm::vec3(0.05f);
-	Directional0.diffuse = glm::vec3( 0.1, 0.1, 0.0f);
+	Directional0.diffuse = glm::vec3(0.1f, 0.1f, 0.0f);
 	Directional0.specular = glm::vec3(0.5f, 0.5f, 0.2f);
-	Directional0.intensity = 2;
+	Directional0.intensity = 1;
 	Directional0.setUpShader();
 
 	
@@ -479,7 +508,7 @@ void initialiseLights(Shader * lightShader)
 	Point2.position = StaticVertices::pointLightPositions[2];// MyLerp(pointLightPositions[0], pointLightPositions[1], SecondCounter); //glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
 	Point2.ambient = glm::vec3(0.0f);
 	Point2.specular = glm::vec3(0.0f);
-	Point2.intensity = 7.5;//* SecondCounter;
+	Point2.intensity = 7.5f;//* SecondCounter;
 	Point2.setUpShader();
 
 
