@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 #define M_PI 3.14159265359
 #define NUMBER_OF_POINT_LIGHTS 3
 
@@ -62,9 +62,12 @@ struct LinearMatVals
 	vec3 diffuse;
 };
 
-in vec2 TexCoords;
-in vec3 Normal;
-in vec3 WorldPos;
+in V2F
+{
+vec3 Normal;
+vec2 TexCoords;
+vec3 WorldPos;
+} fs_in;
 
 out vec4 color;
 
@@ -131,14 +134,14 @@ float CalculateAttenuation(vec3 inFragPos, vec3 inLightPos)
 vec3 GetNormalFromMap()
 {
 	//normalise it to 0-1
-    vec3 tangentNormal = (texture(material.texture_normal, TexCoords).xyz * 2.0) - 1.0;
+    vec3 tangentNormal = (texture(material.texture_normal, fs_in.TexCoords).xyz * 2.0) - 1.0;
 
-    vec3 Q1  = dFdx(WorldPos);
-    vec3 Q2  = dFdy(WorldPos);
-    vec2 st1 = dFdx(TexCoords);
-    vec2 st2 = dFdy(TexCoords);
+    vec3 Q1  = dFdx(fs_in.WorldPos);
+    vec3 Q2  = dFdy(fs_in.WorldPos);
+    vec2 st1 = dFdx(fs_in.TexCoords);
+    vec2 st2 = dFdy(fs_in.TexCoords);
 
-    vec3 N   = normalize(Normal);
+    vec3 N   = normalize(fs_in.Normal);
     vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
     vec3 B  = -normalize(cross(N, T));
     mat3 TBN = mat3(T, B, N);
@@ -148,10 +151,10 @@ vec3 GetNormalFromMap()
 
 LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoords)
 {
-	float roughness =  pow(texture(mats.texture_roughness, TexCoords).rgba, vec4(Exponent)).r;
-	float metallic  =  pow(texture(mats.texture_metallic, TexCoords).rgba, vec4(Exponent)).r;
-    float ao =  pow(texture(mats.texture_ao, TexCoords).rgba, vec4(2.2)).r;
-	vec3 diffuse = pow(texture(mats.texture_diffuse, TexCoords).rgba, vec4(2.2)).rgb;
+	float roughness =  pow(texture(mats.texture_roughness, texCoords).rgba, vec4(Exponent)).r;
+	float metallic  =  pow(texture(mats.texture_metallic, texCoords).rgba, vec4(Exponent)).r;
+    float ao =  pow(texture(mats.texture_ao, texCoords).rgba, vec4(2.2)).r;
+	vec3 diffuse = pow(texture(mats.texture_diffuse, texCoords).rgba, vec4(2.2)).rgb;
 	return  LinearMatVals(roughness, metallic, ao, diffuse);
 }
 
@@ -183,10 +186,10 @@ void main()
 {
 	//we normalise this result before returning it
 	vec3 Norm = GetNormalFromMap();
-	vec3 View = normalize(CamPos - WorldPos);
+	vec3 View = normalize(CamPos - fs_in.WorldPos);
 
 	float RnMPExponent =1.0f;// 2.2;
-	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, TexCoords);
+	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, fs_in.TexCoords);
 
 	//Metelic ratio
 	vec3 F0 = vec3(0.04);
@@ -198,9 +201,9 @@ void main()
 	for(int i = 0; i < NUMBER_OF_POINT_LIGHTS; i++)	
 	{
 		//per light radiance
-		vec3 L = normalize(pointLights[i].position - WorldPos);
+		vec3 L = normalize(pointLights[i].position - fs_in.WorldPos);
 		vec3 Halfway = normalize(View + L);
-		vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(WorldPos, pointLights[i].position);	
+		vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(fs_in.WorldPos, pointLights[i].position);	
 		L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
 	}
 

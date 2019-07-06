@@ -1,9 +1,9 @@
 ﻿  main.cpp
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\source\public\math.h(37): warning C4091: 'static ': ignored on left of 'MoMath' when no variable is declared
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\source\public\math.h(30): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\source\public\math.h(35): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\source\public\camera.h(86): warning C4244: 'argument': conversion from 'Camera_Movement' to 'float', possible loss of data
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(311): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(356): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-d:\documents\moman\gfxrestart\gfxengine\glprojects\glapp\glapp\main.cpp(374): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  GLApp.vcxproj -> D:\Documents\Moman\GFxRestart\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\source\public\math.h(37): warning C4091: 'static ': ignored on left of 'MoMath' when no variable is declared
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\source\public\math.h(30): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\source\public\math.h(35): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\source\public\camera.h(86): warning C4244: 'argument': conversion from 'Camera_Movement' to 'float', possible loss of data
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(340): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(385): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\main.cpp(403): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  GLApp.vcxproj -> D:\Documents\Development\GitHub\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
