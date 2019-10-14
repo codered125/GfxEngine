@@ -1,21 +1,20 @@
 #pragma once
 #include <iostream>
 #include <string.h>
-#include <gl\glew.h>
 #include <glm.hpp>
-#include <gtc\matrix_transform.hpp>
-#include <gtc\type_ptr.hpp>
-#include "Shader.h"
 
-using namespace std;
+//-------------------------------------------------------------------
 
+class Shader;
 
+//-------------------------------------------------------------------
 
 enum LightType
 {
 	Point, Directional, Spot, nulls
 };
 
+//-------------------------------------------------------------------
 
 struct Light
 {
@@ -36,69 +35,19 @@ struct Light
 	LightType ltype = LightType::nulls;
 	std::string accessor, pos, dir, ambi, diff, spec, cutff, outCutOff, cons, lin, quad , intense= "";
 
-	Light(Shader * inShader, LightType inType, std::string inAccessor) : ltype(inType), ShaderRef(inShader) , accessor(inAccessor) 
-	{
-		accessor = inAccessor;
-		pos = inAccessor + ".position";
-		dir = inAccessor + ".direction";
-		ambi = inAccessor + ".ambient";
-		diff = inAccessor + ".diffuse";
-		spec = inAccessor + ".specular";
-		cutff = inAccessor + ".cutOff";
-		outCutOff = inAccessor + ".outerCutOff";
-		cons = inAccessor + ".constant";
-		lin = inAccessor + ".linear";
-		quad = inAccessor + ".quadratic";
-		intense = inAccessor + ".intensity";
-	};
+	Light(Shader * inShader, LightType inType, std::string inAccessor);
 
-	void setUpShader()
-	{
 
-		switch (ltype)
-		{
-		case Point: 
-			ShaderRef->setVec3(pos, position);
-			ShaderRef->setVec3(ambi, ambient);
-			ShaderRef->setVec3(diff, diffuse);
-			ShaderRef->setVec3(spec, specular);
-			ShaderRef->setFloat(cons, constant );
-			ShaderRef->setFloat(lin, linear );
-			ShaderRef->setFloat(quad, quadratic  );
-			ShaderRef->setFloat(intense, intensity);
-			break;
+	void setUpShader();
 
-		case Directional:
-			ShaderRef->setVec3(dir, direction);
-			ShaderRef->setVec3(ambi, ambient);
-			ShaderRef->setVec3(diff, diffuse);
-			ShaderRef->setVec3(spec, specular);
-			ShaderRef->setFloat(intense, intensity);
-			break;
+	static  Light PointLight(Shader * macShader, std::string macAccessor);
 
-		case Spot:
-			ShaderRef->setVec3(pos, position);
-			ShaderRef->setVec3(dir, direction);
-			ShaderRef->setVec3(ambi, ambient);
-			ShaderRef->setVec3(diff, diffuse);
-			ShaderRef->setVec3(spec, specular);
-			ShaderRef->setFloat(cons, constant);
-			ShaderRef->setFloat(lin, linear);
-			ShaderRef->setFloat(quad, quadratic);
-			ShaderRef->setFloat(cutff, cutOff);
-			ShaderRef->setFloat(outCutOff, outerCutOff);
-			ShaderRef->setFloat(intense, intensity);
-			break;
+	static  Light SpotLight(Shader * macShader, std::string macAccessor);
 
-		}
-
-	}
-
+	static  Light DirectionalLight(Shader * macShader, std::string macAccessor);
 };
 
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
 
-inline  Light PointLight(Shader * macShader, std::string macAccessor) { return Light(macShader, LightType::Point, macAccessor); };
-
-inline  Light SpotLight(Shader * macShader, std::string macAccessor) { return Light(macShader, LightType::Spot, macAccessor); };
-
-inline  Light DirectionalLight(Shader * macShader, std::string macAccessor) { return Light(macShader, LightType::Directional, macAccessor); };
