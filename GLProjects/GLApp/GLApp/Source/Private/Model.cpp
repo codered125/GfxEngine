@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Source/Public/Model.h"
-#include "Source/Public/Mesh.h"
 
 #include <SOIL2/src\SOIL2\SOIL2.h>
 #include <assimp/Importer.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 // GL Includes
-#define GLEW_STATIC
+
 #include "Source/Public/TextureLoading.h"
 
 #include <SOIL2/src\SOIL2\SOIL2.h>
@@ -86,7 +86,7 @@ GLuint TextureLoading::LoadCubemap(std::vector<const GLchar * > faces)
 }
 
 
-#undef GLEW_STATIC
+
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------

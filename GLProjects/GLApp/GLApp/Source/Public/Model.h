@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Source/Public/Math.h"
+#include "Source/Public/Mesh.h"
 
 #include <string>
 #include <fstream>
@@ -15,9 +16,8 @@ struct aiMaterial;
 struct aiMesh;
 struct aiNode;
 class Shader;
-class Mesh;
 enum aiTextureType;
-struct Texture;
+
 
 //-------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ public:
 private:
 	std::vector<Mesh> meshes;
 	std::string directory;
-	std::vector<Texture>* textures_loaded;
+	std::vector<Texture> textures_loaded = std::vector<Texture>({ 0 });
 
 	void loadModel(std::string path);
 
