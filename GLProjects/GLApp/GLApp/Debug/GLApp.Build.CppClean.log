@@ -1,5 +1,6 @@
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\vc141.pdb
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\vc141.idb
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\textureloading.obj
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\shader.obj
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\postprocessing.obj
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\model.obj
@@ -8,7 +9,19 @@ d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\math.obj
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\light.obj
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\inputs.obj
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\camera.obj
-d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\textureloading.obj
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\main.obj
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.res
+d:\documents\development\github\gfxengine\glprojects\glapp\debug\glapp.pdb
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\cl.command.1.tlog
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\cl.read.1.tlog
 d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\cl.write.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\link-cvtres.read.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\link-cvtres.write.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\link-rc.read.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\link-rc.write.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\link.command.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\link.read.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\link.write.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\rc.command.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\rc.read.1.tlog
+d:\documents\development\github\gfxengine\glprojects\glapp\glapp\debug\glapp.tlog\rc.write.1.tlog
