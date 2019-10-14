@@ -89,7 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../External Libraries/GLFW/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../GLApp/GLApp/;$(SolutionDir)/../External Libraries/GLFW/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -104,7 +104,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../External Libraries/GLFW/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../GLApp/GLApp/;$(SolutionDir)/../External Libraries/GLFW/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,7 +121,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../External Libraries/GLFW/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../GLApp/GLApp/;$(SolutionDir)/../External Libraries/GLFW/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,7 +140,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../External Libraries/GLFW/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../GLApp/GLApp/;$(SolutionDir)/../External Libraries/GLFW/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,25 +152,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Private\Camera.cpp" />
+    <ClCompile Include="Source\Private\Inputs.cpp" />
+    <ClCompile Include="Source\Private\Light.cpp" />
+    <ClCompile Include="Source\Private\Math.cpp" />
+    <ClCompile Include="Source\Private\Mesh.cpp" />
     <ClCompile Include="Source\Private\Model.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Source\Public\Camera.h" />
-    <ClInclude Include="Source\Public\Inputs.h" />
-    <ClInclude Include="Source\Public\Light.h" />
-    <ClInclude Include="Source\Public\Math.h" />
-    <ClInclude Include="Source\Public\Mesh.h" />
-    <ClInclude Include="Source\Public\Model.h">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-    </ClInclude>
-    <ClInclude Include="Source\Public\PostProcessing.h" />
-    <ClInclude Include="Source\Public\resource.h" />
-    <ClInclude Include="Source\Public\Shader.h" />
-    <ClInclude Include="Source\Public\StaticVertices.h" />
-    <ClInclude Include="Source\Public\TextureLoading.h" />
+    <ClCompile Include="Source\Private\PostProcessing.cpp" />
+    <ClCompile Include="Source\Private\Shader.cpp" />
+    <ClCompile Include="Source\Private\TextureLoading.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\BlinnPhong.frag" />
@@ -205,6 +195,19 @@
     <Image Include="Images\skybox\right.tga" />
     <Image Include="Images\skybox\top.tga" />
     <Image Include="Images\Spiral.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Public\Camera.h" />
+    <ClInclude Include="Source\Public\Inputs.h" />
+    <ClInclude Include="Source\Public\Light.h" />
+    <ClInclude Include="Source\Public\Math.h" />
+    <ClInclude Include="Source\Public\Mesh.h" />
+    <ClInclude Include="Source\Public\Model.h" />
+    <ClInclude Include="Source\Public\PostProcessing.h" />
+    <ClInclude Include="Source\Public\resource.h" />
+    <ClInclude Include="Source\Public\Shader.h" />
+    <ClInclude Include="Source\Public\StaticVertices.h" />
+    <ClInclude Include="Source\Public\TextureLoading.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,8 +2,11 @@
 #include <thread>
 #include <future>
 
+//-------------------------------------------------------------------------------------
+
 #include <SOIL2\src\SOIL2\SOIL2.h>
 
+//-------------------------------------------------------------------------------------
 
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
@@ -12,7 +15,7 @@
 #include <gtx\matrix_decompose.hpp>
 #include <gtc\type_ptr.hpp>
 
-
+//-------------------------------------------------------------------------------------
 
 #include "Source/Public/Shader.h"
 #include "Source/Public/StaticVertices.h"
@@ -23,6 +26,8 @@
 #include "Source/Public/Light.h"
 #include "Source/Public/TextureLoading.h"
 #include "Source/Public/Math.h"
+
+//-------------------------------------------------------------------------------------
 
 //const GLint width = 1200, height = 800;
 const GLint width = 1920, height = 1080;
@@ -49,15 +54,16 @@ GLfloat lastY = height / 2.0f;
 GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 1.0f;
 bool Keys[1024];
 bool firstMouse, lightDirection = true;
-PostProcessing::PostProcessSettings currentPostProcessSettings;
+PostProcessSettings currentPostProcessSettings;
 std::map<int, int> InputMap;
 
 int AliasingCount = 4, NumberofLights = 4;
 
+//-------------------------------------------------------------------------------------
 
 int main()
 {
-	currentPostProcessSettings.HDR = PostProcessing::EffectStatus::Active;
+	currentPostProcessSettings.HDR = EffectStatus::Active;
 	GLFWSetUp();
 	//Creating window
 	GLFWwindow *  window = glfwCreateWindow(width, height, "Moses Playboy Mansion", nullptr, nullptr);
@@ -113,7 +119,7 @@ int main()
 	Model roomModel("Models/Room/Room.obj");
 	Model GizMo("Models/Gizmo/GizmoForMo.obj");
 	// Cubemap (Skybox)
-	vector<const GLchar*> faces;
+	std::vector<const GLchar*> faces;
 	faces.push_back("Images/HRSkybox/right.png");
 	faces.push_back("Images/HRSkybox/left.png");
 	faces.push_back("Images/HRSkybox/top.png");
@@ -153,7 +159,7 @@ int main()
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << endl;
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -189,7 +195,7 @@ int main()
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		std::cout << "Failed  intermediatte Renderbuffer" << endl;
+		std::cout << "Failed  intermediatte Renderbuffer" << std::endl;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -246,7 +252,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
 
-		currentPostProcessSettings.HDR = PostProcessing::EffectStatus::Active;
+		currentPostProcessSettings.HDR = EffectStatus::Active;
 		PostProcessing::ApplyEffects(&screenShader, currentPostProcessSettings);
 
 
@@ -280,7 +286,7 @@ void Tick()
 	lightDirection = (SecondCounter >= 1 || SecondCounter <= 0.0) ? !lightDirection : lightDirection;
 	keyboardlockout = keyboardlockout > 0 ? keyboardlockout - deltaTime : 0;
 
-	if (currentPostProcessSettings.TimeBasedEffects == PostProcessing::EffectStatus::Active)
+	if (currentPostProcessSettings.TimeBasedEffects == EffectStatus::Active)
 	{
 		const GLfloat currentDelt = lightDirection ? deltaTime : deltaTime * -1;
 		SecondCounter += (currentDelt / 6);
@@ -474,7 +480,7 @@ void initialiseLights(Shader * lightShader)
 	// by using 'Uniform buffer objects', but that is something we discuss in the 'Advanced GLSL' tutorial.
 
 	// Directional light
-	Light Directional0 = DirectionalLight(lightShader, "dirLight");
+	Light Directional0 = Light::DirectionalLight(lightShader, "dirLight");
 	Directional0.direction = glm::vec3(0.0, 0.0, 1.0);
 	Directional0.ambient = glm::vec3(0.05f);
 	Directional0.diffuse = glm::vec3(0.1f, 0.1f, 0.0f);
@@ -484,7 +490,7 @@ void initialiseLights(Shader * lightShader)
 
 	
 	// Point light 1
-	Light Point0 = PointLight(lightShader, "pointLights[0]");
+	Light Point0 = Light::PointLight(lightShader, "pointLights[0]");
 	Point0.diffuse = StaticVertices::pointLightColours[0];
 	Point0.position = StaticVertices::pointLightPositions[0]; // MyLerp(pointLightPositions[1], pointLightPositions[0], SecondCounter); //glm::vec3(pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 	Point0.ambient = glm::vec3(0.0f);
@@ -494,7 +500,7 @@ void initialiseLights(Shader * lightShader)
 
 	
 	// Point light 1
-	Light Point1 = PointLight(lightShader, "pointLights[1]");
+	Light Point1 = Light::PointLight(lightShader, "pointLights[1]");
 	Point1.diffuse = StaticVertices::pointLightColours[1];
 	Point1.position = StaticVertices::pointLightPositions[1];//MyLerp(pointLightPositions[2], pointLightPositions[1], SecondCounter);//glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
 	Point1.ambient = glm::vec3(0.0f);
@@ -503,7 +509,7 @@ void initialiseLights(Shader * lightShader)
 	Point1.setUpShader();
 
 	// Point light 1
-	Light Point2 = PointLight(lightShader, "pointLights[2]");
+	Light Point2 = Light::PointLight(lightShader, "pointLights[2]");
 	Point2.diffuse = StaticVertices::pointLightColours[2];
 	Point2.position = StaticVertices::pointLightPositions[2];// MyLerp(pointLightPositions[0], pointLightPositions[1], SecondCounter); //glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
 	Point2.ambient = glm::vec3(0.0f);
@@ -514,7 +520,7 @@ void initialiseLights(Shader * lightShader)
 
 
 	// SpotLight
-	Light CameraSpot = SpotLight(lightShader, "spotLight");
+	Light CameraSpot = Light::SpotLight(lightShader, "spotLight");
 	CameraSpot.position = ourCamera.getPosition();
 	CameraSpot.direction = ourCamera.getFront();
 	CameraSpot.ambient = glm::vec3(0.0f);

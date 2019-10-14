@@ -27,47 +27,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Model.cpp">
-      <Filter>Source Files\Source\Private</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Source\Public\Camera.h">
-      <Filter>Source Files\Source\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\Light.h">
-      <Filter>Source Files\Source\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\Mesh.h">
-      <Filter>Source Files\Source\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\Model.h">
-      <Filter>Source Files\Source\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\PostProcessing.h">
-      <Filter>Source Files\Source\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\resource.h">
-      <Filter>Source Files\Source\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\StaticVertices.h">
-      <Filter>Source Files\Source\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\TextureLoading.h">
-      <Filter>Source Files\Source\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\Shader.h">
-      <Filter>Source Files\Source\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\Math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\Inputs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="Source\Private\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Inputs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\PostProcessing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\TextureLoading.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Lamp.frag">
@@ -150,5 +139,40 @@
     <Image Include="Images\skybox\top.tga">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Public\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Inputs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\PostProcessing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\StaticVertices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\TextureLoading.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
