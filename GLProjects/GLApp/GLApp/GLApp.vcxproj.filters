@@ -57,6 +57,9 @@
     <ClCompile Include="Source\Private\TextureLoading.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\GlfwInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Lamp.frag">
@@ -172,6 +175,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\TextureLoading.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\GlfwInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

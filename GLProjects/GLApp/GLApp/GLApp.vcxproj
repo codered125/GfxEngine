@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Private\Camera.cpp" />
+    <ClCompile Include="Source\Private\GlfwInterface.cpp" />
     <ClCompile Include="Source\Private\Inputs.cpp" />
     <ClCompile Include="Source\Private\Light.cpp" />
     <ClCompile Include="Source\Private\Math.cpp" />
@@ -198,6 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Public\Camera.h" />
+    <ClInclude Include="Source\Public\GlfwInterface.h" />
     <ClInclude Include="Source\Public\Inputs.h" />
     <ClInclude Include="Source\Public\Light.h" />
     <ClInclude Include="Source\Public\Math.h" />
