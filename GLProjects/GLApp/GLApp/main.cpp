@@ -9,14 +9,14 @@
 //-------------------------------------------------------------------------------------
 
 #include <gl/glew.h>
-#include <GLFW/glfw3.h>
+
 #include <glm.hpp>
 #include <gtc\matrix_transform.hpp>
 #include <gtx\matrix_decompose.hpp>
 #include <gtc\type_ptr.hpp>
 
 //-------------------------------------------------------------------------------------
-
+#include "Source/Public/GlfwInterface.h"
 #include "Source/Public/Shader.h"
 #include "Source/Public/StaticVertices.h"
 #include "Source/Public/Model.h"
@@ -31,7 +31,6 @@
 
 //const GLint width = 1200, height = 800;
 const GLint width = 1920, height = 1080;
-void GLFWSetUp();
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 void Tick();
@@ -42,7 +41,7 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model);
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
-void togglePostProcessEffects(int effectNumber);
+//void togglePostProcessEffects(int effectNumber);
 void KeyCallback(GLFWwindow  * window, int key, int scancode, int action, int mode);
 void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset);
 void MouseCallback(GLFWwindow * window, double xPos, double yPos);
@@ -53,45 +52,30 @@ GLfloat lastY = height / 2.0f;
 
 GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 1.0f;
 bool Keys[1024];
-bool firstMouse, lightDirection = true;
+auto firstMouse = false, lightDirection = true;
 PostProcessSettings currentPostProcessSettings;
 std::map<int, int> InputMap;
 
-int AliasingCount = 4, NumberofLights = 4;
+auto AliasingCount = 4, NumberofLights = 4;
 
 //-------------------------------------------------------------------------------------
 
 int main()
 {
 	currentPostProcessSettings.HDR = EffectStatus::Active;
-	GLFWSetUp();
-	//Creating window
-	GLFWwindow *  window = glfwCreateWindow(width, height, "Moses Playboy Mansion", nullptr, nullptr);
 
-	//Going to get the real size and height of the screen and store it to our storage
-	//helps with high density displays. Will use it when creating viewport
-	glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
-
-	if (window == nullptr)
+	auto* window = GlfwInterface::DefineAndCreaateWindow(AliasingCount, height, width);
+	if (window == nullptr) 
 	{
-		//Safety check
-		std::cout << "Failed to create Window" << std::endl;
-		glfwTerminate();
 		return EXIT_FAILURE;
-	}
-
-	//Makes current windows
-	glfwMakeContextCurrent(window);
-	glfwSetKeyCallback(window, KeyCallback);
-	glfwSetCursorPosCallback(window, MouseCallback);
-	glfwSetScrollCallback(window, ScrollCallback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	};
+	GlfwInterface::GetFramebufferSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+	GlfwInterface::SetInputCallbackFunctions(window, KeyCallback, ScrollCallback, MouseCallback);
 
 	//Tells glew to use a modern approach to retrieving function pointers and extensions
 	glewExperimental = GL_TRUE;
 	glewInit();
-
-
+	
 	//inline initiation and safety check
 	if (GLEW_OK != glewInit())
 	{
@@ -154,16 +138,13 @@ int main()
 
 	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
-	
-
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
 		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
+	
 	//Creating our render buffer object (RBO are write-only)
 	//possible type of framebuffer attachments,
 	//These things are quite to copy information from and put
@@ -205,7 +186,7 @@ int main()
 	screenShader.setInt("screenTexture", 0);
 	Input::InitializeInputMap(InputMap);
 
-	while (!glfwWindowShouldClose(window))
+	while (!GlfwInterface::WindowShouldClose(window))
 	{
 		Tick();
 		//check for events/inputs
@@ -273,11 +254,12 @@ int main()
 	return EXIT_SUCCESS;
 }
 
+//-------------------------------------------------------------------
 
 void Tick()
 {
 	//Calculate framedata
-	GLfloat currentFrame = (GLfloat)glfwGetTime();
+	const auto currentFrame = (GLfloat)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 	
@@ -291,29 +273,9 @@ void Tick()
 		const GLfloat currentDelt = lightDirection ? deltaTime : deltaTime * -1;
 		SecondCounter += (currentDelt / 6);
 	}
-
-	//std::cout << currentPostProcessSettings.InvertedColours << std::endl;
-	//std::cout << "Position " << ourCamera.getPosition().x << ", " << ourCamera.getPosition().y << ", " << ourCamera.getPosition().z << std::endl;
-}
-void  GLFWSetUp()
-{
-	glfwInit();
-
-	//Setting the version of our glfw window. Different versions have things like immediate mode removed ( 3.3)
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	//Doesnt care for backwards compatibility
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	//Cares for forwards
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	//Toggles Resizeability
-	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-	glfwWindowHint(GLFW_SAMPLES, AliasingCount);
-	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-	glEnable(GL_MULTISAMPLE);
 }
 
-
+//-------------------------------------------------------------------
 
 void DrawLights(Shader * lampShader)
 {
@@ -343,11 +305,13 @@ void DrawLights(Shader * lampShader)
 		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &StaticVertices::pointLightColours[i][0]);
 		lampShader->setFloat("Time", SecondCounter);
-		lampShader->setFloat("TimeLapsed", glfwGetTime());
+		lampShader->setFloat("TimeLapsed", (float)glfwGetTime());
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 	glBindVertexArray(0);
 }
+
+//-------------------------------------------------------------------
 
 void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 {
@@ -384,11 +348,13 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint *facesRef)
 	glDepthFunc(GL_LESS); // Set depth function back to default
 }
 
+//-------------------------------------------------------------------
+
 void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float shine)
 {
 	modelShader->use();
 	modelShader->setFloat("Time", SecondCounter);
-	modelShader->setFloat("TimeLapsed", glfwGetTime());
+	modelShader->setFloat("TimeLapsed", (float)glfwGetTime());
 	modelShader->setVec3("CamPos", ourCamera.getPosition());
 	modelShader->setVec3("CamDir", ourCamera.getFront());
 	
@@ -402,11 +368,13 @@ void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, float sh
 	ourModel->Draw(modelShader, shine);
 }
 
+//-------------------------------------------------------------------
+
 void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model)
 {
 	modelShader->use();
 	modelShader->setFloat("Time", SecondCounter);
-	modelShader->setFloat("TimeLapsed", glfwGetTime());
+	modelShader->setFloat("TimeLapsed", (float)glfwGetTime());
 	modelShader->setVec3("CamPos", ourCamera.getPosition());
 	modelShader->setVec3("CamDir", ourCamera.getFront() - ourCamera.getPosition());
 
@@ -428,6 +396,7 @@ void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model)
 	ourModel->Draw(modelShader, 0);
 }
 
+//-------------------------------------------------------------------
 
 void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO)
 {
@@ -457,6 +426,8 @@ void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, G
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
+//-------------------------------------------------------------------
+
 void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO)
 {
 	glGenVertexArrays(1, quadVAO);
@@ -470,6 +441,7 @@ void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
+//-------------------------------------------------------------------
 
 void initialiseLights(Shader * lightShader)
 {
@@ -529,17 +501,27 @@ void initialiseLights(Shader * lightShader)
 	CameraSpot.setUpShader();
 }
 
+//-------------------------------------------------------------------
+
 void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode)
 {
 	Input::KeyCallback(window, key, scancode, action, mode, &ourCamera, Keys);
 }
+
+//-------------------------------------------------------------------
 
 void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset)
 {
 	Input::ScrollCallback(window, xOffset, yOffset, &ourCamera);
 }
 
+//-------------------------------------------------------------------
+
 void MouseCallback(GLFWwindow * window, double xPos, double yPos)
 {
 	Input::MouseCallback(window, xPos, yPos, &ourCamera, lastX, lastY, firstMouse);
 }
+
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------

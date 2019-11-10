@@ -70,10 +70,11 @@ glm::mat4 Camera::GetViewMatrix()
 
 void Camera::ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
 {
-	GLfloat velocity = (this->movementSpeed * deltaTime) * MoMath::MoSign(direction);
+	GLfloat velocity = (this->movementSpeed * deltaTime) * MoMath::MoSign((float)direction);
 
-	(direction == Camera_Movement::EForward || direction == Camera_Movement::EBackward) ?
-		this->position += this->front * (velocity) : this->position += this->right * (velocity);
+	(direction == Camera_Movement::EForward || direction == Camera_Movement::EBackward)
+		? this->position += this->front * (velocity) 
+		: this->position += this->right * (velocity);
 
 	/*
 	if (direction == EForward) this->position  += this->front * velocity;

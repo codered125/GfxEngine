@@ -29,14 +29,14 @@ glm::vec3 MoMath::MoCrossProduct(glm::vec3 a, glm::vec3 b)
 
 float MoMath::MoSaturate(float T)
 {
-	return fmax(fmin(T, 1), 0);
+	return static_cast<float>(fmax(fmin(T, 1), 0));
 }
 
 //-------------------------------------------------------------------
 
 float MoMath::MoSign(float T)
 {
-	return (T > 0) - (T < 0);
+	return static_cast<float>((T > 0) - (T < 0));
 }
 
 //-------------------------------------------------------------------
