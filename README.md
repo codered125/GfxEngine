@@ -10,7 +10,7 @@ The Graphics Engine currently has the following features implemented:
 - [x] Frame buffers / Post Processing effects (Dynamic adjustments implemented)
 - [x] GLSL Fragment / Vertex shader importing
 - [x] Multisample anti-aliasing (4-16)
-- [x] Physics Based Rendering (PBR) - in progress
+- [x] Physics Based Rendering (PBR)
 - [ ] Deffered Rendering - After PBR
 - [ ] Deffered Lighting - After Deffered Rendering
 
