@@ -100,7 +100,8 @@ int main()
 
 	//Model oldMan("Models/OldMan/muro.obj");
 	//Model waterModel("Models/WaterBlock/SM_waterBlockOBJ.obj");
-	Model roomModel("Models/Room/Room.obj");
+	//Model roomModel("Models/Room/Room.obj");
+	Model roomModel("Models/Sponza/Sponza.obj");
 	Model GizMo("Models/Gizmo/GizmoForMo.obj");
 	// Cubemap (Skybox)
 	std::vector<const GLchar*> faces;
@@ -206,7 +207,7 @@ int main()
 
 		//Room Model
 		modelTransformation = glm::mat4();
-		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.50f));
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f));
 		DrawModel(&PBRshader, &roomModel, modelTransformation, 1.0f);
 
 
@@ -445,12 +446,6 @@ void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO)
 
 void initialiseLights(Shader * lightShader)
 {
-
-	// Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
-	// the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
-	// by defining light types as classes and set their values in there, or by using a more efficient uniform approach
-	// by using 'Uniform buffer objects', but that is something we discuss in the 'Advanced GLSL' tutorial.
-
 	// Directional light
 	Light Directional0 = Light::DirectionalLight(lightShader, "dirLight");
 	Directional0.direction = glm::vec3(0.0, 0.0, 1.0);

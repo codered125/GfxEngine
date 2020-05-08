@@ -1,4 +1,2 @@
-﻿  Camera.cpp
-  Math.cpp
-  Generating Code...
-  GLApp.vcxproj -> D:\Documents\Development\GitHub\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
+﻿  main.cpp
+  GLApp.vcxproj -> D:\Development\DevelopmentProjects\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe
