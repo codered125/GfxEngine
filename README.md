@@ -1,6 +1,6 @@
 # OpenGL Forward GfxEngine / Rendering Engine
 
-Decided to make this public, this is my current project and it is still ongoing.
+Decided to make this public, this is my current project and it is still ongoing. Alot of my learning here is learn opengl driven
 
 The Graphics Engine currently has the following features implemented:
 - [x] HDR
