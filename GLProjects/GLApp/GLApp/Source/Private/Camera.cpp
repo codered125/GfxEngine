@@ -1,8 +1,9 @@
 #include "Source/Public/Camera.h"
+#include "Source/Public/Math.h"
 
 //-------------------------------------------------------------------
 
-namespace
+namespace CameraStatics
 {
 	const GLfloat YAW = -90.0f;
 	const GLfloat PITCH = 0.0f;
@@ -11,125 +12,179 @@ namespace
 	const GLfloat SENSITIVTY = 0.15f;
 	//Feild of view
 	const GLfloat ZOOM = 45.0f;
+
+	const GLfloat AspectRatio = 1920.0f / 1080.0f;
+	const GLfloat NearPlane = 0.1f;
+	const GLfloat FarPlane = 1000.0f;
 }
 
 //-------------------------------------------------------------------
 
-Camera::Camera(glm::vec3 position, glm::vec3 up)
-	: front(glm::vec3(0.0f, 0.0f, -1.0f))
-	, movementSpeed(SPEED)
-	, mouseSensitivity(SENSITIVTY)
-	, zoom(ZOOM)
-	, yaw(YAW)
-	, pitch(PITCH)
+Camera::Camera(glm::vec3 InPosition, glm::vec3 InUp)
+	: Front(glm::vec3(0.0f, 0.0f, -1.0f))
+	, MovementSpeed(CameraStatics::SPEED)
+	, MouseSensitivity(CameraStatics::SENSITIVTY)
+	, Zoom(CameraStatics::ZOOM)
+	, Yaw(CameraStatics::YAW)
+	, Pitch(CameraStatics::PITCH)
+	, AspectRatio(CameraStatics::AspectRatio)
+	, FarPlane(CameraStatics::FarPlane)
+	, NearPlane(CameraStatics::NearPlane)
 {
-	this->position = position;
-	this->worldUp = up;
-	this->yaw = yaw;
-	this->pitch = pitch;
-	this->updateCameraVectors();
+	Position = InPosition;
+	WorldUp = InUp;
+	Yaw = Yaw;
+	Pitch = Pitch;
+	IsOrthagraphic = false;
+	updateCameraVectors();
 }
 
-//-------------------------------------------------------------------
-
-Camera::Camera(GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch) 
-	: front(glm::vec3(0.0f, 0.0f, -1.0f))
-	, movementSpeed(SPEED)
-	, mouseSensitivity(SENSITIVTY)
-	, zoom(ZOOM)
+Camera::Camera(glm::vec3 InPosition, glm::vec3 InDirection, bool InIsOrthagraphic, GLfloat InAspectRatio, GLfloat InNearPlane, GLfloat InFarPlane, glm::vec3 InUp )
 {
-	this->position = glm::vec3(posX, posY, posZ);
-	this->worldUp = glm::vec3(upX, upY, upZ);
-	this->yaw = yaw;
-	this->pitch = pitch;
-	this->updateCameraVectors();
+	Position = InPosition;
+	WorldUp = InUp;
+	Front = InDirection;
+	Right = glm::normalize(glm::cross(Front, WorldUp));
+	IsOrthagraphic = InIsOrthagraphic;
+	AspectRatio = InAspectRatio;
+	NearPlane = InNearPlane;
+	FarPlane = InFarPlane;
 }
 
-//-------------------------------------------------------------------
+/*/-------------------------------------------------------------------
+
+Camera::Camera(GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat Yaw, GLfloat Pitch) 
+	: Front(glm::vec3(0.0f, 0.0f, -1.0f))
+	, MovementSpeed(CameraStatics::SPEED)
+	, MouseSensitivity(CameraStatics::SENSITIVTY)
+	, Zoom(CameraStatics::ZOOM)
+{
+	Position = glm::vec3(posX, posY, posZ);
+	WorldUp = glm::vec3(upX, upY, upZ);
+	Yaw = Yaw;
+	Pitch = Pitch;
+	updateCameraVectors();
+}
+
+//-------------------------------------------------------------------*/
 
 void Camera::updateCameraVectors()
 {
-	glm::vec3 front;
-	front.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-	front.y = sin(glm::radians(this->pitch));
-	front.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-	this->front = glm::normalize(front);
+	glm::vec3 LocalFront;
+	LocalFront.x = cos(glm::radians(this->Yaw)) * cos(glm::radians(this->Pitch));
+	LocalFront.y = sin(glm::radians(this->Pitch));
+	LocalFront.z = sin(glm::radians(this->Yaw)) * cos(glm::radians(this->Pitch));
+	Front = glm::normalize(LocalFront);
+	
 	// Also re-calculate the Right and Up vector
-	this->right = glm::normalize(glm::cross(this->front, this->worldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-	this->up = glm::normalize(glm::cross(this->right, this->front));
-}
-
-//-------------------------------------------------------------------
-
-glm::mat4 Camera::GetViewMatrix()
-{
-	return glm::lookAt(this->position, this->position + this->front, this->up);
+	Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look Upor down which results in slower movement.
+	Up = glm::normalize(glm::cross(this->Right, this->Front));
 }
 
 //-------------------------------------------------------------------
 
 void Camera::ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
 {
-	GLfloat velocity = (this->movementSpeed * deltaTime) * MoMath::MoSign((float)direction);
+	GLfloat velocity = (this->MovementSpeed * deltaTime) * MoMath::MoSign((float)direction);
+	if (direction == Camera_Movement::EForward || direction == Camera_Movement::EBackward)
+	{
+		this->Position += this->Front * (velocity);
+	}
 
-	(direction == Camera_Movement::EForward || direction == Camera_Movement::EBackward)
-		? this->position += this->front * (velocity) 
-		: this->position += this->right * (velocity);
-
-	/*
-	if (direction == EForward) this->position  += this->front * velocity;
-	if (direction == EBackward)	this->position -=  this->front * velocity;
-	if (direction == ELeft)	this->position -= this->right * velocity;
-	if (direction == ERight)this->position += this->right * velocity;
-	*/
+	if (direction == Camera_Movement::ELeft || direction == Camera_Movement::ERight)
+	{
+		this->Position += this->Right * (velocity);
+	}
 }
 
 //-------------------------------------------------------------------
 
 void Camera::ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch)
 {
-	xOffset *= this->mouseSensitivity;
-	yOffset *= this->mouseSensitivity;
+	xOffset *= MouseSensitivity;
+	yOffset *= MouseSensitivity;
 
-	this->yaw += xOffset;
-	this->pitch += yOffset;
+	Yaw += xOffset;
+	Pitch += yOffset;
 
 	if (constrainPitch)
 	{
-		if (this->pitch > 89.0f)this->pitch = 89.0f;
-		if (this->pitch < -89.0f)this->pitch = -89.0f;
+		Pitch = MoMath::MoClamp(Pitch, -89.0f, 89.0f);
 	}
-	this->updateCameraVectors();
+	updateCameraVectors();
 }
 
 //-------------------------------------------------------------------
 
 void Camera::ProessMouseSroll(GLfloat yOffset)
 {
-	if (this->zoom >= 1.0f && this->zoom <= 45.0f) this->zoom -= (yOffset / 5);
-	if (this->zoom <= 1.0f) this->zoom = 1.0f;
-	if (this->zoom >= 45.0f) this->zoom = 45.0f;
+	this->Zoom -= (yOffset / 5);
+	this->Zoom = MoMath::MoClamp(this->Zoom, 1.0f, 45.0f);
+
+	//if (this->zoom >= 1.0f && this->zoom <= 45.0f) this->zoom -= (yOffset / 5);
+	//if (this->zoom <= 1.0f) this->zoom = 1.0f;
+	//if (this->zoom >= 45.0f) this->zoom = 45.0f;
 }
 
 //-------------------------------------------------------------------
 
-GLfloat Camera::GetZoom()
+GLfloat Camera::GetZoom(Camera* Target)
 {
-	return this->zoom;
+	return Target->Zoom;
 }
 
 //-------------------------------------------------------------------
 
-glm::vec3 Camera::getPosition()
+glm::vec3 Camera::getPosition(Camera* Target)
 {
-	return this->position;
+	return Target->Position;
 }
 
 //-------------------------------------------------------------------
 
-glm::vec3 Camera::getFront()
+glm::vec3 Camera::getFront(Camera* Target)
 {
-	return this->front;
+	return Target->Front;
+}
+
+//-------------------------------------------------------------------
+
+glm::mat4 Camera::GetProjection(Camera * Target)
+{
+	if (Target->IsOrthagraphic)
+	{
+		return  glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, Target->NearPlane, Target->FarPlane);
+	}
+
+	return glm::perspective(Camera::GetZoom(Target), Target->AspectRatio, Target->NearPlane, Target->FarPlane);
+}
+
+//-------------------------------------------------------------------
+
+GLfloat Camera::GetAspectRatio(Camera * Target)
+{
+	return Target->AspectRatio;
+}
+
+//-------------------------------------------------------------------
+
+GLfloat Camera::GetNearPlane(Camera * Target)
+{
+	return Target->NearPlane;
+}
+
+//-------------------------------------------------------------------
+
+GLfloat Camera::GetFarPlane(Camera * Target)
+{
+	return Target->FarPlane;
+}
+
+//-------------------------------------------------------------------
+
+glm::mat4 Camera::GetViewMatrix(Camera* Target)
+{
+	return glm::lookAt(Target->Position, Target->Position + Target->Front, Target->Up);
 }
 
 //-------------------------------------------------------------------

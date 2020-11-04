@@ -1,7 +1,8 @@
 #version 430 core
 #define M_PI 3.14159265359
-#define NUMBER_OF_POINT_LIGHTS 3
+#define NUMBER_OF_POINT_LIGHTS 1
 
+//-------------------------------------------------------------------
 
 struct DirLight 
 {
@@ -12,6 +13,8 @@ struct DirLight
 	vec3 diffuse;
 	vec3 specular;
 };
+
+//-------------------------------------------------------------------
 
 struct PointLight 
 {
@@ -25,6 +28,8 @@ struct PointLight
     vec3 diffuse;
     vec3 specular;
 };
+
+//-------------------------------------------------------------------
 
 struct SpotLight
 {
@@ -42,6 +47,8 @@ struct SpotLight
     vec3 specular;
 };
 
+//-------------------------------------------------------------------
+
 struct Material
 {
     sampler2D  texture_diffuse;
@@ -54,6 +61,8 @@ struct Material
 	float shininess;
 };
 
+//-------------------------------------------------------------------
+
 struct LinearMatVals
 {
 	float roughness;
@@ -62,12 +71,15 @@ struct LinearMatVals
 	vec3 diffuse;
 };
 
+//-------------------------------------------------------------------
+
 in V2F
 {
 vec3 Normal;
 vec2 TexCoords;
 vec3 WorldPos;
 } fs_in;
+
 
 out vec4 color;
 
@@ -78,9 +90,10 @@ uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 
 uniform vec3 CamPos;
 uniform vec3 CamDir;
-bool  blin = false;
 
+bool  blin = false;
 float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
+float Desaturate(vec3 InColour);
 vec3 GetNormalFromMap();
 float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
@@ -89,6 +102,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0, float roughness);
 vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals ToParse, float intensity);
 LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoords);
 
+//-------------------------------------------------------------------
 
 float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness)
 {
@@ -101,6 +115,8 @@ float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness)
 	return a2 / denom;
 }
 
+//-------------------------------------------------------------------
+
 float GeometrySmith(vec3 Norm, vec3 View, vec3 L, float roughness)
 {
     float NdotV = saturate(dot(Norm, View));
@@ -111,6 +127,8 @@ float GeometrySmith(vec3 Norm, vec3 View, vec3 L, float roughness)
     return ggx1 * ggx2;
 }
 
+//-------------------------------------------------------------------
+
 float GeometrySchlickGGX(float NdotV, float roughness)
 {
 	float r = (roughness + 1.0f);
@@ -119,17 +137,23 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 	return NdotV / denom;
 }
 
+//-------------------------------------------------------------------
+
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
 	//Dot product result between halfway  and view
 	return F0 + (1.0f - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
+//-------------------------------------------------------------------
+
 float CalculateAttenuation(vec3 inFragPos, vec3 inLightPos)
 {
 	float distance = length(inFragPos - inLightPos);
 	return 1.0f / (distance * distance);
 }
+
+//-------------------------------------------------------------------
 
 vec3 GetNormalFromMap()
 {
@@ -149,14 +173,21 @@ vec3 GetNormalFromMap()
     return normalize(TBN * tangentNormal);
 }
 
+//-------------------------------------------------------------------
+
 LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoords)
 {
 	float roughness =  pow(texture(mats.texture_roughness, texCoords).rgba, vec4(Exponent)).r;
 	float metallic  =  pow(texture(mats.texture_metallic, texCoords).rgba, vec4(Exponent)).r;
-    float ao =  pow(texture(mats.texture_ao, texCoords).rgba, vec4(2.2)).r;
-	vec3 diffuse = pow(texture(mats.texture_diffuse, texCoords).rgba, vec4(2.2)).rgb;
+	const float DiffuseExpo = 2.2;
+    //float ao =  pow(texture(mats.texture_ao, texCoords).rgba, vec4(DiffuseExpo)).r;
+	float ao = Desaturate(pow(texture(mats.texture_normal, texCoords).rgb, vec3(DiffuseExpo)));
+
+	vec3 diffuse = pow(texture(mats.texture_diffuse, texCoords).rgba, vec4(DiffuseExpo)).rgb;
 	return  LinearMatVals(roughness, metallic, ao, diffuse);
 }
+
+//-------------------------------------------------------------------
 
 vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals ToParse, float intensity)
 {
@@ -182,13 +213,24 @@ vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals 
 	return intensity * ( (kD * ToParse.diffuse / M_PI + specular ) * Radiance * NdotL);
 }
 
+//-------------------------------------------------------------------
+
+float Desaturate(vec3 InColour)
+{
+	return (min(InColour.x, min(InColour.y, InColour.z)) + max(InColour.x, max(InColour.y, InColour.z)) * 0.5f);
+}
+
+//-------------------------------------------------------------------
+
 void main()
 {
 	//we normalise this result before returning it
 	vec3 Norm = GetNormalFromMap();
+	//vec3 Norm = normalize(fs_in.Normal);
 	vec3 View = normalize(CamPos - fs_in.WorldPos);
 
-	float RnMPExponent =1.0f;// 2.2;
+	float RnMPExponent = 1.0f;
+	//float RnMPExponent = 2.2;
 	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, fs_in.TexCoords);
 
 	//Metelic ratio
@@ -217,6 +259,9 @@ void main()
 	
 	color = color / (color + vec4(1.0));
 	color = pow(color, vec4(1.0/2.2));  
-	//color = vec4(GetNormalFromMap(), 1.0f);
+	//color = vec4(vec3(Desaturate(Norm)), 1.0f);
 }
 
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------

@@ -198,6 +198,7 @@
     <Image Include="Images\Spiral.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="main.h" />
     <ClInclude Include="Source\Public\Camera.h" />
     <ClInclude Include="Source\Public\GlfwInterface.h" />
     <ClInclude Include="Source\Public\Inputs.h" />
