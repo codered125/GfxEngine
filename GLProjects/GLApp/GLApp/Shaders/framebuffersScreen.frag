@@ -15,6 +15,7 @@ layout (location = 0) out vec4 FragColor;
  
  
 uniform sampler2D screenTexture;
+uniform sampler2D depthMap;
 uniform PostProcessEffects currentPostProcessEffect;
 
 const float exposure = 1.5;
@@ -23,6 +24,7 @@ const float offset = 1 /300.0f;
 
 vec3 PostProcessEffect(vec3 untouchedColour);
 vec3 ApplyKernal();
+vec4 ShadowCalculation();
 
 void main()
 { 
@@ -37,14 +39,21 @@ void main()
         result = pow(result, vec3(1.0 / gamma));
         FragColor = vec4( PostProcessEffect(result), 1.0);
 		float brightness = dot(normalize(FragColor.rgb),  vec3(0.2126, 0.7152, 0.0722));
-		FragColor = brightness > 01.0? vec4(ApplyKernal(), 1.0f) : FragColor;// vec4(ApplyKernal(), 1.0f) : FragColor;
-	
+		FragColor = brightness > 01.0? vec4(ApplyKernal(), 1.0f) : FragColor;// vec4(ApplyKernal(), 1.0f) : FragColor;	
+
+		
+		//vec4 Shadow = ShadowCalculation();
+		//FragColor = texture(depthMap, TexCoords);
+		//FragColor = max(FragColor, Shadow);
     }
 
     else
     {
         vec3 result = pow( hdrColor, vec3(1.0 / gamma));
         FragColor = vec4( PostProcessEffect(result), 1.0);
+		//vec4 Shadow = ShadowCalculation();
+		//FragColor = texture(depthMap, TexCoords);// max(FragColor, Shadow);
+		//FragColor =  max(FragColor, Shadow);
     }
 }
 
@@ -93,4 +102,14 @@ vec3 ApplyKernal()
 	
 	return outputcol;
 
+}
+
+
+//-------------------------------------------------------------------
+
+vec4 ShadowCalculation()
+{
+	float closestDepth = texture(depthMap, TexCoords).r;   
+
+	return vec4(vec3(closestDepth), 1.0f);
 }

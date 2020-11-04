@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{c2d2bf0a-73cc-420b-886c-97e8e6aaea7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Source">
+      <UniqueIdentifier>{c7470028-472c-45d1-88b6-db36d4da1cfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Source\Public">
+      <UniqueIdentifier>{b700a7cd-a449-489b-b4c0-d8d29c765fe6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Source\Private">
+      <UniqueIdentifier>{e6f048f5-47d6-4de2-b93e-d2b1b96408d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Inputs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\PostProcessing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\TextureLoading.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\GlfwInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Lamp.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\Lamp.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\Skybox.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\Skybox.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\ShadowMapping.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\ShadowMapping.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\framebuffersScreen.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\framebuffersScreen.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\PBR.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\PBR.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\WaterShader.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\WaterShader.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\PBRPrimative.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\PBRPrimative.vs">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="Shaders\BlinnPhong.frag" />
+    <None Include="Shaders\BlinnPhong.vs" />
+    <None Include="Shaders\Unlit.frag" />
+    <None Include="Shaders\Unlit.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Images\Spiral.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\box.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\box_spec.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\back.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\bottom.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\front.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\left.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\right.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\skybox\top.tga">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Public\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Inputs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\PostProcessing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\StaticVertices.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\TextureLoading.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\GlfwInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -146,6 +146,20 @@ void Shader::setInt(const std::string &Accessor, int value)
 {
 	glUniform1i(glGetUniformLocation(shaderProgram, Accessor.c_str()), value);
 }
+
+//-------------------------------------------------------------------
+
+void Shader::SetSampler(const std::string & Accessor, GLuint* value, GLenum TextureType)
+{
+	const auto SamplerLocation = glGetUniformLocation(shaderProgram, Accessor.c_str());
+	if (SamplerLocation != -1)
+	{
+		glActiveTexture(GL_TEXTURE + SamplerLocation);
+		glBindTexture(TextureType, *value);
+		glActiveTexture(GL_TEXTURE0);
+	}
+}
+
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------

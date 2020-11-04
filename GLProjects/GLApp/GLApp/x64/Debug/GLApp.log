@@ -1,6 +1,4 @@
-﻿  main.cpp
-  Camera.cpp
-  GlfwInterface.cpp
+﻿  Camera.cpp
   Inputs.cpp
   Light.cpp
   Math.cpp
@@ -9,16 +7,17 @@ d:\development\developmentprojects\gfxengine\glprojects\glapp\glapp\source\priva
   Model.cpp
   PostProcessing.cpp
   Shader.cpp
-  TextureLoading.cpp
+  main.cpp
   Generating Code...
 main.obj : error LNK2019: unresolved external symbol __imp_glewInit referenced in function main
 main.obj : error LNK2019: unresolved external symbol glfwTerminate referenced in function main
 GlfwInterface.obj : error LNK2001: unresolved external symbol glfwTerminate
 main.obj : error LNK2019: unresolved external symbol glfwPollEvents referenced in function main
-main.obj : error LNK2019: unresolved external symbol glfwGetTime referenced in function "void __cdecl DrawLights(class Shader *)" (?DrawLights@@YAXPEAVShader@@@Z)
+main.obj : error LNK2019: unresolved external symbol glfwGetTime referenced in function "void __cdecl DrawLights(class Shader *,class Camera *)" (?DrawLights@@YAXPEAVShader@@PEAVCamera@@@Z)
 main.obj : error LNK2019: unresolved external symbol glfwSwapBuffers referenced in function main
 main.obj : error LNK2001: unresolved external symbol __imp___glewActiveTexture
 Mesh.obj : error LNK2001: unresolved external symbol __imp___glewActiveTexture
+Shader.obj : error LNK2001: unresolved external symbol __imp___glewActiveTexture
 main.obj : error LNK2001: unresolved external symbol __imp___glewBindBuffer
 Mesh.obj : error LNK2001: unresolved external symbol __imp___glewBindBuffer
 main.obj : error LNK2001: unresolved external symbol __imp___glewBufferData
