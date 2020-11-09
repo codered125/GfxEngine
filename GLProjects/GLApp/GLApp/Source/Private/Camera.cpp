@@ -184,6 +184,11 @@ GLfloat Camera::GetFarPlane(Camera * Target)
 
 glm::mat4 Camera::GetViewMatrix(Camera* Target)
 {
+	if (Target->IsOrthagraphic)
+	{
+		return glm::lookAt(Target->Position, glm::vec3(0.0f), Target->Up);
+	}
+
 	return glm::lookAt(Target->Position, Target->Position + Target->Front, Target->Up);
 }
 

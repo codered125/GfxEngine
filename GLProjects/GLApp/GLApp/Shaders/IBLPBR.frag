@@ -31,24 +31,6 @@ struct PointLight
 
 //-------------------------------------------------------------------
 
-struct SpotLight
-{
-    float cutOff;
-    float outerCutOff;
-    float constant;
-    float linear;
-    float quadratic;
-	float intensity;
-    
-	vec3 position;
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
-//-------------------------------------------------------------------
-
 struct Material
 {
     sampler2D  texture_diffuse;
@@ -86,7 +68,6 @@ out vec4 color;
 
 uniform Material material;
 uniform DirLight dirLight;
-uniform SpotLight spotLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 
 uniform vec3 CamPos;
@@ -95,8 +76,9 @@ uniform float NearPlane;
 uniform float FarPlane;
 uniform samplerCube skybox;
 uniform sampler2D ShadowMap;
+uniform bool ShadowPass = false;
 
-bool  blin = false;
+
 float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
 float Desaturate(vec3 InColour);
 vec3 GetNormalFromMap();
@@ -189,7 +171,6 @@ LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoor
 	const float DiffuseExpo = 2.2;
     //float ao =  pow(texture(mats.texture_ao, texCoords).rgba, vec4(DiffuseExpo)).r;
 	float ao = Desaturate(pow(texture(mats.texture_normal, texCoords).rgb, vec3(DiffuseExpo)));
-	//float ao =0;
 	vec3 diffuse = pow(texture(mats.texture_diffuse, texCoords).rgba, vec4(DiffuseExpo)).rgb;
 	return  LinearMatVals(roughness, metallic, ao, diffuse);
 }
@@ -242,7 +223,7 @@ float ShadowCalculation(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir
 {
 	InLightDir = normalize(InLightDir);
     vec3 projCoords = InFragPosLightSpace.xyz / InFragPosLightSpace.w; // perform perspective divide
-	projCoords = projCoords * 0.5 + 0.5; 
+	projCoords = projCoords * 0.5 + 0.5; // transform to ndc coordinates
 	float closestDepth = texture(ShadowMap, projCoords.xy).r;   
 	float currentDepth = projCoords.z;  
 	
@@ -284,17 +265,17 @@ void main()
 
 	//Directional Lights
 	vec3 r = dirLight.diffuse;
+
 	vec3 L = -dirLight.direction;
 	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
-	float Shadow = ShadowCalculation(fs_in.FragPosLightSpace, Norm, dirLight.direction);
-	L0 +=  1.0 - Shadow;
 	
 	vec3 ambient = vec3(0.03) * parse.diffuse * parse.ao;
-    color = vec4(ambient + L0, 1.0);
+	float Shadow =  ShadowPass? 1.0f - ShadowCalculation(fs_in.FragPosLightSpace, Norm, dirLight.direction) : 1;
+    color = vec4(ambient + (L0 * Shadow), 1.0);
 	
-	color = color / (color + vec4(1.0));
-	color = pow(color, vec4(1.0/2.2));  
-	//color = vec4(vec3(Desaturate(Norm)), 1.0f);
+	//color = vec4(vec3(Shadow));
+	//color = color / (color + vec4(1.0));
+	//color = pow(color, vec4(1.0/2.2));  
 }
 
 //-------------------------------------------------------------------
