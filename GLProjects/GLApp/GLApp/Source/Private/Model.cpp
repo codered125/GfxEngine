@@ -16,11 +16,11 @@ Model::Model(GLchar * inpath)
 
 //-------------------------------------------------------------------
 
-void Model::Draw(Shader *shader, float shine)
+void Model::Draw(Shader *shader)
 {
 	for (GLuint i = 0; i < this->meshes.size(); i++)
 	{
-		this->meshes[i].Draw(shader, shine);
+		this->meshes[i].Draw(shader);
 	}
 }
 

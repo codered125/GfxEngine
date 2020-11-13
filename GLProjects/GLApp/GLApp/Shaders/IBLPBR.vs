@@ -1,4 +1,4 @@
-#version 430 core
+ #version 430 core
 layout (location = 0) in vec3 position; 
 layout (location = 1) in vec3 normal; 
 layout (location = 2) in vec2 texCoords; 
@@ -25,5 +25,5 @@ gl_Position =  projection * view * model * vec4 (position, 1.0f);
 vs_Out.WorldPos = vec3(model * vec4(position, 1.0f));
 vs_Out.Normal = mat3(transpose(inverse(model))) * normal;
 vs_Out.TexCoords = texCoords;
-vs_Out.FragPosLightSpace = lightSpaceMatrix  * vec4(vs_Out.WorldPos, 1.0f);
+vs_Out.FragPosLightSpace = lightSpaceMatrix * model * vec4(position, 1.0); 
 };

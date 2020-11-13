@@ -1,13 +1,13 @@
 #version 430 core
 #define M_PI 3.14159265359
-#define NUMBER_OF_POINT_LIGHTS 1
+#define NUMBER_OF_POINT_LIGHTS 3
 
 //-------------------------------------------------------------------
 
 struct DirLight 
 {
 	float intensity;
-
+	vec3 position;
 	vec3 direction;
 	vec3 ambient;
 	vec3 diffuse;
@@ -64,7 +64,7 @@ vec4 FragPosLightSpace;
 } fs_in;
 
 
-out vec4 color;
+out vec4 FragColor;
 
 uniform Material material;
 uniform DirLight dirLight;
@@ -76,7 +76,6 @@ uniform float NearPlane;
 uniform float FarPlane;
 uniform samplerCube skybox;
 uniform sampler2D ShadowMap;
-uniform bool ShadowPass = false;
 
 
 float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
@@ -228,8 +227,24 @@ float ShadowCalculation(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir
 	float currentDepth = projCoords.z;  
 	
 	float bias = max(0.05 * (1.0 - dot(InNormal, InLightDir)), 0.005); 
-	float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0; 
-	//float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;  
+    // check whether current frag pos is in shadow
+     float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+    // PCF
+    //float shadow = 0.0;
+    // vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);
+    // for(int x = -1; x <= 1; ++x)
+    // {
+    //     for(int y = -1; y <= 1; ++y)
+    //     {
+    //         float pcfDepth = texture(ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+    //         shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+    //     }    
+    // }
+    // shadow /= 9.0;
+    
+    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+  //  if(projCoords.z > 1.0)
+   //     shadow = 0.0;
 
 	return shadow;
 }
@@ -266,16 +281,26 @@ void main()
 	//Directional Lights
 	vec3 r = dirLight.diffuse;
 
-	vec3 L = -dirLight.direction;
+	//vec3 L = -dirLight.direction;
+	vec3 L = normalize(dirLight.position - fs_in.WorldPos);
 	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
 	
 	vec3 ambient = vec3(0.03) * parse.diffuse * parse.ao;
-	float Shadow =  ShadowPass? 1.0f - ShadowCalculation(fs_in.FragPosLightSpace, Norm, dirLight.direction) : 1;
-    color = vec4(ambient + (L0 * Shadow), 1.0);
 	
-	//color = vec4(vec3(Shadow));
-	//color = color / (color + vec4(1.0));
-	//color = pow(color, vec4(1.0/2.2));  
+	float Shadow =  1.0f - ShadowCalculation(fs_in.FragPosLightSpace, Norm, L);
+
+ 	vec3 color = ambient + (L0 * Shadow);
+	//color = color / (color + vec3(1.0));
+	//color = pow(color, vec3(1.0/2.2)); 
+	   
+	vec3 ShadowColour = vec3(Shadow);  
+	FragColor = vec4(color, 1.0);   
+   // vec3 projCoords = fs_in.FragPosLightSpace.xyz / fs_in.FragPosLightSpace.w; // perform perspective divide
+	//projCoords = projCoords * 0.5 + 0.5; // transform to ndc coordinates
+	//color = vec4(vec3( 1 - mix(texture(ShadowMap, projCoords.xy).r, 1.0f, 0.0f)), 1.0);
+	//color = projCoords == fs_in.WorldPos? 
+	//color = vec4(vec3(Shadow), 1.0f);
+ 
 }
 
 //-------------------------------------------------------------------

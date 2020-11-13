@@ -1,9 +1,4 @@
-﻿  Camera.cpp
-  PostProcessing.cpp
-  Shader.cpp
-  main.cpp
-  Generating Code...
-main.obj : error LNK2019: unresolved external symbol __imp_glewInit referenced in function main
+﻿main.obj : error LNK2019: unresolved external symbol __imp_glewInit referenced in function main
 main.obj : error LNK2019: unresolved external symbol glfwTerminate referenced in function main
 GlfwInterface.obj : error LNK2001: unresolved external symbol glfwTerminate
 main.obj : error LNK2019: unresolved external symbol glfwPollEvents referenced in function main
