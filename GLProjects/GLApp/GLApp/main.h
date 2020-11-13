@@ -24,10 +24,10 @@ int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 void Tick();
 void initialiseLights(Shader * lightShader);
-void DrawLights(Shader * lampShader, Camera* Perspective);
-void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef, Camera* Perspective);
+void DrawLights(Shader* lampShader, Camera* Perspective, Model* LampInModel);
+void DrawSkybox(Shader* skyboxShaderRef, GLuint* facesRef, Camera* Perspective);
 void DrawModel(Shader* modelShader, Model* InModel, glm::mat4 model, Camera* Perspective, GLuint * ShadowMap);
-void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
+void SetQuadUp(GLuint* quadVAO, GLuint * quadVBO);
 void KeyCallback(GLFWwindow  * window, int key, int scancode, int action, int mode);
 void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset);
 void MouseCallback(GLFWwindow * window, double xPos, double yPos);
