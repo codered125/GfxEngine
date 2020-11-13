@@ -26,7 +26,7 @@ class Model
 public:
 	Model(GLchar * inpath);
 
-	void Draw(Shader *shader, float shine);
+	void Draw(Shader *shader);
 
 private:
 	std::vector<Mesh> meshes;
