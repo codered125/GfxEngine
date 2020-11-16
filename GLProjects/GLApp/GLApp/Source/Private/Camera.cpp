@@ -151,9 +151,11 @@ glm::vec3 Camera::getFront(Camera* Target)
 
 glm::mat4 Camera::GetProjection(Camera * Target)
 {
+
 	if (Target->IsOrthagraphic)
 	{
-		return  glm::ortho(-10.f, 10.0f, -10.0f, 10.0f, Target->NearPlane, Target->FarPlane);
+		auto ProjSize = 10.0f;
+		return  glm::ortho(-ProjSize, ProjSize, -ProjSize, ProjSize, Target->NearPlane, Target->FarPlane);
 	}
 
 	return glm::perspective(Camera::GetZoom(Target), Target->AspectRatio, Target->NearPlane, Target->FarPlane);
@@ -186,8 +188,8 @@ glm::mat4 Camera::GetViewMatrix(Camera* Target)
 {
 	if (Target->IsOrthagraphic)
 	{
-	//	return glm::lookAt(Target->Position, glm::vec3(0), glm::vec3(0.0f, 1.0f, 0.0f));
-		return glm::lookAt(Target->Position, Target->Position + Target->Front, glm::vec3(0.0f, 1.0f, 0.0f));
+		return glm::lookAt(Target->Position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//	return glm::lookAt(Target->Position, Target->Position + Target->Front, glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	return glm::lookAt(Target->Position, Target->Position + Target->Front, Target->Up);
