@@ -22,13 +22,15 @@
 
 //-------------------------------------------------------------------------------------
 
+#define DEBUGSHADOWMAP 0
+
 int main()
 {
 	//Camera's and post process
 	currentPostProcessSettings = &PostProcessSettings();
 	currentPostProcessSettings->HDR = EffectStatus::Active;
-	ourCamera = &Camera(glm::vec3(0.0f, 1.0f, 3.0f));
-	LightingCamera = &Camera(StaticVertices::SunPos, StaticVertices::SunDir, true, 2048 / 2048, 1.0f, 25.5f);
+	ourCamera = &Camera(glm::vec3(0.0f, 10.0f, 0.0f));
+	LightingCamera = &Camera(StaticVertices::SunPos, StaticVertices::SunDir, true, 2048 / 2048, 4.0f, 15.5);
 
 	//WindowSetup
 	auto* window = GlfwInterface::DefineAndCreaateWindow(AliasingCount, height, width);
@@ -176,27 +178,26 @@ int main()
 		Input::DoMovement(deltaTime, ourCamera, Keys, keyboardlockout, currentPostProcessSettings, InputMap);
 
 		//Shadow Render Pass
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		DepthShader.use();
 		glViewport(0, 0, ShadowWidth, ShadowHeight);
 		glBindFramebuffer(GL_FRAMEBUFFER, DepthMapFBO);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-		glClear(GL_DEPTH_BUFFER_BIT);
-		//glCullFace(GL_FRONT);
+		glCullFace(GL_FRONT);
+
+		DepthShader.use();
 		RenderDemo(nullptr, nullptr, &SkyboxTexture, &DepthShader, &roomModel, &UnlitShader, &GizMo, LightingCamera, nullptr);
-		//glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		
 		//Normal Render Pass
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)							 
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);// make sure we clear the framebuffer's content
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		PBRshader.use();
+		
+		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)	
+		glCullFace(GL_BACK);
 		RenderDemo(&lampShader, &skyboxShader, &SkyboxTexture, &PBRshader, &roomModel, &UnlitShader, &GizMo, ourCamera, &DepthMap);
-		DrawLights(&lampShader, ourCamera, &ArrowLight);
 		//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
 		//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -218,45 +219,14 @@ int main()
 		screenShader.SetSampler("screenTexture", &screenTexture, GL_TEXTURE_2D);
 		
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, screenTexture);	// use the color attachment texture as the texture of the quad plane
+		glBindTexture(GL_TEXTURE_2D, screenTexture);
+		if (DEBUGSHADOWMAP)
+		{
+			glBindTexture(GL_TEXTURE_2D, DepthMap);	// use the color attachment texture as the texture of the quad plane
+		}
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
 		
-		
-		/*
-		debugdepthquad.use();
-		debugdepthquad.setInt("depthMap", 0);
-		// render Depth map to quad for visual debugging
-		// ---------------------------------------------
-		debugdepthquad.setFloat("near_plane", Camera::GetNearPlane(LightingCamera));
-		debugdepthquad.setFloat("far_plane", Camera::GetFarPlane(LightingCamera));
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, DepthMap);
-		if (quadVAO == 0)
-		{
-			float quadVertices[] = {
-				// positions        // texture Coords
-				-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-				-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-				 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-				 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-			};
-			// setup plane VAO
-			glGenVertexArrays(1, &quadVAO);
-			glGenBuffers(1, &quadVBO);
-			glBindVertexArray(quadVAO);
-			glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-		}
-		glBindVertexArray(quadVAO);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glBindVertexArray(0);
-		
-		*/
 
 		//swap screen buffers
 		glfwSwapBuffers(window);
@@ -271,6 +241,7 @@ int main()
 
 void DrawLights(Shader * lampShader, Camera* Perspective, Model* InModel)
 {
+	/*
 	if (!lampShader)
 	{
 		return;
@@ -307,6 +278,46 @@ void DrawLights(Shader * lampShader, Camera* Perspective, Model* InModel)
 		lampShader->setFloat("TimeLapsed", (float)glfwGetTime());
 		InModel->Draw(lampShader);
 	}
+	*/
+
+	lampShader->use();
+	GLuint lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+
+	glEnableVertexAttribArray(0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(StaticVertices::vertices), StaticVertices::vertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+
+	glm::mat4 model;
+	glm::mat4 FOV = Camera::GetProjection(Perspective);
+	lampShader->setMat4("projection", FOV);
+	glm::mat4 view = Camera::GetViewMatrix(Perspective);
+	lampShader->setMat4("view", view);
+
+
+	model = glm::mat4();
+	model = glm::translate(model, StaticVertices::SunPos); //pointLightPositions[i]);
+	model = glm::scale(model, glm::vec3(0.2f));
+	glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &glm::vec3(50, 50, 50)[0]);
+	lampShader->setFloat("Time", SecondCounter);
+	lampShader->setFloat("TimeLapsed", (float)glfwGetTime());
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//for (GLuint i = 0; i < pointLightPositions->length(); i++)
+	for (GLuint i = 0; i < 3; i++)
+	{
+		model = glm::mat4();
+		model = glm::translate(model, StaticVertices::pointLightPositions[i]); //pointLightPositions[i]);
+		model = glm::scale(model, glm::vec3(0.2f));
+		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &StaticVertices::pointLightColours[i][0]);
+		lampShader->setFloat("Time", SecondCounter);
+		lampShader->setFloat("TimeLapsed", (float)glfwGetTime());
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+	glBindVertexArray(0);
 }
 
 //-------------------------------------------------------------------
@@ -363,19 +374,19 @@ void DrawModel(Shader* modelShader, Model* ourModel, glm::mat4 model, Camera* Pe
 			glActiveTexture(GL_TEXTURE0 + i);
 			glBindTexture(GL_TEXTURE_2D, *ShadowMap);
 		}
-
-		modelShader->setFloat("NearPlane", Camera::GetNearPlane(Perspective));
-		modelShader->setFloat("FarPlane", Camera::GetFarPlane(Perspective));
-		modelShader->setVec3("CamPos", Camera::getPosition(Perspective));
-		modelShader->setVec3("CamDir", Camera::getFront(Perspective));
-
-		glm::mat4 FOV = Camera::GetProjection(Perspective);//glm::perspective(Camera::GetZoom(Perspective), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
-		glm::mat4 view = Camera::GetViewMatrix(Perspective);
-
-		modelShader->setMat4("projection", FOV);
-		modelShader->setMat4("view", view);
-		initialiseLights(modelShader);
 	}
+
+	modelShader->setFloat("NearPlane", Camera::GetNearPlane(Perspective));
+	modelShader->setFloat("FarPlane", Camera::GetFarPlane(Perspective));
+	modelShader->setVec3("CamPos", Camera::getPosition(Perspective));
+	modelShader->setVec3("CamDir", Camera::getFront(Perspective));
+
+	glm::mat4 FOV = Camera::GetProjection(Perspective);//glm::perspective(Camera::GetZoom(Perspective), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+	glm::mat4 view = Camera::GetViewMatrix(Perspective);
+
+	modelShader->setMat4("projection", FOV);
+	modelShader->setMat4("view", view);
+	initialiseLights(modelShader);
 
 	glm::mat4 LightingFOV = Camera::GetProjection(LightingCamera);
 	glm::mat4 LightingView = Camera::GetViewMatrix(LightingCamera);
@@ -414,7 +425,7 @@ void Tick()
 void initialiseLights(Shader * lightShader)
 {
 
-	const float pointIntes = 0.2f; const float directIntes = 0.05f;
+	const float pointIntes = 0.02f; const float directIntes = 0.05f;
 	// Directional light
 	auto Directional0 = Light::DirectionalLight(lightShader, "dirLight");
 	Directional0.direction = StaticVertices::SunDir;//Camera::getFront(LightingCamera);
@@ -465,20 +476,21 @@ void RenderDemo(Shader* InLampShader, Shader* InSkyboxShader, GLuint* InSkyboxTe
 {
 	//Room Model
 	auto modelTransformation = glm::mat4();
-	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f));
-	modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 0.0f, 0.0f));
+	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.005f));
+	modelTransformation = glm::rotate(modelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	DrawModel(InModelShader, InModel, modelTransformation, Perspective, ShadowMap);
 
 	modelTransformation = glm::mat4();
 	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.25f));
 	modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 1.50f, 0.0f));
-	DrawModel(InModelShader, InGizmo, modelTransformation, Perspective, ShadowMap);
+	DrawModel(InUnlitShader, InGizmo, modelTransformation, Perspective, ShadowMap);
 
 //RENDER 
 //skip this for depth pass
 	if (LightingCamera != Perspective)
 	{
-	//	DrawSkybox(InSkyboxShader, InSkyboxTexture, Perspective);
+		DrawSkybox(InSkyboxShader, InSkyboxTexture, Perspective);
+		DrawLights(InLampShader, ourCamera, nullptr);
 	}
 
 }

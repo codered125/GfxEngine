@@ -44,7 +44,7 @@ auto firstMouse = false, lightDirection = true;
 PostProcessSettings* currentPostProcessSettings;
 std::map<int, int> InputMap;
 
-auto AliasingCount = 4, NumberofLights = 4;
+auto AliasingCount = 4, NumberofLights = 3;
 
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------

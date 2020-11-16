@@ -124,22 +124,23 @@ namespace StaticVertices {
 
 	glm::vec3 pointLightPositions[] =
 	{
-		glm::vec3(4.5, 4.3, 1.3),//white
+		glm::vec3(2.0, 1.0, 2.0),//white
 
-		glm::vec3(-6.5, 1.3, 1.3),//red
+		glm::vec3(-2.f, 1.f, 2.f),//red
 
-		glm::vec3(0.5, 1.3, -2.3)//blue
+		glm::vec3(2.f, 1.f, -2.f)//blue
 	};
 
 	glm::vec3 pointLightColours[] =
 	{
-		glm::vec3(20.0f, 50.0f, 50.0f),//White,
+		glm::vec3(20.0f, 50.0f, 20.0f),//White,
 
-		glm::vec3(50.0f, 50.0f, 20.3f),//red
+		glm::vec3(50.0f, 20.0f, 20.0f),//red
 
-		glm::vec3(50.f, 20.f, 50.f)//blue
+		glm::vec3(20.f, 20.f, 50.0f)//blue
 	};
 
-	glm::vec3 SunPos(-2.0f, 4.0f, -1.0f);;
-	glm::vec3 SunDir(MoMath::MoNormalize(-glm::vec3(SunPos)));
+	glm::vec3 SunPos = glm::vec3(-5.02f, 12.5, 0.02f);
+	glm::vec3 SunDir(glm::vec3(0.0f));
+	//glm::vec3 SunDir(-20.0f * MoMath::MoNormalize(glm::vec3(SunPos)));
 };
