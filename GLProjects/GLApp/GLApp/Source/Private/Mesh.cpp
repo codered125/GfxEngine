@@ -15,7 +15,7 @@ Mesh::Mesh(std::vector<Vertex> inVertices, std::vector<GLuint> inIndices, std::v
 
 //-------------------------------------------------------------------
 
-void Mesh::Draw(Shader * shader, float Shine)
+void Mesh::Draw(Shader * shader)
 {
 	GLuint diffuseNr = 1;
 	GLuint specularNR = 1;
@@ -76,8 +76,6 @@ void Mesh::Draw(Shader * shader, float Shine)
 		glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
 
 	}
-
-	glUniform1f(glGetUniformLocation(shader->shaderProgram, "material.shininess"), Shine);
 
 	glBindVertexArray(this->VAO);
 	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);

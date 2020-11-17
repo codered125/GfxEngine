@@ -45,7 +45,7 @@ public:
 
 	Mesh(std::vector<Vertex> inVertices, std::vector<GLuint> inIndices, std::vector<Texture> inTextures);
 
-	void Draw(Shader * shader, float Shine);
+	void Draw(Shader * shader);
 
 private:
 	GLuint VAO, VBO, EBO;

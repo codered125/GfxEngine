@@ -22,14 +22,16 @@
 
 //-------------------------------------------------------------------------------------
 
+#define DEBUGSHADOWMAP 0
 int main()
 {
+	//Camera's and post process
 	currentPostProcessSettings = &PostProcessSettings();
 	currentPostProcessSettings->HDR = EffectStatus::Active;
-	ourCamera = &Camera(glm::vec3(0.0f, 1.0f, 3.0f));
+	ourCamera = &Camera(glm::vec3(0.0f, 10.0f, 0.0f));
+	LightingCamera = &Camera(StaticVertices::SunPos, StaticVertices::SunDir, true, 4096 / 4096, 0.10f, 50.5f);
 
-	LightingCamera = &Camera(StaticVertices::pointLightPositions[0], glm::vec3(0.0, 1.0, 1.0), true, 1024.0f / 1024.0f, 1.0f, 7.5f);
-
+	//WindowSetup
 	auto* window = GlfwInterface::DefineAndCreaateWindow(AliasingCount, height, width);
 	if (window == nullptr) 
 	{
@@ -37,9 +39,7 @@ int main()
 	};
 	GlfwInterface::GetFramebufferSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
 	GlfwInterface::SetInputCallbackFunctions(window, KeyCallback, ScrollCallback, MouseCallback);
-
-	//Tells glew to use a modern approach to retrieving function pointers and extensions
-	glewExperimental = GL_TRUE;
+	glewExperimental = GL_TRUE;//Tells glew to use a modern approach to retrieving function pointers and extensions
 	glewInit();
 	
 	//inline initiation and safety check
@@ -50,28 +50,25 @@ int main()
 	}
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_DEPTH_TEST);
 
-	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
-	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_MULTISAMPLE);
 
-	auto BlinnPhong = Shader("Shaders/BlinnPhong.vs", "Shaders/BlinnPhong.frag");
-	//Shader WaterShader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag");
+	//Shaders & Models
 	auto UnlitShader = Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 	auto PBRshader = Shader("Shaders/IBLPBR.vs", "Shaders/IBLPBR.frag");
 	auto skyboxShader = Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	auto lampShader = Shader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	auto DepthShader = Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
 	auto screenShader = Shader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
-
-	//Model waterModel("Models/WaterBlock/SM_waterBlockOBJ.obj");
-	Model roomModel("Models/Room/Room.obj");
-	//auto roomModel = Model("Models/Sponza/Sponza.obj");
+	auto debugdepthquad = Shader("Shaders/debugquad.vs", "Shaders/debugquad.frag");
+	auto roomModel = Model("Models/SponzaTest/sponza.obj");
+	//auto roomModel = Model("Models/Room/Room.obj");
 	auto GizMo = Model("Models/Gizmo/GizmoForMo.obj");
+	auto ArrowLight = Model("Models/ArrowLight/ArrowLight.obj");
 
-	// Cubemap (Skybox)
-	std::vector<const GLchar*> SkyboxFaces;
+	std::vector<const GLchar*> SkyboxFaces;	// Cubemap (Skybox)
 	//Right, left, top, bottom, back, front
 	SkyboxFaces.push_back("Images/WaveEngineSkybox/posx.bmp");
 	SkyboxFaces.push_back("Images/WaveEngineSkybox/negx.bmp");
@@ -80,17 +77,6 @@ int main()
 	SkyboxFaces.push_back("Images/WaveEngineSkybox/negz.bmp");
 	SkyboxFaces.push_back("Images/WaveEngineSkybox/posz.bmp");
 	auto SkyboxTexture = TextureLoading::LoadCubemap(SkyboxFaces);
-
-	// Cubemap (Skybox)
-	std::vector<const GLchar*> IBLFaces;
-	//Right, left, top, bottom, back, front
-	IBLFaces.push_back("Images/WaveEngineIBL/posx.bmp");
-	IBLFaces.push_back("Images/WaveEngineIBL/negx.bmp");
-	IBLFaces.push_back("Images/WaveEngineIBL/posy.bmp");
-	IBLFaces.push_back("Images/WaveEngineIBL/negy.bmp");
-	IBLFaces.push_back("Images/WaveEngineIBL/negz.bmp");
-	IBLFaces.push_back("Images/WaveEngineIBL/posz.bmp");
-	auto IBLTexture = TextureLoading::LoadCubemap(IBLFaces);
 
 	GLuint quadVAO, quadVBO;
 	SetQuadUp(&quadVAO, &quadVBO);
@@ -133,7 +119,6 @@ int main()
 	glRenderbufferStorageMultisample(GL_RENDERBUFFER, AliasingCount, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColourBuffer[0], 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -163,15 +148,17 @@ int main()
 	glGenFramebuffers(1, &DepthMapFBO);
 
 	//2D Texture for FBO depth buffer
-	const GLuint ShadowWidth = 1024,  ShadowHeight = 1024;
+	const GLuint ShadowWidth = 4096,  ShadowHeight = 4096;
 	GLuint DepthMap;
 	glGenTextures(1, &DepthMap);
 	glBindTexture(GL_TEXTURE_2D, DepthMap);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, ShadowWidth, ShadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthMapFBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, DepthMap, 0);
@@ -179,41 +166,38 @@ int main()
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	DepthShader.use();
-	DepthShader.setInt("depthMap", 0);
-
-	//glm::mat4 FOV = glm::perspective(Camera::GetZoom(ourCamera), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
-
-	screenShader.use();
-	screenShader.setInt("screenTexture", 0);
 	Input::InitializeInputMap(InputMap);
 
 	while (!GlfwInterface::WindowShouldClose(window))
 	{
-		//TICK
-		Tick();
 		//check for events/inputs
 		glfwPollEvents();
 
 		//INPUTS
+		Tick();
 		Input::DoMovement(deltaTime, ourCamera, Keys, keyboardlockout, currentPostProcessSettings, InputMap);
 
 		//Shadow Render Pass
 		glViewport(0, 0, ShadowWidth, ShadowHeight);
 		glBindFramebuffer(GL_FRAMEBUFFER, DepthMapFBO);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-		glClear(GL_DEPTH_BUFFER_BIT);
-		RenderDemo(&lampShader, &skyboxShader, &SkyboxTexture, &DepthShader, &roomModel, &UnlitShader, &GizMo, &IBLTexture, LightingCamera, &DepthMap);
+		glCullFace(GL_FRONT);
+
+		DepthShader.use();
+		RenderDemo(nullptr, nullptr, &SkyboxTexture, &DepthShader, &roomModel, nullptr, &GizMo, LightingCamera, nullptr);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		
 		//Normal Render Pass
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)							 
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);// make sure we clear the framebuffer's content
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RenderDemo(&lampShader, &skyboxShader, &SkyboxTexture, &PBRshader, &roomModel, &UnlitShader, &GizMo, &IBLTexture, ourCamera, &DepthMap);
-
+		
+		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)	
+		glCullFace(GL_BACK);
+		RenderDemo(&lampShader, &skyboxShader, &SkyboxTexture, &PBRshader, &roomModel, &UnlitShader, &GizMo, ourCamera, &DepthMap);
 		//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
 		//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
@@ -224,19 +208,26 @@ int main()
 		//PostProcess Render Pass
 		// clear all relevant buffers
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
+		glClearColor(1.0f, 0.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-
+ 
+		glBindVertexArray(quadVAO);
 		currentPostProcessSettings->HDR = EffectStatus::Active;
 		PostProcessing::ApplyEffects(&screenShader, currentPostProcessSettings);
-		screenShader.SetSampler("depthMap", &DepthMap, GL_TEXTURE_2D);
-
-		glBindVertexArray(quadVAO);
+		//screenShader.SetSampler("depthMap", &DepthMap, GL_TEXTURE_2D);
+		screenShader.SetSampler("screenTexture", &screenTexture, GL_TEXTURE_2D);
+		
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, screenTexture);	// use the color attachment texture as the texture of the quad plane
+		glBindTexture(GL_TEXTURE_2D, screenTexture);
+		if (DEBUGSHADOWMAP)
+		{
+			glBindTexture(GL_TEXTURE_2D, DepthMap);	// use the color attachment texture as the texture of the quad plane
+		}
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
+		
+
 		//swap screen buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -248,28 +239,7 @@ int main()
 
 //-------------------------------------------------------------------
 
-void Tick()
-{
-	//Calculate framedata
-	const auto currentFrame = (GLfloat)glfwGetTime();
-	deltaTime = currentFrame - lastFrame;
-	lastFrame = currentFrame;
-	
-	SecondCounter = MoMath::MoSaturate(SecondCounter);
-
-	lightDirection = (SecondCounter >= 1 || SecondCounter <= 0.0) ? !lightDirection : lightDirection;
-	keyboardlockout = keyboardlockout > 0 ? keyboardlockout - deltaTime : 0;
-
-	if (currentPostProcessSettings->TimeBasedEffects == EffectStatus::Active)
-	{
-		const auto currentDelt = lightDirection ? deltaTime : deltaTime * -1;
-		SecondCounter += (currentDelt / 6);
-	}
-}
-
-//-------------------------------------------------------------------
-
-void DrawLights(Shader * lampShader, Camera* Perspective)
+void DrawLights(Shader * lampShader, Camera* Perspective, Model* InModel)
 {
 	lampShader->use();
 	GLuint lightVAO;
@@ -279,7 +249,6 @@ void DrawLights(Shader * lampShader, Camera* Perspective)
 	glEnableVertexAttribArray(0);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(StaticVertices::vertices), StaticVertices::vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
-	glBindVertexArray(0);
 
 	glm::mat4 model;
 	glm::mat4 FOV = Camera::GetProjection(Perspective);
@@ -287,7 +256,16 @@ void DrawLights(Shader * lampShader, Camera* Perspective)
 	glm::mat4 view = Camera::GetViewMatrix(Perspective);
 	lampShader->setMat4("view", view);
 
-	glBindVertexArray(lightVAO);
+
+	model = glm::mat4();
+	model = glm::translate(model, StaticVertices::SunPos); //pointLightPositions[i]);
+	model = glm::scale(model, glm::vec3(2.f));
+	glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &glm::vec3(50, 50, 50)[0]);
+	lampShader->setFloat("Time", SecondCounter);
+	lampShader->setFloat("TimeLapsed", (float)glfwGetTime());
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
 	//for (GLuint i = 0; i < pointLightPositions->length(); i++)
 	for (GLuint i = 0; i < 3; i++)
 	{
@@ -305,8 +283,13 @@ void DrawLights(Shader * lampShader, Camera* Perspective)
 
 //-------------------------------------------------------------------
 
-void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef, Camera* Perspective)
+void DrawSkybox(Shader* skyboxShaderRef, GLuint* facesRef, Camera* Perspective)
 {
+	if (!skyboxShaderRef)
+	{
+		return;
+	}
+
 	// Draw skybox as last
 	// skybox cube
 	skyboxShaderRef->use();
@@ -322,19 +305,15 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef, Camera* Perspective
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
 
-
 	glDepthFunc(GL_LEQUAL);  // Change depth function so depth test passes when values are equal to depth buffer's content
 	glm::mat4 view = glm::mat4(glm::mat3(Camera::GetViewMatrix(Perspective)));	// Remove any translation component of the view matrix
 	skyboxShaderRef->setMat4("view", view);
 
-
 	auto FOV = Camera::GetProjection(Perspective);
 	skyboxShaderRef->setMat4("projection", FOV);
 
-
 	glBindVertexArray(skyboxVAO);
 	glActiveTexture(GL_TEXTURE0);
-	//GLuint cubemapTexture = TextureLoading::LoadCubemap(*facesRef);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, *facesRef);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
@@ -343,86 +322,38 @@ void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef, Camera* Perspective
 
 //-------------------------------------------------------------------
 
-void DrawModel(Shader * modelShader, Model * ourModel, glm::mat4 model, GLuint *facesRef, Camera* Perspective, GLuint * ShadowMap, float shine)
+void DrawModel(Shader* modelShader, Model* ourModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap)
 {
 	modelShader->use();
-	modelShader->setFloat("Time", SecondCounter);
-	modelShader->setFloat("TimeLapsed", (float)glfwGetTime());
+	if (ShadowMap)
+	{
+		glEnable(GL_TEXTURE_2D);
+		auto i = modelShader->GetUniformLocation("ShadowMap");
+		if (i != -1)
+		{
+			modelShader->setInt("ShadowMap", i);
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, *ShadowMap);
+		}
+	}
+
 	modelShader->setFloat("NearPlane", Camera::GetNearPlane(Perspective));
 	modelShader->setFloat("FarPlane", Camera::GetFarPlane(Perspective));
 	modelShader->setVec3("CamPos", Camera::getPosition(Perspective));
 	modelShader->setVec3("CamDir", Camera::getFront(Perspective));
-	modelShader->SetSampler("ShadowMap", ShadowMap, GL_TEXTURE_2D);
-	
+
 	glm::mat4 FOV = Camera::GetProjection(Perspective);//glm::perspective(Camera::GetZoom(Perspective), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
 	glm::mat4 view = Camera::GetViewMatrix(Perspective);
-	
 
 	modelShader->setMat4("projection", FOV);
 	modelShader->setMat4("view", view);
-	modelShader->setMat4("model", model);
-	modelShader->setMat4("lightSpaceMatrix", FOV * view);
-
-	//glBindTexture(GL_TEXTURE_CUBE_MAP, *facesRef);
 	initialiseLights(modelShader);
-	ourModel->Draw(modelShader, shine);
-}
 
-//-------------------------------------------------------------------
-
-void DrawWater(Shader * modelShader, Model * ourModel, glm::mat4 model)
-{
-	//modelShader->use();
-	//modelShader->setFloat("Time", SecondCounter);
-	//modelShader->setFloat("TimeLapsed", (float)glfwGetTime());
-	//modelShader->setVec3("CamPos", ourCamera->getPosition());
-	//modelShader->setVec3("CamDir", ourCamera->getFront() - ourCamera->getPosition());
-
-	//glm::vec3 scale;
-	//glm::quat rotation;
-	//glm::vec3 translation;
-	//glm::vec3 skew;
-	//glm::vec4 perspective;
-	//glm::decompose(model, scale, rotation, translation, skew, perspective);
-	//modelShader->setVec3("ActorPos", translation);
-	//
-	//glm::mat4 FOV = glm::perspective(ourCamera->GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
-	//glm::mat4 view = ourCamera->GetViewMatrix();
-
-	//glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(FOV));
-	//glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	//glUniformMatrix4fv(glGetUniformLocation(modelShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-	//initialiseLights(modelShader);
-	//ourModel->Draw(modelShader, 0);
-}
-
-//-------------------------------------------------------------------
-
-void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint * difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO)
-{
-	floorShader->use();
-	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.diffuse"), 0);
-	glUniform1i(glGetUniformLocation(floorShader->shaderProgram, "material.specular"), 1);
-
-	floorShader->setFloat("material.shininess", 16.0f);
-	floorShader->setFloat("Time", SecondCounter);
-	glm::mat4 FOV = glm::perspective(Camera::GetZoom(ourCamera), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
-	floorShader->setMat4("projection", FOV);
-
-	glm::mat4 view = Camera::GetViewMatrix(ourCamera);
-	floorShader->setMat4("view", view);
-	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-	glBindVertexArray(*acubeVAO);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, *difftex);
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, *spectex);
-	glUniformMatrix4fv(glGetUniformLocation(floorShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(Transformation));
-	initialiseLights(floorShader);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glm::mat4 LightingFOV = Camera::GetProjection(LightingCamera);
+	glm::mat4 LightingView = Camera::GetViewMatrix(LightingCamera);
+	modelShader->setMat4("lightSpaceMatrix", LightingFOV * LightingView);
+	modelShader->setMat4("model", model);
+	ourModel->Draw(modelShader);
 }
 
 //-------------------------------------------------------------------
@@ -442,56 +373,41 @@ void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO)
 
 //-------------------------------------------------------------------
 
+void Tick()
+{
+	const auto currentFrame = (GLfloat)glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+	keyboardlockout = keyboardlockout > 0 ? keyboardlockout - deltaTime : 0;
+}
+
+//-------------------------------------------------------------------------------------
+
 void initialiseLights(Shader * lightShader)
 {
+
+	const float pointIntes = 0.02f; const float directIntes = 0.05f;
 	// Directional light
 	auto Directional0 = Light::DirectionalLight(lightShader, "dirLight");
-	Directional0.direction = glm::vec3(0.0, 1.0, 1.0);
-	Directional0.ambient = MoMath::MoNormalize(glm::vec3(0.05f));
-	Directional0.diffuse = MoMath::MoNormalize(glm::vec3(1, 1, 1));
-	Directional0.specular = MoMath::MoNormalize(glm::vec3(1, 1, 1));
-	Directional0.intensity = 0;
+	Directional0.direction = StaticVertices::SunDir;//Camera::getFront(LightingCamera);
+	Directional0.ambient = glm::vec3(1);
+	Directional0.diffuse = glm::vec3(50, 50, 50);
+	Directional0.specular = glm::vec3(1);
+	Directional0.position = StaticVertices::SunPos;
+	Directional0.intensity = directIntes;
 	Directional0.setUpShader();
-
 	
 	// Point light 1
-	auto Point0 = Light::PointLight(lightShader, "pointLights[0]");
-	Point0.diffuse = MoMath::MoNormalize(StaticVertices::pointLightColours[0]);
-	Point0.position = StaticVertices::pointLightPositions[0]; // MyLerp(pointLightPositions[1], pointLightPositions[0], SecondCounter);
-	Point0.ambient = glm::vec3(0.0f);
-	Point0.specular = glm::vec3(0.0f);
-	Point0.intensity = 200;
-	Point0.setUpShader();
-
-	/*
-	// Point light 1
-	Light Point1 = Light::PointLight(lightShader, "pointLights[1]");
-	Point1.diffuse = StaticVertices::pointLightColours[1];
-	Point1.position = StaticVertices::pointLightPositions[1];//MyLerp(pointLightPositions[2], pointLightPositions[1], SecondCounter);//glm::vec3(pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
-	Point1.ambient = glm::vec3(0.0f);
-	Point1.specular = glm::vec3(0.0f);
-	Point1.intensity = 10.0f; //* SecondCounter;
-	Point1.setUpShader();
-
-	// Point light 1
-	Light Point2 = Light::PointLight(lightShader, "pointLights[2]");
-	Point2.diffuse = StaticVertices::pointLightColours[2];
-	Point2.position = StaticVertices::pointLightPositions[2];// MyLerp(pointLightPositions[0], pointLightPositions[1], SecondCounter); //glm::vec3(pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
-	Point2.ambient = glm::vec3(0.0f);
-	Point2.specular = glm::vec3(0.0f);
-	Point2.intensity = 7.5f;//* SecondCounter;
-	Point2.setUpShader();
-	*/
-
-
-	// SpotLight
-	auto CameraSpot = Light::SpotLight(lightShader, "spotLight");
-	CameraSpot.position = Camera::getPosition(ourCamera);
-	CameraSpot.direction = Camera::getFront(ourCamera);
-	CameraSpot.ambient = glm::vec3(0.0f);
-	CameraSpot.diffuse = glm::vec3(1.0f);
-	CameraSpot.specular = glm::vec3(1.0f);
-	CameraSpot.setUpShader();
+	for (int i = 0; StaticVertices::pointLightColours->length() > i; i++)
+	{
+		auto Point = Light::PointLight(lightShader, "pointLights[" + std::to_string(i) + "]");
+		Point.diffuse = StaticVertices::pointLightColours[i];
+		Point.position = StaticVertices::pointLightPositions[i]; // MyLerp(pointLightPositions[1], pointLightPositions[0], SecondCounter);
+		Point.ambient = glm::vec3(1.0f);
+		Point.specular = glm::vec3(1.0f);
+		Point.intensity = pointIntes;
+		Point.setUpShader();
+	}
 }
 
 //-------------------------------------------------------------------
@@ -515,32 +431,33 @@ void MouseCallback(GLFWwindow * window, double xPos, double yPos)
 	Input::MouseCallback(window, xPos, yPos, ourCamera, lastX, lastY, firstMouse);
 }
 
-void RenderDemo(Shader* InLampShader, Shader* InSkyboxShader, GLuint* InSkyboxTexture, Shader* InModelShader, Model* InModel, Shader* InUnlitShader, Model* InGizmo, GLuint* IBLTexture, Camera* Perspective, GLuint * ShadowMap)
+//-------------------------------------------------------------------------------------
+
+void RenderDemo(Shader* InLampShader, Shader* InSkyboxShader, GLuint* InSkyboxTexture, Shader* InModelShader, Model* InModel, Shader* InUnlitShader, Model* InGizmo, Camera* Perspective, GLuint * ShadowMap)
 {
-	//RENDER
-	if (LightingCamera != Perspective)
+	//Room Model
+	auto modelTransformation = glm::mat4();
+	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f));
+	//modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f));
+	modelTransformation = glm::rotate(modelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	DrawModel(InModelShader, InModel, modelTransformation, Perspective, ShadowMap);
+
+	if (InUnlitShader)
+	{
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.25f));
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 1.50f, 0.0f));
+		DrawModel(InUnlitShader, InGizmo, modelTransformation, Perspective, ShadowMap);
+	}
+
+//RENDER 
+//skip this for depth pass
+	if (ShadowMap)
 	{
 		DrawSkybox(InSkyboxShader, InSkyboxTexture, Perspective);
+		DrawLights(InLampShader, ourCamera, nullptr);
 	}
-	DrawLights(InLampShader, Perspective);
 
-	auto modelTransformation = glm::mat4();
-
-	//Room Model
-	modelTransformation = glm::mat4();
-	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f));
-	DrawModel(InModelShader, InModel, modelTransformation, IBLTexture, Perspective, ShadowMap, 1.0f);
-
-
-	modelTransformation = glm::mat4();
-	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.25f));
-	modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 6.0f, 0.0f));
-	DrawModel(InUnlitShader, InGizmo, modelTransformation, IBLTexture, Perspective, ShadowMap, 1.0f);
-
-	//modelTransformation = glm::scale(modelTransformation, glm::vec3(0.05f));
-	//modelTransformation = glm::rotate(modelTransformation, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, -0.75f, 4.0f));
-	//DrawWater(&WaterShader, &waterModel, modelTransformation);
 }
 
 //-------------------------------------------------------------------

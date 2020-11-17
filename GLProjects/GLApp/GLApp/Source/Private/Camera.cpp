@@ -15,7 +15,7 @@ namespace CameraStatics
 
 	const GLfloat AspectRatio = 1920.0f / 1080.0f;
 	const GLfloat NearPlane = 0.1f;
-	const GLfloat FarPlane = 1000.0f;
+	const GLfloat FarPlane = 50.0f;
 }
 
 //-------------------------------------------------------------------
@@ -151,9 +151,13 @@ glm::vec3 Camera::getFront(Camera* Target)
 
 glm::mat4 Camera::GetProjection(Camera * Target)
 {
+
 	if (Target->IsOrthagraphic)
 	{
-		return  glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, Target->NearPlane, Target->FarPlane);
+		auto Left = 20.0f;
+
+		auto Top = 10.0f;
+		return  glm::ortho(-Left, Left, -Top, Top, Target->NearPlane, Target->FarPlane);
 	}
 
 	return glm::perspective(Camera::GetZoom(Target), Target->AspectRatio, Target->NearPlane, Target->FarPlane);
@@ -184,6 +188,12 @@ GLfloat Camera::GetFarPlane(Camera * Target)
 
 glm::mat4 Camera::GetViewMatrix(Camera* Target)
 {
+	if (Target->IsOrthagraphic)
+	{
+		return glm::lookAt(Target->Position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//	return glm::lookAt(Target->Position, Target->Position + Target->Front, glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+
 	return glm::lookAt(Target->Position, Target->Position + Target->Front, Target->Up);
 }
 

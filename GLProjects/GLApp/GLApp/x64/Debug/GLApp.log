@@ -1,15 +1,4 @@
-﻿  Camera.cpp
-  Inputs.cpp
-  Light.cpp
-  Math.cpp
-  Mesh.cpp
-d:\development\developmentprojects\gfxengine\glprojects\glapp\glapp\source\private\mesh.cpp(83): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  Model.cpp
-  PostProcessing.cpp
-  Shader.cpp
-  main.cpp
-  Generating Code...
-main.obj : error LNK2019: unresolved external symbol __imp_glewInit referenced in function main
+﻿main.obj : error LNK2019: unresolved external symbol __imp_glewInit referenced in function main
 main.obj : error LNK2019: unresolved external symbol glfwTerminate referenced in function main
 GlfwInterface.obj : error LNK2001: unresolved external symbol glfwTerminate
 main.obj : error LNK2019: unresolved external symbol glfwPollEvents referenced in function main
@@ -30,9 +19,6 @@ Mesh.obj : error LNK2001: unresolved external symbol __imp___glewEnableVertexAtt
 main.obj : error LNK2001: unresolved external symbol __imp___glewGetUniformLocation
 Mesh.obj : error LNK2001: unresolved external symbol __imp___glewGetUniformLocation
 Shader.obj : error LNK2001: unresolved external symbol __imp___glewGetUniformLocation
-main.obj : error LNK2001: unresolved external symbol __imp___glewUniform1i
-Mesh.obj : error LNK2001: unresolved external symbol __imp___glewUniform1i
-Shader.obj : error LNK2001: unresolved external symbol __imp___glewUniform1i
 main.obj : error LNK2001: unresolved external symbol __imp___glewUniform3fv
 Shader.obj : error LNK2001: unresolved external symbol __imp___glewUniform3fv
 main.obj : error LNK2001: unresolved external symbol __imp___glewUniformMatrix4fv
@@ -70,6 +56,8 @@ GlfwInterface.obj : error LNK2019: unresolved external symbol glfwMakeContextCur
 Inputs.obj : error LNK2019: unresolved external symbol glfwSetWindowShouldClose referenced in function "public: static void __cdecl Input::KeyCallback(struct GLFWwindow *,int,int,int,int,class Camera *,bool * const)" (?KeyCallback@Input@@SAXPEAUGLFWwindow@@HHHHPEAVCamera@@QEA_N@Z)
 Mesh.obj : error LNK2001: unresolved external symbol __imp___glewUniform1f
 Shader.obj : error LNK2001: unresolved external symbol __imp___glewUniform1f
+Mesh.obj : error LNK2001: unresolved external symbol __imp___glewUniform1i
+Shader.obj : error LNK2001: unresolved external symbol __imp___glewUniform1i
 Model.obj : error LNK2019: unresolved external symbol SOIL_load_image referenced in function "private: int __cdecl Model::TextureFromFile(char const *,class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >)" (?TextureFromFile@Model@@AEAAHPEBDV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z)
 TextureLoading.obj : error LNK2001: unresolved external symbol SOIL_load_image
 Model.obj : error LNK2019: unresolved external symbol SOIL_free_image_data referenced in function "private: int __cdecl Model::TextureFromFile(char const *,class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >)" (?TextureFromFile@Model@@AEAAHPEBDV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z)

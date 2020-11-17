@@ -1,10 +1,6 @@
-#version 330 core
-in vec3 TexCoords;
-out vec4 color;
-
-uniform samplerCube skybox;
+#version 430 core
 
 void main()
-{
-
+{             
+    // gl_FragDepth = gl_FragCoord.z;
 }

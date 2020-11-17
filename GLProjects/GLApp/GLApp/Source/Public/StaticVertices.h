@@ -1,8 +1,8 @@
 #pragma once
-#include<gtc/matrix_transform.hpp>
+#include <gtc/matrix_transform.hpp>
 #include <glm.hpp>
 #include <GL\glew.h>
-
+#include "Math.h"
 
 namespace StaticVertices {
 	//SmoothShading
@@ -124,22 +124,23 @@ namespace StaticVertices {
 
 	glm::vec3 pointLightPositions[] =
 	{
-		glm::vec3(0, 20, 0),//white
+		glm::vec3(2.0, 1.0, 2.0),//white
 
-		glm::vec3(5, 5, 6),//red
+		glm::vec3(-2.f, 1.f, 2.f),//red
 
-		glm::vec3(-5, 5, -6)//blue
+		glm::vec3(2.f, 1.f, -2.f)//blue
 	};
 
 	glm::vec3 pointLightColours[] =
 	{
-		glm::vec3(0.98f, 0.83f, 0.25f),//White,
+		glm::vec3(20.0f, 50.0f, 20.0f),//White,
 
-		glm::vec3(1.50f, 0.0f, 0.0f),//red
+		glm::vec3(50.0f, 20.0f, 20.0f),//red
 
-		glm::vec3(0.0f, 0.0f, 1.50f)//blue
+		glm::vec3(20.f, 20.f, 50.0f)//blue
 	};
-//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-
+	glm::vec3 SunPos = glm::vec3(-15.02f, 25.0f, -15.02f);
+	glm::vec3 SunDir(glm::vec3(-2.0f, -1.0f, 0.0f));
+	//glm::vec3 SunDir(-20.0f * MoMath::MoNormalize(glm::vec3(SunPos)));
 };

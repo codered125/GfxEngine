@@ -8,7 +8,6 @@
 void PostProcessing::ApplyEffects(Shader * FBShader, PostProcessSettings *PPS)
 {
 	FBShader->use();
-	FBShader->setInt("screenTexture", 0);
 	FBShader->setBool("currentPostProcessEffect.HDR", PPS->HDR);
 	FBShader->setFloat("exposure", 0.50f);
 	FBShader->setInt("currentPostProcessEffect.Invert", PPS->InvertedColours);

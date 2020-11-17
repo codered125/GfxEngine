@@ -44,6 +44,7 @@ void Light::setUpShader()
 		break;
 
 	case Directional:
+		ShaderRef->setVec3(pos, position);
 		ShaderRef->setVec3(dir, direction);
 		ShaderRef->setVec3(ambi, ambient);
 		ShaderRef->setVec3(diff, diffuse);

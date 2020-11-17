@@ -39,6 +39,8 @@ public:
 	void setInt(const std::string& Accessor, int value);
 
 	void SetSampler(const std::string& Accessor, GLuint* value, GLenum TextureType);
+
+	GLint GetUniformLocation(const std::string& Accessor);
 };
 
 #endif
