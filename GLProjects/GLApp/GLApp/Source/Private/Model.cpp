@@ -144,9 +144,6 @@ Mesh Model::proccesMesh(aiMesh * mesh, const aiScene * scene)
 
 		std::vector<Texture> aoMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "material.texture_ao");
 		textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
-
-
-
 	}
 	return Mesh(vertices, indices, textures);
 }

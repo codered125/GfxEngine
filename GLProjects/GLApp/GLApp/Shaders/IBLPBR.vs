@@ -25,5 +25,5 @@ gl_Position =  projection * view * model * vec4 (position, 1.0f);
 vs_Out.WorldPos = vec3(model * vec4(position, 1.0f));
 vs_Out.Normal = mat3(transpose(inverse(model))) * normal;
 vs_Out.TexCoords = texCoords;
-vs_Out.FragPosLightSpace = lightSpaceMatrix * model * vec4(position, 1.0); 
+vs_Out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_Out.WorldPos, 1.0f); 
 };

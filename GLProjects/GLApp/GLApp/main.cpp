@@ -23,14 +23,13 @@
 //-------------------------------------------------------------------------------------
 
 #define DEBUGSHADOWMAP 0
-
 int main()
 {
 	//Camera's and post process
 	currentPostProcessSettings = &PostProcessSettings();
 	currentPostProcessSettings->HDR = EffectStatus::Active;
 	ourCamera = &Camera(glm::vec3(0.0f, 10.0f, 0.0f));
-	LightingCamera = &Camera(StaticVertices::SunPos, StaticVertices::SunDir, true, 2048 / 2048, 4.0f, 15.5);
+	LightingCamera = &Camera(StaticVertices::SunPos, StaticVertices::SunDir, true, 2048 / 2048, 0.10f, 50.5f);
 
 	//WindowSetup
 	auto* window = GlfwInterface::DefineAndCreaateWindow(AliasingCount, height, width);
@@ -51,10 +50,10 @@ int main()
 	}
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-	glEnable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
-	glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_MULTISAMPLE);
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_DEPTH_TEST);
+
 
 	//Shaders & Models
 	auto UnlitShader = Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
@@ -64,7 +63,8 @@ int main()
 	auto DepthShader = Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
 	auto screenShader = Shader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
 	auto debugdepthquad = Shader("Shaders/debugquad.vs", "Shaders/debugquad.frag");
-	auto roomModel = Model("Models/Sponza/Sponza.obj");
+	auto roomModel = Model("Models/SponzaTest/sponza.obj");
+	//auto roomModel = Model("Models/Room/Room.obj");
 	auto GizMo = Model("Models/Gizmo/GizmoForMo.obj");
 	auto ArrowLight = Model("Models/ArrowLight/ArrowLight.obj");
 
@@ -186,7 +186,7 @@ int main()
 		glCullFace(GL_FRONT);
 
 		DepthShader.use();
-		RenderDemo(nullptr, nullptr, &SkyboxTexture, &DepthShader, &roomModel, &UnlitShader, &GizMo, LightingCamera, nullptr);
+		RenderDemo(nullptr, nullptr, &SkyboxTexture, &DepthShader, &roomModel, nullptr, &GizMo, LightingCamera, nullptr);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		
 		//Normal Render Pass
@@ -241,45 +241,6 @@ int main()
 
 void DrawLights(Shader * lampShader, Camera* Perspective, Model* InModel)
 {
-	/*
-	if (!lampShader)
-	{
-		return;
-	}
-
-	lampShader->use();
-	glm::mat4 model;
-	glm::mat4 FOV = Camera::GetProjection(Perspective);
-	lampShader->setMat4("projection", FOV);
-	glm::mat4 view = Camera::GetViewMatrix(Perspective);
-	lampShader->setMat4("view", view);
-	lampShader->setMat4("model", model);
-
-	model = glm::mat4();
-	// Wrong order but we want to keep world direction here
-	model = glm::translate(model, StaticVertices::SunPos);
-	model = glm::scale(model, glm::vec3(0.008f));
-
-	//model = glm::lookAt(model, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-
-	lampShader->setMat4("model", model);
-	lampShader->setVec3("inColour", glm::vec3(50, 50, 50));
-	InModel->Draw(lampShader);
-
-	for (int i = 0; StaticVertices::pointLightColours->length() > i; i++)
-	{
-		model = glm::mat4();
-		model = glm::translate(model, StaticVertices::pointLightPositions[i]); //pointLightPositions[i]);
-		model = glm::scale(model, glm::vec3(0.008f));
-		glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &StaticVertices::pointLightColours[i][0]);
-		lampShader->setFloat("Time", SecondCounter);
-		lampShader->setFloat("TimeLapsed", (float)glfwGetTime());
-		InModel->Draw(lampShader);
-	}
-	*/
-
 	lampShader->use();
 	GLuint lightVAO;
 	glGenVertexArrays(1, &lightVAO);
@@ -298,7 +259,7 @@ void DrawLights(Shader * lampShader, Camera* Perspective, Model* InModel)
 
 	model = glm::mat4();
 	model = glm::translate(model, StaticVertices::SunPos); //pointLightPositions[i]);
-	model = glm::scale(model, glm::vec3(0.2f));
+	model = glm::scale(model, glm::vec3(2.f));
 	glUniformMatrix4fv(glGetUniformLocation(lampShader->shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniform3fv(glGetUniformLocation(lampShader->shaderProgram, "inColour"), 1, &glm::vec3(50, 50, 50)[0]);
 	lampShader->setFloat("Time", SecondCounter);
@@ -476,18 +437,22 @@ void RenderDemo(Shader* InLampShader, Shader* InSkyboxShader, GLuint* InSkyboxTe
 {
 	//Room Model
 	auto modelTransformation = glm::mat4();
-	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.005f));
+	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.01f));
+	//modelTransformation = glm::scale(modelTransformation, glm::vec3(0.5f));
 	modelTransformation = glm::rotate(modelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	DrawModel(InModelShader, InModel, modelTransformation, Perspective, ShadowMap);
 
-	modelTransformation = glm::mat4();
-	modelTransformation = glm::scale(modelTransformation, glm::vec3(0.25f));
-	modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 1.50f, 0.0f));
-	DrawModel(InUnlitShader, InGizmo, modelTransformation, Perspective, ShadowMap);
+	if (InUnlitShader)
+	{
+		modelTransformation = glm::mat4();
+		modelTransformation = glm::scale(modelTransformation, glm::vec3(0.25f));
+		modelTransformation = glm::translate(modelTransformation, glm::vec3(0.0f, 1.50f, 0.0f));
+		DrawModel(InUnlitShader, InGizmo, modelTransformation, Perspective, ShadowMap);
+	}
 
 //RENDER 
 //skip this for depth pass
-	if (LightingCamera != Perspective)
+	if (ShadowMap)
 	{
 		DrawSkybox(InSkyboxShader, InSkyboxTexture, Perspective);
 		DrawLights(InLampShader, ourCamera, nullptr);
