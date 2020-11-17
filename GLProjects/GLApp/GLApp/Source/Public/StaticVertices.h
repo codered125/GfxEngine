@@ -140,7 +140,7 @@ namespace StaticVertices {
 		glm::vec3(20.f, 20.f, 50.0f)//blue
 	};
 
-	glm::vec3 SunPos = glm::vec3(-5.02f, 12.5, 0.02f);
-	glm::vec3 SunDir(glm::vec3(0.0f));
+	glm::vec3 SunPos = glm::vec3(-15.02f, 25.0f, -15.02f);
+	glm::vec3 SunDir(glm::vec3(-2.0f, -1.0f, 0.0f));
 	//glm::vec3 SunDir(-20.0f * MoMath::MoNormalize(glm::vec3(SunPos)));
 };
