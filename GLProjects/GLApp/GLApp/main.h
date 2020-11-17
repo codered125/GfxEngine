@@ -24,16 +24,14 @@ int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 void Tick();
 void initialiseLights(Shader * lightShader);
-void DrawLights(Shader * lampShader, Camera* Perspective);
-void DrawSkybox(Shader * skyboxShaderRef, GLuint * facesRef, Camera* Perspective);
-void DrawModel(Shader* modelShader, Model* InModel, glm::mat4 model, GLuint* facesRef, Camera* Perspective, GLuint * ShadowMap, float shine = 16);
-void DrawWater(Shader* modelShader, Model* InModel, glm::mat4 model, Camera* Perspectivec);
-void DrawBox(Shader * floorShader, glm::mat4 Transformation, GLuint* difftex, GLuint * spectex, bool depthTest, GLuint * acubeVbo, GLuint * acubeVAO);
-void SetQuadUp(GLuint * quadVAO, GLuint * quadVBO);
+void DrawLights(Shader* lampShader, Camera* Perspective, Model* LampInModel);
+void DrawSkybox(Shader* skyboxShaderRef, GLuint* facesRef, Camera* Perspective);
+void DrawModel(Shader* modelShader, Model* InModel, glm::mat4 model, Camera* Perspective, GLuint * ShadowMap);
+void SetQuadUp(GLuint* quadVAO, GLuint * quadVBO);
 void KeyCallback(GLFWwindow  * window, int key, int scancode, int action, int mode);
 void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset);
 void MouseCallback(GLFWwindow * window, double xPos, double yPos);
-void RenderDemo(Shader* InLampShader, Shader* InSkyboxShader, GLuint* InSkyboxTexture, Shader* InModelShader, Model* InModel, Shader* InUnlitShader, Model* InGizmo, GLuint* IBLTexture, Camera* Perspective, GLuint * ShadowMap);
+void RenderDemo(Shader* InLampShader, Shader* InSkyboxShader, GLuint* InSkyboxTexture, Shader* InModelShader, Model* InModel, Shader* InUnlitShader, Model* InGizmo,  Camera* Perspective, GLuint * ShadowMap);
 
 Camera* ourCamera;
 Camera* LightingCamera;
@@ -46,7 +44,7 @@ auto firstMouse = false, lightDirection = true;
 PostProcessSettings* currentPostProcessSettings;
 std::map<int, int> InputMap;
 
-auto AliasingCount = 4, NumberofLights = 4;
+auto AliasingCount = 4, NumberofLights = 3;
 
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------

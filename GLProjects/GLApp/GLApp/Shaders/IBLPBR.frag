@@ -1,13 +1,13 @@
 #version 430 core
 #define M_PI 3.14159265359
-#define NUMBER_OF_POINT_LIGHTS 1
+#define NUMBER_OF_POINT_LIGHTS 3
 
 //-------------------------------------------------------------------
 
 struct DirLight 
 {
 	float intensity;
-
+	vec3 position;
 	vec3 direction;
 	vec3 ambient;
 	vec3 diffuse;
@@ -24,24 +24,6 @@ struct PointLight
     float quadratic;
 
 	vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
-//-------------------------------------------------------------------
-
-struct SpotLight
-{
-    float cutOff;
-    float outerCutOff;
-    float constant;
-    float linear;
-    float quadratic;
-	float intensity;
-    
-	vec3 position;
-    vec3 direction;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -82,11 +64,10 @@ vec4 FragPosLightSpace;
 } fs_in;
 
 
-out vec4 color;
+out vec4 FragColor;
 
 uniform Material material;
 uniform DirLight dirLight;
-uniform SpotLight spotLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 
 uniform vec3 CamPos;
@@ -96,7 +77,7 @@ uniform float FarPlane;
 uniform samplerCube skybox;
 uniform sampler2D ShadowMap;
 
-bool  blin = false;
+
 float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
 float Desaturate(vec3 InColour);
 vec3 GetNormalFromMap();
@@ -189,7 +170,6 @@ LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoor
 	const float DiffuseExpo = 2.2;
     //float ao =  pow(texture(mats.texture_ao, texCoords).rgba, vec4(DiffuseExpo)).r;
 	float ao = Desaturate(pow(texture(mats.texture_normal, texCoords).rgb, vec3(DiffuseExpo)));
-	//float ao =0;
 	vec3 diffuse = pow(texture(mats.texture_diffuse, texCoords).rgba, vec4(DiffuseExpo)).rgb;
 	return  LinearMatVals(roughness, metallic, ao, diffuse);
 }
@@ -240,17 +220,34 @@ float LinearizeDepth(float depth)
 
 float ShadowCalculation(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir)
 {
-	InLightDir = normalize(InLightDir);
-    vec3 projCoords = InFragPosLightSpace.xyz / InFragPosLightSpace.w; // perform perspective divide
-	projCoords = projCoords * 0.5 + 0.5; 
+  	vec3 projCoords = InFragPosLightSpace.xyz / InFragPosLightSpace.w; // perform perspective divide
+	projCoords = projCoords * 0.5 + 0.5; // transform to ndc coordinates
+
 	float closestDepth = texture(ShadowMap, projCoords.xy).r;   
 	float currentDepth = projCoords.z;  
-	
-	float bias = max(0.05 * (1.0 - dot(InNormal, InLightDir)), 0.005); 
-	float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0; 
-	//float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;  
 
-	return shadow;
+	float bias = max(0.05 * (1.0 - dot(InNormal, InLightDir)), 0.005); 
+
+    // check whether current frag pos is in shadow
+    //PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);
+    for(int x = -2; x <= 2; ++x)
+    {
+    	for(int y = -2; y <= 2; ++y)
+       {
+           float pcfDepth = texture(ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+    	 }   
+  	}
+   	shadow /= 25.0;
+    
+    //keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+   if(projCoords.z > 1.0)
+   {
+	  shadow = 0.0;
+   }
+	return  shadow;
 }
 
 //-------------------------------------------------------------------
@@ -284,17 +281,18 @@ void main()
 
 	//Directional Lights
 	vec3 r = dirLight.diffuse;
-	vec3 L = -dirLight.direction;
-	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
-	float Shadow = ShadowCalculation(fs_in.FragPosLightSpace, Norm, dirLight.direction);
-	L0 +=  1.0 - Shadow;
-	
+	//vec3 L = -normalize(dirLight.direction);
+	vec3 L = normalize(dirLight.position - fs_in.WorldPos);
 	vec3 ambient = vec3(0.03) * parse.diffuse * parse.ao;
-    color = vec4(ambient + L0, 1.0);
 	
-	color = color / (color + vec4(1.0));
-	color = pow(color, vec4(1.0/2.2));  
-	//color = vec4(vec3(Desaturate(Norm)), 1.0f);
+
+	float Shadow = 1.0f - ShadowCalculation(fs_in.FragPosLightSpace, normalize(fs_in.Normal), L);
+	L0 += max(Shadow, 0.1) * ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
+ 	vec3 color = ambient + L0;
+	
+	//color = color / (color + vec3(1.0));
+	//color = pow(color, vec3(1.0/2.2)); 
+	FragColor = vec4(color, texture(material.texture_diffuse, fs_in.TexCoords).a);    
 }
 
 //-------------------------------------------------------------------

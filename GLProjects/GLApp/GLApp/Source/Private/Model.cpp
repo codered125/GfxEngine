@@ -16,11 +16,11 @@ Model::Model(GLchar * inpath)
 
 //-------------------------------------------------------------------
 
-void Model::Draw(Shader *shader, float shine)
+void Model::Draw(Shader *shader)
 {
 	for (GLuint i = 0; i < this->meshes.size(); i++)
 	{
-		this->meshes[i].Draw(shader, shine);
+		this->meshes[i].Draw(shader);
 	}
 }
 
@@ -144,9 +144,6 @@ Mesh Model::proccesMesh(aiMesh * mesh, const aiScene * scene)
 
 		std::vector<Texture> aoMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "material.texture_ao");
 		textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
-
-
-
 	}
 	return Mesh(vertices, indices, textures);
 }
