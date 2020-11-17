@@ -29,7 +29,7 @@ int main()
 	currentPostProcessSettings = &PostProcessSettings();
 	currentPostProcessSettings->HDR = EffectStatus::Active;
 	ourCamera = &Camera(glm::vec3(0.0f, 10.0f, 0.0f));
-	LightingCamera = &Camera(StaticVertices::SunPos, StaticVertices::SunDir, true, 2048 / 2048, 0.10f, 50.5f);
+	LightingCamera = &Camera(StaticVertices::SunPos, StaticVertices::SunDir, true, 4096 / 4096, 0.10f, 50.5f);
 
 	//WindowSetup
 	auto* window = GlfwInterface::DefineAndCreaateWindow(AliasingCount, height, width);
@@ -148,7 +148,7 @@ int main()
 	glGenFramebuffers(1, &DepthMapFBO);
 
 	//2D Texture for FBO depth buffer
-	const GLuint ShadowWidth = 2048,  ShadowHeight = 2048;
+	const GLuint ShadowWidth = 4096,  ShadowHeight = 4096;
 	GLuint DepthMap;
 	glGenTextures(1, &DepthMap);
 	glBindTexture(GL_TEXTURE_2D, DepthMap);

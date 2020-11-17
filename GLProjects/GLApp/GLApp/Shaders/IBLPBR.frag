@@ -226,10 +226,9 @@ float ShadowCalculation(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir
 	float closestDepth = texture(ShadowMap, projCoords.xy).r;   
 	float currentDepth = projCoords.z;  
 
-	float bias = max(0.05 * (1.0 - dot(InNormal, -InLightDir)), 0.005); 
+	float bias = max(0.05 * (1.0 - dot(InNormal, InLightDir)), 0.005); 
 
     // check whether current frag pos is in shadow
-    //float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
     //PCF
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);
@@ -277,7 +276,7 @@ void main()
 		vec3 L = normalize(pointLights[i].position - fs_in.WorldPos);
 		vec3 Halfway = normalize(View + L);
 		vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(fs_in.WorldPos, pointLights[i].position);	
-		//L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
+		L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
 	}
 
 	//Directional Lights
@@ -288,17 +287,12 @@ void main()
 	
 
 	float Shadow = 1.0f - ShadowCalculation(fs_in.FragPosLightSpace, normalize(fs_in.Normal), L);
-	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
-	L0.rgb *= max(Shadow, 0.1);
+	L0 += max(Shadow, 0.1) * ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
  	vec3 color = ambient + L0;
 	
 	//color = color / (color + vec3(1.0));
 	//color = pow(color, vec3(1.0/2.2)); 
-	//color = vec3(Shadow);
-	FragColor = vec4(color, texture(material.texture_diffuse, fs_in.TexCoords).a);   
-
-	//FragColor = vec4(color, 1);   
- 
+	FragColor = vec4(color, texture(material.texture_diffuse, fs_in.TexCoords).a);    
 }
 
 //-------------------------------------------------------------------
