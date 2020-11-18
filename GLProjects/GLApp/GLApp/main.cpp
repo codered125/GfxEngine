@@ -118,6 +118,7 @@ int main()
 	//Creating our render buffer object (RBO are write-only)
 	//framebuffer attachments,
 	//stores its data in OpenGL's native rendering format making it optimized for off-screen rendering to a framebuffer
+;
 	GLuint rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
@@ -132,27 +133,27 @@ int main()
 	//configure second post-processing framebuffer
 	//Pushes our texture into our 
 
-	//SceneRenderTarget IntermediateRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
+	SceneRenderTarget IntermediateRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
 	//(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, GLuint InNrColourAttachments = 1, bool InMakeDepth = false, bool InMSAA = false)
 	
-	GLuint intermediateFBO;
-	glGenFramebuffers(1, &intermediateFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+	//GLuint intermediateFBO;
+	//glGenFramebuffers(1, &intermediateFBO);
+	//glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
 
-	GLuint screenTexture;
-	glGenTextures(1, &screenTexture);
-	glBindTexture(GL_TEXTURE_2D, screenTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
-	
+	//GLuint screenTexture;
+	//glGenTextures(1, &screenTexture);
+	//glBindTexture(GL_TEXTURE_2D, screenTexture);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
+	//
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		std::cout << "Failed  intermediatte Renderbuffer" << std::endl;
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	//{
+	//	std::cout << "Failed  intermediatte Renderbuffer" << std::endl;
+	//}
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//Frame buffer object for rendering depth map
 	GLuint DepthMapFBO;
@@ -199,10 +200,12 @@ int main()
 		DepthShader.use();
 		RenderDemo(nullptr, nullptr, &SkyboxTexture, &DepthShader, &roomModel, nullptr, &GizMo, LightingCamera, nullptr);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		
-		//Normal Render Pass
+
+
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, MainRenderTarget.Id);
+		std::cout << "Main MainRenderTargetPass1 : " << glGetError() << std::endl;
+
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);// make sure we clear the framebuffer's content
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -211,11 +214,15 @@ int main()
 		RenderDemo(&lampShader, &skyboxShader, &SkyboxTexture, &PBRshader, &roomModel, &UnlitShader, &GizMo, ourCamera, &DepthMap);
 		//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
 		//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, MainRenderTarget.Id);
-		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IntermediateRenderTarget.Id);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
-   		glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, MainRenderTarget.Id);
+		std::cout << "Main MainRenderTargetPass2 : " << glGetError() << std::endl;
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IntermediateRenderTarget.Id);
+		std::cout << "Main IntermediateRenderTarget : " << glGetError() << std::endl;
+
+		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+   		glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		
 		//PostProcess Render Pass
 		// clear all relevant buffers
@@ -228,12 +235,12 @@ int main()
 		currentPostProcessSettings->HDR = EffectStatus::Active;
 		PostProcessing::ApplyEffects(&screenShader, currentPostProcessSettings);
 		//screenShader.SetSampler("depthMap", &DepthMap, GL_TEXTURE_2D);
-		screenShader.SetSampler("screenTexture", &screenTexture, GL_TEXTURE_2D);
-		//screenShader.SetSampler("screenTexture", &IntermediateRenderTarget.ColourAttachments[0].Id, GL_TEXTURE_2D);
+		//screenShader.SetSampler("screenTexture", &screenTexture, GL_TEXTURE_2D);
+		screenShader.SetSampler("screenTexture", &IntermediateRenderTarget.ColourAttachments[0].Id, GL_TEXTURE_2D);
 		
 		glActiveTexture(GL_TEXTURE0);
-//		glBindTexture(GL_TEXTURE_2D, IntermediateRenderTarget.ColourAttachments[0].Id);
-		glBindTexture(GL_TEXTURE_2D, screenTexture);
+		glBindTexture(GL_TEXTURE_2D, IntermediateRenderTarget.ColourAttachments[0].Id);
+		//glBindTexture(GL_TEXTURE_2D, screenTexture);
 		if (DEBUGSHADOWMAP)
 		{
 			glBindTexture(GL_TEXTURE_2D, DepthMap);	// use the color attachment texture as the texture of the quad plane
