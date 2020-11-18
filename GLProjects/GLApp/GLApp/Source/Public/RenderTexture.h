@@ -17,10 +17,10 @@ public:
 	GLuint Id;
 	GLint Height;
 	GLint Width;
-	GLenum WrapS;
-	GLenum WrapT;
-	GLenum MinFilter;
-	GLenum MagFilter;
+	GLenum WrapS = GL_CLAMP_TO_EDGE;
+	GLenum WrapT = GL_CLAMP_TO_EDGE;
+	GLenum MinFilter = GL_LINEAR;
+	GLenum MagFilter = GL_LINEAR;
 	GLenum TargetType;
 	GLenum Format;
 	GLenum InternalFormat;

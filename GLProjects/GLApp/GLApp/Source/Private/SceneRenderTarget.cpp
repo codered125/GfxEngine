@@ -26,7 +26,10 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentEnums[i], InTargetType, RT.Id, 0);
 		std::cout << "SceneRenderTarget glFramebufferTexture2D Id " << i << " : " << glGetError() << std::endl;
 	}
+	if (InNrColourAttachments > 1)
+	{
 		glDrawBuffers(InNrColourAttachments, AttachmentEnums);
+	}
 
 
 	if (InMakeDepth)
