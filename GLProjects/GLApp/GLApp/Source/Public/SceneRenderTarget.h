@@ -17,6 +17,7 @@ public:
 	SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum InTargetType,  GLenum InInternalFormat, GLenum InFormat, GLuint InNrColourAttachments = 1, bool InMakeDepth = false, bool InMSAA = false);
 	GLuint Id;
 	std::vector<RenderTexture> ColourAttachments;
+	RenderTexture Depth;
 private:
 
 	GLint Height;
@@ -28,7 +29,7 @@ private:
 	GLenum Format;
 	GLenum InternalFormat;
 
-	RenderTexture Depth;
+
 };
 
 //-------------------------------------------------------------------

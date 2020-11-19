@@ -84,41 +84,7 @@ int main()
 
 	SceneRenderTarget MainRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true);
 	//(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, GLuint InNrColourAttachments = 1, bool InMakeDepth = false, bool InMSAA = false)
-	
-	
-	////Creating our framebuffer pointer
-	//GLuint fbo;
-	//glGenFramebuffers(1, &fbo);
-	//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-	////Create a colour buffer 
-	//GLuint texColourBuffer[2];
-	//glGenTextures(2, texColourBuffer);
-	//for (GLuint i = 0; i < 2; i++)
-	//{
-	//	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texColourBuffer[i]);
-	//	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, AliasingCount, GL_RGBA16F, SCREEN_WIDTH, SCREEN_HEIGHT, GL_TRUE);
-	//	glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//	glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//	// we clamp to the edge as the blur filter would otherwise sample repeated texture values!
-	//	glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//	glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D_MULTISAMPLE, texColourBuffer[i], 0);
-	//}
-
-	//GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-	//glDrawBuffers(2, attachments);
-
-	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	//{
-	//	std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-	//}
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
-	//Creating our render buffer object (RBO are write-only)
-	//framebuffer attachments,
-	//stores its data in OpenGL's native rendering format making it optimized for off-screen rendering to a framebuffer
-;
 	GLuint rbo;
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
@@ -134,49 +100,8 @@ int main()
 	//Pushes our texture into our 
 
 	SceneRenderTarget IntermediateRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
-	//(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, GLuint InNrColourAttachments = 1, bool InMakeDepth = false, bool InMSAA = false)
-	
-	//GLuint intermediateFBO;
-	//glGenFramebuffers(1, &intermediateFBO);
-	//glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+	SceneRenderTarget DepthRenderTarget(4096, 4096, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
 
-	//GLuint screenTexture;
-	//glGenTextures(1, &screenTexture);
-	//glBindTexture(GL_TEXTURE_2D, screenTexture);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
-	//
-
-	//if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	//{
-	//	std::cout << "Failed  intermediatte Renderbuffer" << std::endl;
-	//}
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	//Frame buffer object for rendering depth map
-	GLuint DepthMapFBO;
-	glGenFramebuffers(1, &DepthMapFBO);
-
-	//2D Texture for FBO depth buffer
-	const GLuint ShadowWidth = 4096,  ShadowHeight = 4096;
-	GLuint DepthMap;
-	glGenTextures(1, &DepthMap);
-	glBindTexture(GL_TEXTURE_2D, DepthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, ShadowWidth, ShadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, DepthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, DepthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	Input::InitializeInputMap(InputMap);
 
@@ -190,8 +115,8 @@ int main()
 		Input::DoMovement(deltaTime, ourCamera, Keys, keyboardlockout, currentPostProcessSettings, InputMap);
 
 		//Shadow Render Pass
-		glViewport(0, 0, ShadowWidth, ShadowHeight);
-		glBindFramebuffer(GL_FRAMEBUFFER, DepthMapFBO);
+		glViewport(0, 0, 4096, 4096);
+		glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderTarget.Id);
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
@@ -204,22 +129,21 @@ int main()
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, MainRenderTarget.Id);
-		std::cout << "Main MainRenderTargetPass1 : " << glGetError() << std::endl;
+		//std::cout << "Main MainRenderTargetPass1 : " << glGetError() << std::endl;
 
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);// make sure we clear the framebuffer's content
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)	
 		glCullFace(GL_BACK);
-		RenderDemo(&lampShader, &skyboxShader, &SkyboxTexture, &PBRshader, &roomModel, &UnlitShader, &GizMo, ourCamera, &DepthMap);
+		RenderDemo(&lampShader, &skyboxShader, &SkyboxTexture, &PBRshader, &roomModel, &UnlitShader, &GizMo, ourCamera, &DepthRenderTarget.Depth.Id);
 		//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
 		//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, MainRenderTarget.Id);
-		std::cout << "Main MainRenderTargetPass2 : " << glGetError() << std::endl;
+		//std::cout << "Main MainRenderTargetPass2 : " << glGetError() << std::endl;
 
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IntermediateRenderTarget.Id);
-		std::cout << "Main IntermediateRenderTarget : " << glGetError() << std::endl;
 
 		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
    		glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -243,7 +167,7 @@ int main()
 		//glBindTexture(GL_TEXTURE_2D, screenTexture);
 		if (DEBUGSHADOWMAP)
 		{
-			glBindTexture(GL_TEXTURE_2D, DepthMap);	// use the color attachment texture as the texture of the quad plane
+			glBindTexture(GL_TEXTURE_2D, DepthRenderTarget.Depth.Id);	// use the color attachment texture as the texture of the quad plane
 		}
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
