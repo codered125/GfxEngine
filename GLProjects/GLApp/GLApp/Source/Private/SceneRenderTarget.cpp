@@ -23,7 +23,7 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 		RenderTexture RT(Width, Height, TargetType, InternalFormat, Format, InMSAA);
 		ColourAttachments.push_back(RT);
 		AttachmentEnums[i] = GL_COLOR_ATTACHMENT0 + i;
-		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentEnums[i], InTargetType, RT.Id, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentEnums[i], InTargetType, RT.GetID(), 0);
 		std::cout << "SceneRenderTarget glFramebufferTexture2D Id " << i << " : " << glGetError() << std::endl;
 	}
 	if (InNrColourAttachments > 1)
@@ -35,7 +35,7 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 	if (InMakeDepth)
 	{
 		Depth = RenderTexture(InWidth, InHeight, InTargetType, InInternalFormat, InInternalFormat);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, InTargetType, Depth.Id, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, InTargetType, Depth.GetID(), 0);
 	}
 	auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
@@ -43,6 +43,25 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 		std::cout << "SceneRenderTarget not complete: " << fboStatus << std::endl;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+GLuint& SceneRenderTarget::GetID()
+{
+	return Id;
+}
+
+//-------------------------------------------------------------------
+
+RenderTexture* SceneRenderTarget::GetColourAttachmentByIndex(GLint Index)
+{
+	return ColourAttachments.size() > Index ? &ColourAttachments[Index] : nullptr;
+}
+
+//-------------------------------------------------------------------
+
+RenderTexture* SceneRenderTarget::GetDepthTexture()
+{
+	return &Depth;
 }
 
 //-------------------------------------------------------------------

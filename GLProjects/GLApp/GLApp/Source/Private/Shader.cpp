@@ -55,6 +55,7 @@ Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
 	//Create vertex shader
 	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertShader, 1, &vShaderCode, NULL);
+	
 	glCompileShader(vertShader);
 
 	//Vertex Safety check
@@ -96,6 +97,37 @@ Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
 	glDeleteShader(vertShader);
 	glDeleteShader(fragShader);
 
+}
+
+std::string Shader::RecursivelySearchForInclude(std::string CurrentShader)
+{
+	std::string OutputShader;
+	std::ifstream CurrentShaderFile;
+	CurrentShaderFile.exceptions(std::ifstream::badbit);
+	try
+	{
+
+		//Open files
+		CurrentShaderFile.open(CurrentShader);
+
+		//Creates streams
+		std::stringstream cShaderStream;
+
+		//Read files buffer content into streams
+		cShaderStream << CurrentShaderFile.rdbuf();
+
+		//Close our handlers
+		CurrentShaderFile.close();
+
+		//Converting the stream to string
+		OutputShader = cShaderStream.str();
+
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "shader failed read" << std::endl;
+	}
+	return std::string();
 }
 
 //-------------------------------------------------------------------

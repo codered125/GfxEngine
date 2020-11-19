@@ -2,6 +2,7 @@
 
 #include <gl/glew.h>
 #include <vector>
+#include <tuple>
 
 //-------------------------------------------------------------------
 
@@ -14,6 +15,10 @@ public:
 	RenderTexture();
 	RenderTexture(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, bool InMSAA = false);
 
+	GLuint& GetID();
+	std::tuple<GLint, GLint> GetWidthAndHeightOfTexture();
+
+private:
 	GLuint Id;
 	GLint Height;
 	GLint Width;
