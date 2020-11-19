@@ -24,6 +24,8 @@ public:
 
 	Shader(const GLchar *vertexPath, const GLchar *fragmentPath);
 
+	std::string RecursivelySearchForInclude(std::string CurrentShader);
+
 	void use();
 
 	void setFloat(const std::string& Accessor, float value);

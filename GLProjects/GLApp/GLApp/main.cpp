@@ -90,7 +90,7 @@ int main()
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 	glRenderbufferStorageMultisample(GL_RENDERBUFFER, AliasingCount, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, MainRenderTarget.Id);
+	glBindFramebuffer(GL_FRAMEBUFFER, MainRenderTarget.GetID());
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -115,8 +115,8 @@ int main()
 		Input::DoMovement(deltaTime, ourCamera, Keys, keyboardlockout, currentPostProcessSettings, InputMap);
 
 		//Shadow Render Pass
-		glViewport(0, 0, 4096, 4096);
-		glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderTarget.Id);
+		glViewport(0, 0, std::get<0>(DepthRenderTarget.GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderTarget.GetDepthTexture()->GetWidthAndHeightOfTexture()));
+		glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderTarget.GetID());
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
@@ -128,24 +128,18 @@ int main()
 
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, MainRenderTarget.Id);
-		//std::cout << "Main MainRenderTargetPass1 : " << glGetError() << std::endl;
+		glBindFramebuffer(GL_FRAMEBUFFER, MainRenderTarget.GetID());
 
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);// make sure we clear the framebuffer's content
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
 		glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)	
 		glCullFace(GL_BACK);
-		RenderDemo(&lampShader, &skyboxShader, &SkyboxTexture, &PBRshader, &roomModel, &UnlitShader, &GizMo, ourCamera, &DepthRenderTarget.Depth.Id);
+		RenderDemo(&lampShader, &skyboxShader, &SkyboxTexture, &PBRshader, &roomModel, &UnlitShader, &GizMo, ourCamera, &DepthRenderTarget.GetDepthTexture()->GetID());
+		
 		//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
 		//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)
-
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, MainRenderTarget.Id);
-		//std::cout << "Main MainRenderTargetPass2 : " << glGetError() << std::endl;
-
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IntermediateRenderTarget.Id);
-
-		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, MainRenderTarget.GetID());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IntermediateRenderTarget.GetID());
    		glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		
 		//PostProcess Render Pass
@@ -158,21 +152,17 @@ int main()
 		glBindVertexArray(quadVAO);
 		currentPostProcessSettings->HDR = EffectStatus::Active;
 		PostProcessing::ApplyEffects(&screenShader, currentPostProcessSettings);
-		//screenShader.SetSampler("depthMap", &DepthMap, GL_TEXTURE_2D);
-		//screenShader.SetSampler("screenTexture", &screenTexture, GL_TEXTURE_2D);
-		screenShader.SetSampler("screenTexture", &IntermediateRenderTarget.ColourAttachments[0].Id, GL_TEXTURE_2D);
+		screenShader.SetSampler("screenTexture", &IntermediateRenderTarget.GetColourAttachmentByIndex(0)->GetID(), GL_TEXTURE_2D);
 		
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, IntermediateRenderTarget.ColourAttachments[0].Id);
-		//glBindTexture(GL_TEXTURE_2D, screenTexture);
+		glBindTexture(GL_TEXTURE_2D, IntermediateRenderTarget.GetColourAttachmentByIndex(0)->GetID());
 		if (DEBUGSHADOWMAP)
 		{
-			glBindTexture(GL_TEXTURE_2D, DepthRenderTarget.Depth.Id);	// use the color attachment texture as the texture of the quad plane
+			glBindTexture(GL_TEXTURE_2D, DepthRenderTarget.GetDepthTexture()->GetID());	// use the color attachment texture as the texture of the quad plane
 		}
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
 		
-
 		//swap screen buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();

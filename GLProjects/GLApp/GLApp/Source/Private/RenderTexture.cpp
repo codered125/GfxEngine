@@ -58,6 +58,16 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 
 }
 
+GLuint& RenderTexture::GetID()
+{
+	return Id;
+}
+
+std::tuple<GLint, GLint> RenderTexture::GetWidthAndHeightOfTexture()
+{
+	return std::tuple<GLint, GLint>(Width, Height);
+}
+
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------
