@@ -54,7 +54,8 @@ int main()
 	//glEnable(GL_BLEND);
 	//glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glEnable(GL_DEPTH_TEST);
-
+	std::ifstream IncludedFile;
+	auto string = Shader::ParseShaderForIncludes("Shaders/TestIncludeSupport0.glsl");
 
 	//Shaders & Models
 	auto UnlitShader = Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");

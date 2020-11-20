@@ -7,48 +7,17 @@
 Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
 {
 
-	//Gets shader source code from frag and vert path
+	//Recursively get shader source code from frag and vert path
 	std::string vertexCode;
 	std::string fragmentCode;
-	std::ifstream vShaderFile;
-	std::ifstream fShaderFile;
 
-	//Ensures ifstream objects can throw exceptions
-
-	vShaderFile.exceptions(std::ifstream::badbit);
-	fShaderFile.exceptions(std::ifstream::badbit);
-	try
-	{
-		//Open files
-		vShaderFile.open(vertexPath);
-		fShaderFile.open(fragmentPath);
-
-		//Creates streams
-		std::stringstream vShaderStream, fShaderStream;
-
-		//Read files buffer content into streams
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
-
-		//Close our handlers
-		vShaderFile.close();
-		fShaderFile.close();
-
-		//Converting the stream to string
-		vertexCode = vShaderStream.str();
-		fragmentCode = fShaderStream.str();
-	}
-	catch (std::ifstream::failure e)
-	{
-		std::cout << "shader failed read" << std::endl;
-	}
+	vertexCode = ParseShaderForIncludes(vertexPath);
+	fragmentCode = ParseShaderForIncludes(fragmentPath);
 
 	const GLchar *vShaderCode = vertexCode.c_str();
 	const GLchar *fShaderCode = fragmentCode.c_str();
 
 	//2. Compile Shaders
-
-
 	GLint Success;
 	GLchar infolog[512];
 
@@ -99,35 +68,41 @@ Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
 
 }
 
-std::string Shader::RecursivelySearchForInclude(std::string CurrentShader)
+std::string Shader::ParseShaderForIncludes(const GLchar* CurrentShaderPath)
 {
 	std::string OutputShader;
 	std::ifstream CurrentShaderFile;
 	CurrentShaderFile.exceptions(std::ifstream::badbit);
 	try
 	{
-
 		//Open files
-		CurrentShaderFile.open(CurrentShader);
-
-		//Creates streams
-		std::stringstream cShaderStream;
-
-		//Read files buffer content into streams
-		cShaderStream << CurrentShaderFile.rdbuf();
-
-		//Close our handlers
+		CurrentShaderFile.open(CurrentShaderPath);
+		std::string CurrentLine;
+		while (std::getline(CurrentShaderFile, CurrentLine))
+		{
+			if (CurrentLine.substr(0, 8) == "#include")
+			{
+				auto CurrentIncludePath = CurrentLine.substr(9);
+				std::ifstream IncludedFile(CurrentIncludePath);
+				if (IncludedFile.is_open())
+				{
+					IncludedFile.close();
+					OutputShader += ParseShaderForIncludes(CurrentIncludePath.c_str());
+				}
+			}
+			else
+			{
+				OutputShader += CurrentLine + "\n";
+			}
+		}
 		CurrentShaderFile.close();
-
-		//Converting the stream to string
-		OutputShader = cShaderStream.str();
 
 	}
 	catch (std::ifstream::failure e)
 	{
-		std::cout << "shader failed read" << std::endl;
+		std::cout << "shader include failed to read" << CurrentShaderPath << std::endl;
 	}
-	return std::string();
+	return OutputShader;
 }
 
 //-------------------------------------------------------------------
