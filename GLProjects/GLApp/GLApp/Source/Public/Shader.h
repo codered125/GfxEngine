@@ -24,7 +24,7 @@ public:
 
 	Shader(const GLchar *vertexPath, const GLchar *fragmentPath);
 
-	std::string RecursivelySearchForInclude(std::string CurrentShader);
+	static std::string ParseShaderForIncludes(const GLchar* CurrentShaderPath);
 
 	void use();
 
