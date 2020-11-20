@@ -60,6 +60,21 @@
     <ClCompile Include="Source\Private\GlfwInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\RenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Actor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\SceneRenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\RenderTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Lamp.frag">
@@ -108,6 +123,10 @@
     <None Include="Shaders\BlinnPhong.vs" />
     <None Include="Shaders\Unlit.frag" />
     <None Include="Shaders\Unlit.vs" />
+    <None Include="Shaders\IBLPBR.vs" />
+    <None Include="Shaders\IBLPBR.frag" />
+    <None Include="glew32.dll" />
+    <None Include="assimp-vc140-mt.dll" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GLApp.rc">
@@ -181,6 +200,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Actor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\RenderTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\SceneRenderTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\RenderTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

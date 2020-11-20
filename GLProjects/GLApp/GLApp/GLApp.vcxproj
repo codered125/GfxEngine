@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Private\Actor.cpp" />
     <ClCompile Include="Source\Private\Camera.cpp" />
     <ClCompile Include="Source\Private\GlfwInterface.cpp" />
     <ClCompile Include="Source\Private\Inputs.cpp" />
@@ -160,14 +161,20 @@
     <ClCompile Include="Source\Private\Mesh.cpp" />
     <ClCompile Include="Source\Private\Model.cpp" />
     <ClCompile Include="Source\Private\PostProcessing.cpp" />
+    <ClCompile Include="Source\Private\RenderTexture.cpp" />
+    <ClCompile Include="Source\Private\SceneRenderTarget.cpp" />
     <ClCompile Include="Source\Private\Shader.cpp" />
     <ClCompile Include="Source\Private\TextureLoading.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assimp-vc140-mt.dll" />
+    <None Include="glew32.dll" />
     <None Include="Shaders\BlinnPhong.frag" />
     <None Include="Shaders\BlinnPhong.vs" />
     <None Include="Shaders\framebuffersScreen.frag" />
     <None Include="Shaders\framebuffersScreen.vs" />
+    <None Include="Shaders\IBLPBR.frag" />
+    <None Include="Shaders\IBLPBR.vs" />
     <None Include="Shaders\Lamp.frag" />
     <None Include="Shaders\Lamp.vs" />
     <None Include="Shaders\PBR.frag" />
@@ -199,6 +206,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
+    <ClInclude Include="Source\Public\Actor.h" />
     <ClInclude Include="Source\Public\Camera.h" />
     <ClInclude Include="Source\Public\GlfwInterface.h" />
     <ClInclude Include="Source\Public\Inputs.h" />
@@ -207,9 +215,13 @@
     <ClInclude Include="Source\Public\Mesh.h" />
     <ClInclude Include="Source\Public\Model.h" />
     <ClInclude Include="Source\Public\PostProcessing.h" />
+    <ClInclude Include="Source\Public\RenderTarget.h" />
+    <ClInclude Include="Source\Public\RenderTexture.h" />
     <ClInclude Include="Source\Public\resource.h" />
+    <ClInclude Include="Source\Public\SceneRenderTarget.h" />
     <ClInclude Include="Source\Public\Shader.h" />
     <ClInclude Include="Source\Public\StaticVertices.h" />
+    <ClInclude Include="Source\Public\Texture.h" />
     <ClInclude Include="Source\Public\TextureLoading.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
