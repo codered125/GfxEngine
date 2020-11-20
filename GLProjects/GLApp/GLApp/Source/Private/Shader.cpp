@@ -7,54 +7,24 @@
 Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
 {
 
-	//Gets shader source code from frag and vert path
+	//Recursively get shader source code from frag and vert path
 	std::string vertexCode;
 	std::string fragmentCode;
-	std::ifstream vShaderFile;
-	std::ifstream fShaderFile;
 
-	//Ensures ifstream objects can throw exceptions
-
-	vShaderFile.exceptions(std::ifstream::badbit);
-	fShaderFile.exceptions(std::ifstream::badbit);
-	try
-	{
-		//Open files
-		vShaderFile.open(vertexPath);
-		fShaderFile.open(fragmentPath);
-
-		//Creates streams
-		std::stringstream vShaderStream, fShaderStream;
-
-		//Read files buffer content into streams
-		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
-
-		//Close our handlers
-		vShaderFile.close();
-		fShaderFile.close();
-
-		//Converting the stream to string
-		vertexCode = vShaderStream.str();
-		fragmentCode = fShaderStream.str();
-	}
-	catch (std::ifstream::failure e)
-	{
-		std::cout << "shader failed read" << std::endl;
-	}
+	vertexCode = ParseShaderForIncludes(vertexPath);
+	fragmentCode = ParseShaderForIncludes(fragmentPath);
 
 	const GLchar *vShaderCode = vertexCode.c_str();
 	const GLchar *fShaderCode = fragmentCode.c_str();
 
 	//2. Compile Shaders
-
-
 	GLint Success;
 	GLchar infolog[512];
 
 	//Create vertex shader
 	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertShader, 1, &vShaderCode, NULL);
+	
 	glCompileShader(vertShader);
 
 	//Vertex Safety check
@@ -96,6 +66,43 @@ Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
 	glDeleteShader(vertShader);
 	glDeleteShader(fragShader);
 
+}
+
+std::string Shader::ParseShaderForIncludes(const GLchar* CurrentShaderPath)
+{
+	std::string OutputShader;
+	std::ifstream CurrentShaderFile;
+	CurrentShaderFile.exceptions(std::ifstream::badbit);
+	try
+	{
+		//Open files
+		CurrentShaderFile.open(CurrentShaderPath);
+		std::string CurrentLine;
+		while (std::getline(CurrentShaderFile, CurrentLine))
+		{
+			if (CurrentLine.substr(0, 8) == "#include")
+			{
+				auto CurrentIncludePath = CurrentLine.substr(9);
+				std::ifstream IncludedFile(CurrentIncludePath);
+				if (IncludedFile.is_open())
+				{
+					IncludedFile.close();
+					OutputShader += ParseShaderForIncludes(CurrentIncludePath.c_str());
+				}
+			}
+			else
+			{
+				OutputShader += CurrentLine + "\n";
+			}
+		}
+		CurrentShaderFile.close();
+
+	}
+	catch (std::ifstream::failure e)
+	{
+		std::cout << "shader include failed to read" << CurrentShaderPath << std::endl;
+	}
+	return OutputShader;
 }
 
 //-------------------------------------------------------------------

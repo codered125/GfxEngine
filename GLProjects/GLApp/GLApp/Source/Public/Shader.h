@@ -24,6 +24,8 @@ public:
 
 	Shader(const GLchar *vertexPath, const GLchar *fragmentPath);
 
+	static std::string ParseShaderForIncludes(const GLchar* CurrentShaderPath);
+
 	void use();
 
 	void setFloat(const std::string& Accessor, float value);
