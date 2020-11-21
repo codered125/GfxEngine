@@ -60,7 +60,7 @@ int main()
 
 	//Shaders & Models
 	auto UnlitShader = Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
-	auto PBRshader = Shader("Shaders/IBLPBR.vs", "Shaders/IBLPBR.frag");
+	auto PBRshader = Shader("Shaders/ForwardPBR.vs", "Shaders/ForwardPBR.frag");
 	auto skyboxShader = Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	auto lampShader = Shader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	auto DepthShader = Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
