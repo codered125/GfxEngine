@@ -7,7 +7,7 @@
 
 //-------------------------------------------------------------------
 
-//class RenderTexture;
+class RenderTexture;
 
 //-------------------------------------------------------------------
 
@@ -31,8 +31,6 @@ private:
 	GLenum InternalFormat;
 	std::vector<RenderTexture> ColourAttachments;
 	RenderTexture Depth;
-
-
 };
 
 //-------------------------------------------------------------------

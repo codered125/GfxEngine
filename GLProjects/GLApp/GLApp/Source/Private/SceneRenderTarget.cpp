@@ -14,7 +14,6 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 	glGenFramebuffers(1, &Id);
 	glBindFramebuffer(GL_FRAMEBUFFER, Id);
 
-	//Create a colour buffer 
 	ColourAttachments.empty();
 	GLuint* AttachmentEnums = new GLuint[InNrColourAttachments];
 
@@ -26,17 +25,18 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentEnums[i], InTargetType, RT.GetID(), 0);
 		std::cout << "SceneRenderTarget glFramebufferTexture2D Id " << i << " : " << glGetError() << std::endl;
 	}
+
 	if (InNrColourAttachments > 1)
 	{
 		glDrawBuffers(InNrColourAttachments, AttachmentEnums);
 	}
-
 
 	if (InMakeDepth)
 	{
 		Depth = RenderTexture(InWidth, InHeight, InTargetType, InInternalFormat, InInternalFormat);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, InTargetType, Depth.GetID(), 0);
 	}
+
 	auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
 	{
@@ -44,6 +44,8 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+//-------------------------------------------------------------------
 
 GLuint& SceneRenderTarget::GetID()
 {
