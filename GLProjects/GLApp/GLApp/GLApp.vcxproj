@@ -159,6 +159,9 @@
     <ClCompile Include="Source\Private\Light.cpp" />
     <ClCompile Include="Source\Private\Math.cpp" />
     <ClCompile Include="Source\Private\Mesh.cpp" />
+    <ClCompile Include="Source\Private\Meshes\Cube.cpp" />
+    <ClCompile Include="Source\Private\Meshes\Quad.cpp" />
+    <ClCompile Include="Source\Private\Meshes\Shape.cpp" />
     <ClCompile Include="Source\Private\Model.cpp" />
     <ClCompile Include="Source\Private\PostProcessing.cpp" />
     <ClCompile Include="Source\Private\RenderTexture.cpp" />
@@ -213,6 +216,10 @@
     <ClInclude Include="Source\Public\Light.h" />
     <ClInclude Include="Source\Public\Math.h" />
     <ClInclude Include="Source\Public\Mesh.h" />
+    <ClInclude Include="Source\Public\Meshes\Cube.h" />
+    <ClInclude Include="Source\Public\Meshes\Quad.h" />
+    <ClInclude Include="Source\Public\Meshes\Shape.h" />
+    <ClInclude Include="Source\Public\Meshes\StaticVertices.h" />
     <ClInclude Include="Source\Public\Model.h" />
     <ClInclude Include="Source\Public\PostProcessing.h" />
     <ClInclude Include="Source\Public\RenderTarget.h" />

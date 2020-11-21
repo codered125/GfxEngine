@@ -9,6 +9,8 @@ RenderTexture::RenderTexture()
 
 }
 
+//-------------------------------------------------------------------
+
 RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA)
 	: Height(InHeight)
 	, Width (InWidth)
@@ -33,7 +35,6 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 		std::cout << "RenderTexture glTexImage2D : " << glGetError() << std::endl;
 	}
 	
-	
 	if (Format == GL_DEPTH_COMPONENT)
 	{
 		WrapS = GL_CLAMP_TO_BORDER;
@@ -45,7 +46,6 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 		std::cout << "RenderTexture glTexParameterfv: " << glGetError() << std::endl;
 	}
 
-
 	glTexParameteri(TargetType, GL_TEXTURE_MIN_FILTER, MinFilter);	
 	std::cout << "RenderTexture MinFilter: " << glGetError() << std::endl;
 	glTexParameteri(TargetType, GL_TEXTURE_MAG_FILTER, MagFilter);
@@ -54,14 +54,16 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 	std::cout << "RenderTexture WrapS: " << glGetError() << std::endl;
 	glTexParameteri(TargetType, GL_TEXTURE_WRAP_T, WrapT);
 	std::cout << "RenderTexture WrapT: " << glGetError() << std::endl;
-	
-
 }
+
+//-------------------------------------------------------------------
 
 GLuint& RenderTexture::GetID()
 {
 	return Id;
 }
+
+//-------------------------------------------------------------------
 
 std::tuple<GLint, GLint> RenderTexture::GetWidthAndHeightOfTexture()
 {

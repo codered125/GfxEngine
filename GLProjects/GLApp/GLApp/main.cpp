@@ -12,6 +12,8 @@
 #include "Source/Public/GlfwInterface.h"
 #include "Source/Public/Shader.h"
 #include "Source/Public/StaticVertices.h"
+#include "Source/Public/Meshes/Cube.h"
+#include "Source/Public/Meshes/Quad.h"
 #include "Source/Public/Model.h"
 #include "Source/Public/Inputs.h"
 #include "Source/Public/Camera.h"
@@ -55,7 +57,6 @@ int main()
 	//glBlendFunc(GL_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//glEnable(GL_DEPTH_TEST);
 	std::ifstream IncludedFile;
-	auto string = Shader::ParseShaderForIncludes("Shaders/TestIncludeSupport0.glsl");
 
 	//Shaders & Models
 	auto UnlitShader = Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");

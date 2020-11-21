@@ -4,6 +4,11 @@
 
 //-------------------------------------------------------------------
 
+#include Shaders/HelperShaders/HelperFunctions.glsl
+#include Shaders/HelperShaders/PCFShadowCalculation.glsl
+
+//-------------------------------------------------------------------
+
 struct DirLight 
 {
 	float intensity;
@@ -57,29 +62,21 @@ struct LinearMatVals
 
 in V2F
 {
-vec3 Normal;
-vec2 TexCoords;
-vec3 WorldPos;
-vec4 FragPosLightSpace;
+	vec3 Normal;
+	vec2 TexCoords;
+	vec3 WorldPos;
+	vec4 FragPosLightSpace;
 } fs_in;
-
 
 out vec4 FragColor;
 
 uniform Material material;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
-
 uniform vec3 CamPos;
 uniform vec3 CamDir;
-uniform float NearPlane;
-uniform float FarPlane;
-uniform samplerCube skybox;
 uniform sampler2D ShadowMap;
 
-
-float saturate(float x) {return max(min(x, 1.0f), 0.0f);};
-float Desaturate(vec3 InColour);
 vec3 GetNormalFromMap();
 float DistributionGGX(vec3 Norm, vec3 Halfway, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
@@ -87,8 +84,6 @@ float GeometrySmith(vec3 Norm, vec3 View, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0, float roughness);
 vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals ToParse, float intensity);
 LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoords);
-float ShadowCalculation(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir);
-float LinearizeDepth(float depth);
 
 //-------------------------------------------------------------------
 
@@ -167,8 +162,8 @@ LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoor
 {
 	float roughness =  pow(texture(mats.texture_roughness, texCoords).rgba, vec4(Exponent)).r;
 	float metallic  =  pow(texture(mats.texture_metallic, texCoords).rgba, vec4(Exponent)).r;
+	
 	const float DiffuseExpo = 2.2;
-    //float ao =  pow(texture(mats.texture_ao, texCoords).rgba, vec4(DiffuseExpo)).r;
 	float ao = Desaturate(pow(texture(mats.texture_normal, texCoords).rgb, vec3(DiffuseExpo)));
 	vec3 diffuse = pow(texture(mats.texture_diffuse, texCoords).rgba, vec4(DiffuseExpo)).rgb;
 	return  LinearMatVals(roughness, metallic, ao, diffuse);
@@ -197,57 +192,7 @@ vec3 ProgrammablePBR(vec3 Norm, vec3 View, vec3 Radiance, vec3 L, LinearMatVals 
 	kD *= 1.0f - ToParse.metallic;
 
 	float NdotL = saturate(dot(Norm, L));
-	return intensity * ( (kD * ToParse.diffuse / M_PI + specular ) * Radiance * NdotL);
-}
-
-//-------------------------------------------------------------------
-
-float Desaturate(vec3 InColour)
-{
-	return (min(InColour.x, min(InColour.y, InColour.z)) + max(InColour.x, max(InColour.y, InColour.z)) * 0.5f);
-}
-
-//-------------------------------------------------------------------
-
-// required when using a perspective projection matrix
-float LinearizeDepth(float depth)
-{
-    float z = depth * 2.0 - 1.0; // Back to NDC 
-    return (2.0 * NearPlane * FarPlane) / (NearPlane + FarPlane - z * (FarPlane - NearPlane));	
-}
-
-//-------------------------------------------------------------------
-
-float ShadowCalculation(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir)
-{
-  	vec3 projCoords = InFragPosLightSpace.xyz / InFragPosLightSpace.w; // perform perspective divide
-	projCoords = projCoords * 0.5 + 0.5; // transform to ndc coordinates
-
-	float closestDepth = texture(ShadowMap, projCoords.xy).r;   
-	float currentDepth = projCoords.z;  
-
-	float bias = max(0.05 * (1.0 - dot(InNormal, InLightDir)), 0.005); 
-
-    // check whether current frag pos is in shadow
-    //PCF
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);
-    for(int x = -2; x <= 2; ++x)
-    {
-    	for(int y = -2; y <= 2; ++y)
-       {
-           float pcfDepth = texture(ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
-    	 }   
-  	}
-   	shadow /= 25.0;
-    
-    //keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
-   if(projCoords.z > 1.0)
-   {
-	  shadow = 0.0;
-   }
-	return  shadow;
+	return intensity * ((kD * ToParse.diffuse / M_PI + specular ) * Radiance * NdotL);
 }
 
 //-------------------------------------------------------------------
@@ -256,11 +201,8 @@ void main()
 {
 	//we normalise this result before returning it
 	vec3 Norm = GetNormalFromMap();
-	//vec3 Norm = normalize(fs_in.Normal);
 	vec3 View = normalize(CamPos - fs_in.WorldPos);
-
 	float RnMPExponent = 1.0f;
-	//float RnMPExponent = 2.2;
 	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, fs_in.TexCoords);
 
 	//Metelic ratio
@@ -281,12 +223,10 @@ void main()
 
 	//Directional Lights
 	vec3 r = dirLight.diffuse;
-	//vec3 L = -normalize(dirLight.direction);
 	vec3 L = normalize(dirLight.position - fs_in.WorldPos);
 	vec3 ambient = vec3(0.03) * parse.diffuse * parse.ao;
 	
-
-	float Shadow = 1.0f - ShadowCalculation(fs_in.FragPosLightSpace, normalize(fs_in.Normal), L);
+	float Shadow = 1.0f - DetermineShadow(fs_in.FragPosLightSpace, normalize(fs_in.Normal), L, ShadowMap);
 	L0 += max(Shadow, 0.1) * ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
  	vec3 color = ambient + L0;
 	

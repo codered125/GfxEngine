@@ -24,7 +24,7 @@ public:
 
 	Shader(const GLchar *vertexPath, const GLchar *fragmentPath);
 
-	static std::string ParseShaderForIncludes(const GLchar* CurrentShaderPath);
+	std::string ParseShaderForIncludes(const GLchar* CurrentShaderPath);
 
 	void use();
 
