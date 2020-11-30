@@ -13,7 +13,7 @@ The Graphics Engine currently has the following features implemented:
 - [x] Physics Based Rendering (PBR)
 - [x] Shadow Mapping (Not Cascading)
 - [x] Render Target Revamp
-- [ ] Modularising my lighting and shading algorithms in prep for Deffered
+- [x] Modularising my lighting and shading algorithms in prep for Deffered
 - [ ] Deffered Rendering - After PBR
 - [ ] Deffered Lighting - After Deffered Rendering
 
