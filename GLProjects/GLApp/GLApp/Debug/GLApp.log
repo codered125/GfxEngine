@@ -1,2 +1,4 @@
-﻿  main.cpp
+﻿  Mesh.cpp
+  Renderer.cpp
+  Generating Code...
   GLApp.vcxproj -> D:\Development\DevelopmentProjects\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe

@@ -9,8 +9,9 @@
 
 //-------------------------------------------------------------------
 
-Model::Model(GLchar * inpath)
+Model::Model(GLchar* inpath, Shader* InShader)
 {
+	ThisShader = InShader;
 	this->loadModel(inpath);
 }
 
@@ -209,6 +210,10 @@ GLint Model::TextureFromFile(const char * path, std::string directory)
 	SOIL_free_image_data(image);
 
 	return textureID;
+}
+
+void Model::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView)
+{
 }
 
 //-------------------------------------------------------------------

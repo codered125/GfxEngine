@@ -11,7 +11,11 @@ class Cube : public Shape
 
 public:
 
-	static const std::array<GLfloat, 288> GetVertices();
+	const GLfloat* GetVertices();
+
+	glm::vec3 Colour;
+
+	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView) override;
 };
 
 //-------------------------------------------------------------------

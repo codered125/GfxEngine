@@ -7,10 +7,10 @@
 
 Mesh::Mesh(std::vector<Vertex> inVertices, std::vector<GLuint> inIndices, std::vector<Texture> inTextures)
 {
-	this->vertices = inVertices;
-	this->indices = inIndices;
-	this->textures = inTextures;
-	this->SetupMesh();
+	vertices = inVertices;
+	indices = inIndices;
+	textures = inTextures;
+	SetupMesh();
 }
 
 //-------------------------------------------------------------------
@@ -25,13 +25,13 @@ void Mesh::Draw(Shader * shader)
 	GLuint metallic = 1;
 	GLuint ao = 1;
 
-	for (GLuint i = 0; i < this->textures.size(); i++)
+	for (GLuint i = 0; i < textures.size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 
 		std::stringstream ss;
 		std::string number;
-		std::string name = this->textures[i].type;
+		std::string name = textures[i].type;
 
 		if ("material.texture_diffuse" == name)
 		{
@@ -67,21 +67,17 @@ void Mesh::Draw(Shader * shader)
 			ss << metallic++;
 		}
 
-
-
 		number = ss.str();
-		//cout << (name + number) << endl;
 		glUniform1i(glGetUniformLocation(shader->shaderProgram, name.c_str()), i);
-		//glUniform1i(glGetUniformLocation(shader->shaderProgram, (name + number).c_str()), i);
-		glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
+		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 
 	}
 
-	glBindVertexArray(this->VAO);
-	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 
-	for (GLuint i = 0; i < this->textures.size(); i++)
+	for (GLuint i = 0; i < textures.size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE + i);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -92,16 +88,16 @@ void Mesh::Draw(Shader * shader)
 
 void Mesh::SetupMesh()
 {
-	glGenVertexArrays(1, &this->VAO);
-	glGenBuffers(1, &this->VBO);
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 
-	glBindVertexArray(this->VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(Vertex), &this->vertices[0], GL_STATIC_DRAW);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(GLuint), &this->indices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
 
 	//Vertex Positions
@@ -124,9 +120,7 @@ void Mesh::SetupMesh()
 	//Vertext bitangent
 	glEnableVertexAttribArray(4);
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)offsetof(Vertex, Bitanget));
-
 	glBindVertexArray(0);
-
 }
 
 //-------------------------------------------------------------------
