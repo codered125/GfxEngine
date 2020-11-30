@@ -162,8 +162,11 @@
     <ClCompile Include="Source\Private\Meshes\Cube.cpp" />
     <ClCompile Include="Source\Private\Meshes\Quad.cpp" />
     <ClCompile Include="Source\Private\Meshes\Shape.cpp" />
+    <ClCompile Include="Source\Private\Meshes\SkyBox.cpp" />
     <ClCompile Include="Source\Private\Model.cpp" />
     <ClCompile Include="Source\Private\PostProcessing.cpp" />
+    <ClCompile Include="Source\Private\Rendering\ForwardRenderer.cpp" />
+    <ClCompile Include="Source\Private\Rendering\Renderer.cpp" />
     <ClCompile Include="Source\Private\RenderTexture.cpp" />
     <ClCompile Include="Source\Private\SceneRenderTarget.cpp" />
     <ClCompile Include="Source\Private\Shader.cpp" />
@@ -219,9 +222,12 @@
     <ClInclude Include="Source\Public\Meshes\Cube.h" />
     <ClInclude Include="Source\Public\Meshes\Quad.h" />
     <ClInclude Include="Source\Public\Meshes\Shape.h" />
+    <ClInclude Include="Source\Public\Meshes\SkyBox.h" />
     <ClInclude Include="Source\Public\Meshes\StaticVertices.h" />
     <ClInclude Include="Source\Public\Model.h" />
     <ClInclude Include="Source\Public\PostProcessing.h" />
+    <ClInclude Include="Source\Public\Rendering\ForwardRenderer.h" />
+    <ClInclude Include="Source\Public\Rendering\Renderer.h" />
     <ClInclude Include="Source\Public\RenderTarget.h" />
     <ClInclude Include="Source\Public\RenderTexture.h" />
     <ClInclude Include="Source\Public\resource.h" />

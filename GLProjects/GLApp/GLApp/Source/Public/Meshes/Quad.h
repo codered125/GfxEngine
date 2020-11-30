@@ -5,14 +5,23 @@
 
 //-------------------------------------------------------------------
 
+struct PostProcessSettings;
+
+//-------------------------------------------------------------------
+
 class Quad : public Shape
 {
 
 public:
 
-	static const GLfloat* GetVerticesForNDCPlane();
+	Quad(Shader* InShader, PostProcessSettings* InPPS, bool InNDC);
 
-	static const GLfloat* GetVerticesForPlane();
+	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView) override;
+
+protected:
+
+	PostProcessSettings* ThisPPS;
+
 };
 
 //-------------------------------------------------------------------

@@ -9,6 +9,8 @@
 #include <iostream>
 #include <map> 
 
+#include "Source/Public/Meshes/Shape.h"
+
 //-------------------------------------------------------------------
 
 struct aiScene;
@@ -21,10 +23,10 @@ enum aiTextureType;
 
 //-------------------------------------------------------------------
 
-class Model
+class Model : public Shape
 {
 public:
-	Model(GLchar * inpath);
+	Model(GLchar * inpath, Shader* InShader);
 
 	void Draw(Shader *shader);
 
@@ -42,6 +44,8 @@ private:
 	std::vector<Texture> loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName);
 
 	GLint TextureFromFile(const char * path, std::string directory);
+
+	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView) override;
 
 };
 

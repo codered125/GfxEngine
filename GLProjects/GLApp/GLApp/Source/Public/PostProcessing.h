@@ -5,6 +5,7 @@
 //-------------------------------------------------------------------
 
 class Shader;
+class SceneRenderTarget;
 
 //-------------------------------------------------------------------
 
@@ -16,6 +17,9 @@ enum EffectStatus
 struct PostProcessSettings
 {
 	EffectStatus InvertedColours, HDR, AntiAliasing, ColourGrading, TimeBasedEffects = EffectStatus::UnActive;
+	SceneRenderTarget* MainRenderBuffer;
+	SceneRenderTarget* IntermediateRenderBuffer;
+	SceneRenderTarget* DepthRenderBuffer;
 };
 
 class PostProcessing
