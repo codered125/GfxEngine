@@ -30,6 +30,14 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 	{
 		glDrawBuffers(InNrColourAttachments, AttachmentEnums);
 	}
+	if (InMSAA)
+	{
+		GLuint rbo;
+		glGenRenderbuffers(1, &rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, InWidth, InHeight);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+	}
 
 	if (InMakeDepth)
 	{

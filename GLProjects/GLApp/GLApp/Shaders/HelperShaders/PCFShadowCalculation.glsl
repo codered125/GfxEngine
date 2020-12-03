@@ -25,7 +25,7 @@ float DetermineShadow(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir, 
     }   
  	}
   Shadow /= 49.0;
-    
+
   //keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
   if(ProjCoords.z > 1.0)
   {

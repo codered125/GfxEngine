@@ -63,7 +63,8 @@ LinearMatVals ConvertMapsToPBRValues(Material mats, float Exponent, vec2 texCoor
 	const float DiffuseExpo = 2.2;
 	float ao = Desaturate(pow(texture(mats.texture_normal, texCoords).rgb, vec3(DiffuseExpo)));
 	vec3 diffuse = pow(texture(mats.texture_diffuse, texCoords).rgba, vec4(DiffuseExpo)).rgb;
-	return  LinearMatVals(roughness, metallic, ao, diffuse);
+	float alpha = texture(mats.texture_diffuse, texCoords).a;
+	return  LinearMatVals(roughness, metallic, ao, diffuse, alpha);
 }
 
 //-------------------------------------------------------------------

@@ -11,8 +11,7 @@ in vec2 TexCoords;
 
 layout (location = 0) out vec4 FragColor;
  
-uniform sampler2D screenTexture;
-uniform sampler2D depthMap;
+layout (location = 1) uniform sampler2D screenTexture;
 uniform PostProcessEffects currentPostProcessEffect;
 
 const float exposure = 1.5;

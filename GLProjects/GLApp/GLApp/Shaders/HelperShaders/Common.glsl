@@ -49,6 +49,7 @@ struct LinearMatVals
 	float metallic;
     float ao;
 	vec3 diffuse;
+	float alpha;
 };
 #endif
 //-------------------------------------------------------------------

@@ -17,7 +17,7 @@ public:
 	Quad(Shader* InShader, PostProcessSettings* InPPS, bool InNDC);
 
 	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView) override;
-
+	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView, GLuint* Sampler);
 protected:
 
 	PostProcessSettings* ThisPPS;

@@ -19,14 +19,14 @@ in V2F
 	vec4 FragPosLightSpace;
 } fs_in;
 
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
 
 uniform Material material;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform vec3 CamPos;
 uniform vec3 CamDir;
-uniform sampler2D ShadowMap;
+layout (location = 1) uniform sampler2D ShadowMap;
 
 vec3 GetNormalFromMap();
 

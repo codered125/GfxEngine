@@ -165,6 +165,7 @@
     <ClCompile Include="Source\Private\Meshes\SkyBox.cpp" />
     <ClCompile Include="Source\Private\Model.cpp" />
     <ClCompile Include="Source\Private\PostProcessing.cpp" />
+    <ClCompile Include="Source\Private\Rendering\DeferredRenderer.cpp" />
     <ClCompile Include="Source\Private\Rendering\ForwardRenderer.cpp" />
     <ClCompile Include="Source\Private\Rendering\Renderer.cpp" />
     <ClCompile Include="Source\Private\RenderTexture.cpp" />
@@ -226,6 +227,7 @@
     <ClInclude Include="Source\Public\Meshes\StaticVertices.h" />
     <ClInclude Include="Source\Public\Model.h" />
     <ClInclude Include="Source\Public\PostProcessing.h" />
+    <ClInclude Include="Source\Public\Rendering\DefferedRenderer.h" />
     <ClInclude Include="Source\Public\Rendering\ForwardRenderer.h" />
     <ClInclude Include="Source\Public\Rendering\Renderer.h" />
     <ClInclude Include="Source\Public\RenderTarget.h" />
