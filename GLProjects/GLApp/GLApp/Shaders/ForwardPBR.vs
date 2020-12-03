@@ -20,7 +20,6 @@ uniform mat4 lightSpaceMatrix;
 
 void main()
 {
-
 gl_Position =  projection * view * model * vec4 (position, 1.0f);
 vs_Out.WorldPos = vec3(model * vec4(position, 1.0f));
 vs_Out.Normal = mat3(transpose(inverse(model))) * normal;

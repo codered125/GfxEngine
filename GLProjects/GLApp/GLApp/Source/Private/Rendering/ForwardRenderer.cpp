@@ -19,14 +19,14 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true);
 	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer;
 
-	GLuint rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, AliasingCount, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
+	//GLuint rbo;
+	//glGenRenderbuffers(1, &rbo);
+	//glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	//glRenderbufferStorageMultisample(GL_RENDERBUFFER, AliasingCount, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, MainRenderBuffer->GetID());
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, MainRenderBuffer->GetID());
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	IntermediateRenderBuffer= new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
 	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer;
@@ -90,6 +90,14 @@ void ForwardRenderer::RenderLoop()
 
 void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Camera* Perspective, GLuint * ShadowMap)
 {
+	//RENDER 
+	//skip this for depth pass
+	if (RenderStage != RenderStage::Depth)
+	{
+		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
+		//DrawLights(InLampShader, ourCamera, nullptr);
+	}
+
 	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : PBRshader;
 	auto LocalUnlitShader = RenderStage == RenderStage::Depth ? DepthShader : UnlitShader;
 	 
@@ -104,14 +112,6 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.25f));
 	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 1.50f, 0.0f));
 	DrawModel(LocalUnlitShader, GizMo, ModelTransformation, Perspective, ShadowMap);
-
-	//RENDER 
-	//skip this for depth pass
-	if (RenderStage != RenderStage::Depth)
-	{
-		InSkybox->Draw(ModelTransformation, Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
-		//DrawLights(InLampShader, ourCamera, nullptr);
-	}
 }
 
 
@@ -122,14 +122,7 @@ void ForwardRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat4
 	ModelShader->use();
 	if (ShadowMap)
 	{
-		glEnable(GL_TEXTURE_2D);
-		auto i = ModelShader->GetUniformLocation("ShadowMap");
-		if (i != -1)
-		{
-			ModelShader->setInt("ShadowMap", i);
-			glActiveTexture(GL_TEXTURE0 + i);
-			glBindTexture(GL_TEXTURE_2D, *ShadowMap);
-		}
+		ModelShader->SetSampler("ShadowMap", ShadowMap, GL_TEXTURE_2D);
 	}
 
 	ModelShader->setFloat("NearPlane", Camera::GetNearPlane(Perspective));

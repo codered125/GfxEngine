@@ -15,6 +15,7 @@
 #include "Source/Public/PostProcessing.h"
 #include "Source/Public/Light.h"
 #include "Source/Public/Rendering/ForwardRenderer.h"
+#include "Source/Public/Rendering/DefferedRenderer.h"
 
 //-------------------------------------------------------------------------------------
 
@@ -41,6 +42,7 @@ int main()
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	MainRenderer = &ForwardRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	//MainRenderer = &DefferedRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	Input::InitializeInputMap(InputMap);
 
 	while (!GlfwInterface::WindowShouldClose(window))
