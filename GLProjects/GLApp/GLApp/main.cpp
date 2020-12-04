@@ -19,6 +19,7 @@
 
 //-------------------------------------------------------------------------------------
 
+#define DEFFERED 1
 int main()
 {
 	//WindowSetup
@@ -41,8 +42,15 @@ int main()
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	MainRenderer = &ForwardRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
-	//MainRenderer = &DefferedRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	if (DEFFERED)
+	{
+		MainRenderer = &DefferedRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	}
+	else
+	{
+		MainRenderer = &ForwardRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+	}
+
 	Input::InitializeInputMap(InputMap);
 
 	while (!GlfwInterface::WindowShouldClose(window))
