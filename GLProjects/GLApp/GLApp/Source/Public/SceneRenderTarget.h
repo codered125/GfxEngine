@@ -14,7 +14,7 @@ class RenderTexture;
 class SceneRenderTarget
 {
 public:
-	SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum InTargetType,  GLenum InInternalFormat, GLenum InFormat, GLuint InNrColourAttachments = 1, bool InMakeDepth = false, bool InMSAA = false);
+	SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum InTargetType,  GLenum InInternalFormat, GLenum InFormat, GLuint InNrColourAttachments = 1, bool InMakeDepth = false, bool InMSAA = false, bool InRbo = false);
 	GLuint& GetID();
 	RenderTexture* GetColourAttachmentByIndex(GLint Index);
 	RenderTexture* GetDepthTexture();

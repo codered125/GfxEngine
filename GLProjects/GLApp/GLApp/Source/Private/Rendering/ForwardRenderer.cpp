@@ -16,7 +16,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	MainPostProcessSetting = new PostProcessSettings();
 	MainPostProcessSetting->HDR = EffectStatus::Active;
 
-	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true);
+	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true, true);
 	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer;
 
 	//GLuint rbo;
@@ -39,7 +39,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	SkyboxShader = new Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	LampShader = new Shader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	DepthShader = new Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
-	ScreenShader = new Shader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
+	ScreenShader = new Shader("Shaders/ForwardScreen.vs", "Shaders/ForwardScreen.frag");
 	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);
 	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
 	VisualSkybox= new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
@@ -83,6 +83,7 @@ void ForwardRenderer::RenderLoop()
 	glClearColor(1.0f, 0.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+	PostProcessingQuad->ThisShader->use();
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
 }
 

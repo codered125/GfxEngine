@@ -1,5 +1,4 @@
 #version 430 core
-#define M_PI 3.14159265359
 #define NUMBER_OF_POINT_LIGHTS 3
 
 //-------------------------------------------------------------------
@@ -87,7 +86,7 @@ void main()
 	
 	//color = color / (color + vec3(1.0));
 	//color = pow(color, vec3(1.0/2.2)); 
-	FragColor = vec4(color, texture(material.texture_diffuse, fs_in.TexCoords).a);    
+	FragColor = vec4(color, parse.alpha);    
 }
 
 //-------------------------------------------------------------------

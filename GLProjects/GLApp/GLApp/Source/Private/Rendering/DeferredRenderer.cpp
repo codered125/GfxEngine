@@ -26,14 +26,14 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	DepthRenderBuffer = new SceneRenderTarget(4096, 4096, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
 	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer;
 
-	GBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 5, false, false);
+	GBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGBA16F, GL_RGBA, 5, false, false, true);
 
 	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 	PBRshader = new Shader("Shaders/ForwardPBR.vs", "Shaders/ForwardPBR.frag");
 	SkyboxShader = new Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	LampShader = new Shader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	DepthShader = new Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
-	ScreenShader = new Shader("Shaders/framebuffersScreen.vs", "Shaders/framebuffersScreen.frag");
+	ScreenShader = new Shader("Shaders/DefferedScreen.vs", "Shaders/DefferedScreen.frag");
 	GBufferShader = new Shader("Shaders/DefferedGBufferFill.vs", "Shaders/DefferedGBufferFill.frag");
 
 	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);
@@ -78,7 +78,22 @@ void DefferedRenderer::RenderLoop()
 	glClearColor(1.0f, 0.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4(), &GBuffer->GetColourAttachmentByIndex(2)->GetID());
+	PostProcessingQuad->ThisShader->use();
+	PostProcessingQuad->ThisShader->setVec3("CamPos", Camera::getPosition(MainCamera));
+	PostProcessingQuad->ThisShader->setVec3("CamDir", Camera::getFront(MainCamera));
+	PostProcessingQuad->ThisShader->SetSampler("PositionTexture", &GBuffer->GetColourAttachmentByIndex(0)->GetID(), GL_TEXTURE_2D);
+	PostProcessingQuad->ThisShader->SetSampler("NormalTexture", &GBuffer->GetColourAttachmentByIndex(1)->GetID(), GL_TEXTURE_2D);
+	PostProcessingQuad->ThisShader->SetSampler("DiffuseShadowTexture", &GBuffer->GetColourAttachmentByIndex(2)->GetID(), GL_TEXTURE_2D);
+	PostProcessingQuad->ThisShader->SetSampler("NormalMapTexture", &GBuffer->GetColourAttachmentByIndex(3)->GetID(), GL_TEXTURE_2D);
+	PostProcessingQuad->ThisShader->SetSampler("RMATexture", &GBuffer->GetColourAttachmentByIndex(4)->GetID(), GL_TEXTURE_2D);
+	PostProcessingQuad->ThisShader->SetSampler("ShadowMap", &DepthRenderBuffer->GetDepthTexture()->GetID(), GL_TEXTURE_2D);
+
+	glm::mat4 LightingFOV = Camera::GetProjection(LightingCamera);
+	glm::mat4 LightingView = Camera::GetViewMatrix(LightingCamera);
+	PostProcessingQuad->ThisShader->setMat4("lightSpaceMatrix", LightingFOV * LightingView);
+	InitialiseLightingDataForShader(PostProcessingQuad->ThisShader);
+	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
+	//PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4(), &GBuffer->GetColourAttachmentByIndex(4)->GetID());
 }
 
 //-------------------------------------------------------------------
@@ -101,7 +116,6 @@ void DefferedRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Ca
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
 	ModelTransformation = glm::rotate(ModelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	DrawModel(LocalPBRShader, Sponza, ModelTransformation, Perspective, ShadowMap);
-
 
 	ModelTransformation = glm::mat4();
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.25f));
