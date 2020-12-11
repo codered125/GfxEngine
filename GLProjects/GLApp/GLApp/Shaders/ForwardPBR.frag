@@ -19,13 +19,13 @@ in V2F
 } fs_in;
 
 layout (location = 0) out vec4 FragColor;
+layout (location = 1) uniform sampler2D ShadowMap;
 
 uniform Material material;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform vec3 CamPos;
 uniform vec3 CamDir;
-layout (location = 1) uniform sampler2D ShadowMap;
 
 vec3 GetNormalFromMap();
 
@@ -80,12 +80,9 @@ void main()
 	vec3 L = normalize(dirLight.position - fs_in.WorldPos);
 	vec3 ambient = vec3(0.03) * parse.diffuse * parse.ao;
 	
-	float Shadow = 1.0f - DetermineShadow(fs_in.FragPosLightSpace, normalize(fs_in.Normal), L, ShadowMap);
+	float Shadow = 1 - DetermineShadow(fs_in.FragPosLightSpace, normalize(fs_in.Normal), L, ShadowMap);
 	L0 += max(Shadow, 0.1) * ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
- 	vec3 color = ambient + L0;
-	
-	//color = color / (color + vec3(1.0));
-	//color = pow(color, vec3(1.0/2.2)); 
+ 	vec3 color = ambient + L0; 
 	FragColor = vec4(color, parse.alpha);    
 }
 

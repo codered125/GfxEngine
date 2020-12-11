@@ -9,6 +9,7 @@ class SkyBox;
 class Camera;
 class Quad;
 class SceneRenderTarget;
+class Shape;
 struct PostProcessSettings;
 
 //-------------------------------------------------------------------
@@ -32,6 +33,8 @@ public:
 protected:
 
 	void InitialiseLightingDataForShader(Shader * lightShader);
+
+	void DrawLights(Camera* Perspective, Shader* LightShader);
 
 	GLint SCREEN_WIDTH;
 	GLint SCREEN_HEIGHT;
