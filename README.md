@@ -1,4 +1,4 @@
-# OpenGL Forward GfxEngine / Rendering Engine
+# OpenGL Forward / Deffered Rendering Engine
 
 Decided to make this public, this is my current project and it is still ongoing. Alot of my learning here is learn opengl driven
 
@@ -14,8 +14,11 @@ The Graphics Engine currently has the following features implemented:
 - [x] Shadow Mapping (Not Cascading)
 - [x] Render Target Revamp
 - [x] Modularising my lighting and shading algorithms in prep for Deffered
-- [ ] Deffered Rendering - After PBR
-- [ ] Deffered Lighting - After Deffered Rendering
+- [x] Deffered Rendering - After PBR
+- [x] Deffered Lighting - After Deffered Rendering
+- [ ] Implementing Tesselation
+- [ ] Port Gertsner water sim to engine
+- [ ] Image Based Lighting PBR
 
 The Graphics Engine currently utalises the current libraries:
 - [x] ASSIMP
