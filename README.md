@@ -1,7 +1,6 @@
 # OpenGL Forward / Deffered Rendering Engine
 
-Decided to make this public, this is my current project and it is still ongoing. Alot of my learning here is learn opengl driven
-
+Decided to make this public, this is my current project and it is still ongoing.
 The Graphics Engine currently has the following features implemented:
 - [x] HDR
 - [x] Directional, Point, and Spot lighting (Blinn/Phong)
