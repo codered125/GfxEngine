@@ -19,15 +19,6 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true, true);
 	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer;
 
-	//GLuint rbo;
-	//glGenRenderbuffers(1, &rbo);
-	//glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	//glRenderbufferStorageMultisample(GL_RENDERBUFFER, AliasingCount, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	//glBindFramebuffer(GL_FRAMEBUFFER, MainRenderBuffer->GetID());
-	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	IntermediateRenderBuffer= new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
 	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer;
 
@@ -44,12 +35,11 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
 	VisualSkybox= new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
-	//ArrowLight = &Model("Models/ArrowLight/ArrowLight.obj");
 }
 
 void ForwardRenderer::RenderLoop()
 {
-//	Renderer::RenderLoop();
+	Renderer::RenderLoop();
 
 	//Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
@@ -96,7 +86,7 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	if (RenderStage != RenderStage::Depth)
 	{
 		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
-		//DrawLights(InLampShader, ourCamera, nullptr);
+		DrawLights(Perspective, LampShader);
 	}
 
 	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : PBRshader;
@@ -107,7 +97,6 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
 	ModelTransformation = glm::rotate(ModelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	DrawModel(LocalPBRShader, Sponza, ModelTransformation, Perspective, ShadowMap);
-
 
 	ModelTransformation = glm::mat4();
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.25f));
@@ -131,7 +120,7 @@ void ForwardRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat4
 	ModelShader->setVec3("CamPos", Camera::getPosition(Perspective));
 	ModelShader->setVec3("CamDir", Camera::getFront(Perspective));
 
-	glm::mat4 FOV = Camera::GetProjection(Perspective);//glm::perspective(Camera::GetZoom(Perspective), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+	glm::mat4 FOV = Camera::GetProjection(Perspective);
 	glm::mat4 view = Camera::GetViewMatrix(Perspective);
 
 	ModelShader->setMat4("projection", FOV);

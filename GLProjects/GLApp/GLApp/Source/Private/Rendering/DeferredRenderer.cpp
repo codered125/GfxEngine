@@ -19,7 +19,6 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true);
 	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer;
 
-
 	IntermediateRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
 	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer;
 
@@ -27,6 +26,7 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer;
 
 	GBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGBA16F, GL_RGBA, 5, false, false, true);
+	MainPostProcessSetting->GRenderBuffer = GBuffer;
 
 	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 	PBRshader = new Shader("Shaders/ForwardPBR.vs", "Shaders/ForwardPBR.frag");
@@ -71,6 +71,7 @@ void DefferedRenderer::RenderLoop()
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, GBuffer->GetID());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IntermediateRenderBuffer->GetID());
 	glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
 	//PostProcess Render Pass
 	// clear all relevant buffers
@@ -93,7 +94,6 @@ void DefferedRenderer::RenderLoop()
 	PostProcessingQuad->ThisShader->setMat4("lightSpaceMatrix", LightingFOV * LightingView);
 	InitialiseLightingDataForShader(PostProcessingQuad->ThisShader);
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
-	//PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4(), &GBuffer->GetColourAttachmentByIndex(4)->GetID());
 }
 
 //-------------------------------------------------------------------

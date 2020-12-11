@@ -20,6 +20,7 @@ struct PostProcessSettings
 	SceneRenderTarget* MainRenderBuffer;
 	SceneRenderTarget* IntermediateRenderBuffer;
 	SceneRenderTarget* DepthRenderBuffer;
+	SceneRenderTarget* GRenderBuffer;
 };
 
 class PostProcessing

@@ -4,6 +4,9 @@
 #include "Source/Public/StaticVertices.h"
 #include "Source/Public/Camera.h"
 #include "Source/Public/Light.h"
+#include "Source/Public/Shader.h"
+#include "Source/Public/Meshes/Cube.h"
+
 
 #include <string>
 
@@ -49,6 +52,30 @@ void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 		Point.specular = glm::vec3(1.0f);
 		Point.intensity = pointIntes;
 		Point.setUpShader();
+	}
+}
+
+void Renderer::DrawLights(Camera * Perspective, Shader* LightShader)
+{
+	LightShader->use();
+	Cube LightCube;
+	LightCube.Colour = glm::vec3(50, 50, 50);
+
+	glm::mat4 FOV = Camera::GetProjection(Perspective);
+	glm::mat4 View = Camera::GetViewMatrix(Perspective);
+	glm::mat4 Model = glm::mat4();
+	Model = glm::translate(Model, TheMostStaticVertices::SunPos); //pointLightPositions[i]);
+	Model = glm::scale(Model, glm::vec3(2.f));
+	LightCube.ThisShader = LightShader;
+	LightCube.Draw(Model, FOV, View);
+
+	for (GLuint i = 0; i < sizeof(TheMostStaticVertices::pointLightPositions); i++)
+	{
+		Model = glm::mat4();
+		Model = glm::translate(Model, TheMostStaticVertices::pointLightPositions[i]); //pointLightPositions[i]);
+		Model = glm::scale(Model, glm::vec3(0.2f));
+		LightCube.Colour = TheMostStaticVertices::pointLightColours[i];
+		LightCube.Draw(Model, FOV, View);
 	}
 }
 
