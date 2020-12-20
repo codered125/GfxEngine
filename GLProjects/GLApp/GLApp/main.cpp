@@ -13,7 +13,7 @@
 #include "Source/Public/Inputs.h"
 #include "Source/Public/Camera.h"
 #include "Source/Public/PostProcessing.h"
-#include "Source/Public/Light.h"
+#include "Source/Public/Lights/Light.h"
 #include "Source/Public/Rendering/ForwardRenderer.h"
 #include "Source/Public/Rendering/DefferedRenderer.h"
 

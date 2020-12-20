@@ -22,17 +22,17 @@ vec3 ApplyKernal();
 
 void main()
 { 	
-	const float gamma = 1.0f; //const float gamma = 2.2f;
+	const float gamma = 1.0f; 
+	//const float gamma = 2.2f;
 	vec3 hdrColor = texture(screenTexture, TexCoords).rgb;
 	if(currentPostProcessEffect.HDR)
     {
         //vec3 result = hdrColor / (hdrColor + vec3(1.0)); // reinhard
-		vec3 result = vec3(1.0) - exp(-hdrColor * exposure); // exposure
-        //gamma correction       
-        result = pow(result, vec3(1.0 / gamma));
+		vec3 result = vec3(1.0) - exp(-hdrColor * exposure); // exposure    
         FragColor = vec4( PostProcessEffect(result), 1.0);
 	    float brightness = dot(normalize(FragColor.rgb),  vec3(0.2126, 0.7152, 0.0722));
-		FragColor = brightness > 01.0? vec4(ApplyKernal(), 1.0f) : FragColor;// vec4(ApplyKernal(), 1.0f) : FragColor;	
+		FragColor = brightness > 01.0? vec4(ApplyKernal(), 1.0f) : FragColor;
+		FragColor = pow(FragColor, vec4(1.0 / gamma));
     }
 
     else

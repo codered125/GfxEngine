@@ -23,7 +23,7 @@ namespace SV
 		5.0f, -0.5f, -5.0f,  2.0f, 2.0f
 	};
 	float NDCPlaneVertices[24] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
-							 // positions   // texCoords
+		// positions		// texCoords
 		-1.0f,  1.0f,  0.0f, 1.0f,
 		-1.0f, -1.0f,  0.0f, 0.0f,
 		1.0f, -1.0f,  1.0f, 0.0f,

@@ -6,6 +6,7 @@
 #include "Source/Public/Meshes/SkyBox.h"
 #include "Source/Public/Meshes/Quad.h"
 #include "Source/Public/Camera.h"
+#include "Source/Public/Lights/DirectionalLight.h"
 
 #include <vector>
 
@@ -138,13 +139,14 @@ void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat
 	ModelShader->setFloat("FarPlane", Camera::GetFarPlane(Perspective));
 	ModelShader->setVec3("CamPos", Camera::getPosition(Perspective));
 	ModelShader->setVec3("CamDir", Camera::getFront(Perspective));
-
-	glm::mat4 FOV = Camera::GetProjection(Perspective);//glm::perspective(Camera::GetZoom(Perspective), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
-	glm::mat4 view = Camera::GetViewMatrix(Perspective);
-
-	ModelShader->setMat4("projection", FOV);
-	ModelShader->setMat4("view", view);
-	InitialiseLightingDataForShader(ModelShader);
+	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
+	{
+		glm::mat4 FOV = Direction->GetLightSpaceProjection();
+		glm::mat4 view = Direction->GetLightSpaceViewMatrix();
+		ModelShader->setMat4("projection", FOV);
+		ModelShader->setMat4("view", view);
+		InitialiseLightingDataForShader(ModelShader);
+	}
 
 	glm::mat4 LightingFOV = Camera::GetProjection(LightingCamera);
 	glm::mat4 LightingView = Camera::GetViewMatrix(LightingCamera);
