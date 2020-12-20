@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Source/Public/Camera.h"
 #include "Source/Public/Math.h"
 
@@ -154,10 +156,7 @@ glm::mat4 Camera::GetProjection(Camera * Target)
 
 	if (Target->IsOrthagraphic)
 	{
-		auto Left = 20.0f;
 
-		auto Top = 10.0f;
-		return  glm::ortho(-Left, Left, -Top, Top, Target->NearPlane, Target->FarPlane);
 	}
 
 	return glm::perspective(Camera::GetZoom(Target), Target->AspectRatio, Target->NearPlane, Target->FarPlane);
@@ -190,8 +189,9 @@ glm::mat4 Camera::GetViewMatrix(Camera* Target)
 {
 	if (Target->IsOrthagraphic)
 	{
-		return glm::lookAt(Target->Position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//	return glm::lookAt(Target->Position, Target->Position + Target->Front, glm::vec3(0.0f, 1.0f, 0.0f));
+//		return glm::lookAt(Target->Position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::vec3 SunDir(glm::vec3(0.45f, 1.50f, 0.05f));
+		return glm::lookAt(-SunDir * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 
 	return glm::lookAt(Target->Position, Target->Position + Target->Front, Target->Up);

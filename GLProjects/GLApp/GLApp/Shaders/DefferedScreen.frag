@@ -134,7 +134,7 @@ vec4 CalculateLight()
 
 	//Directional Lights
 	vec3 r = dirLight.diffuse;
-	vec3 L = normalize(dirLight.position - FragPos);
+	vec3 L = normalize(-dirLight.direction);
 	vec3 ambient = vec3(0.03) * Parse.diffuse * Parse.ao;
 	
 	//float Shadow = 1.0f - DetermineShadow(fs_in.FragPosLightSpace, normalize(FragNormal), L, ShadowMap);

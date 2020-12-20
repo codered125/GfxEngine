@@ -1,4 +1,5 @@
 #pragma once
+
 #include <gtc/matrix_transform.hpp>
 #include <glm.hpp>
 #include <GL\glew.h>
@@ -21,16 +22,17 @@ namespace TheMostStaticVertices
 
 	glm::vec3 pointLightColours[] =
 	{
-		glm::vec3(20.0f, 50.0f, 20.0f),//Green,
+		glm::vec3(0.2f, 0.5f, 0.2f),//Green,
 
-		glm::vec3(50.0f, 20.0f, 20.0f),//red
+		glm::vec3(0.5f, 0.2f, 0.2f),//red
 
-		glm::vec3(20.f, 20.f, 50.0f)//blue
+		glm::vec3(0.2f, 0.2f, 0.5f)//blue
 	};
 
-	glm::vec3 SunPos = glm::vec3(-5.02f, 25.0f, -0.02f);
-	glm::vec3 SunDir(glm::vec3(-2.0f, -1.0f, 0.0f));
-	//glm::vec3 SunDir(-20.0f * MoMath::MoNormalize(glm::vec3(SunPos)));
+	
+	glm::vec3 SunDir(glm::vec3(0.45f, -1.50f, 0.05f));
+	glm::vec3 DebugSunPos = SunDir * -10.0f;
+	//glm::vec3 SunDir(-1.0f * MoMath::MoNormalize(glm::vec3(SunPos)));
 };
 
 #endif // !MostSV

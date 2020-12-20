@@ -77,12 +77,13 @@ void main()
 
 	//Directional Lights
 	vec3 r = dirLight.diffuse;
-	vec3 L = normalize(dirLight.position - fs_in.WorldPos);
+	//vec3 L = normalize(dirLight.position - fs_in.WorldPos);
+	vec3 L = normalize(-dirLight.direction);
 	vec3 ambient = vec3(0.03) * parse.diffuse * parse.ao;
-	
-	float Shadow = 1 - DetermineShadow(fs_in.FragPosLightSpace, normalize(fs_in.Normal), L, ShadowMap);
-	L0 += max(Shadow, 0.1) * ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
+	float Shadow = 1.0 - DetermineShadow(fs_in.FragPosLightSpace, Norm, L, ShadowMap);
+	L0 += (ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity) *max(Shadow, 0.1)) ;
  	vec3 color = ambient + L0; 
+	//color = vec3(Shadow);s
 	FragColor = vec4(color, parse.alpha);    
 }
 

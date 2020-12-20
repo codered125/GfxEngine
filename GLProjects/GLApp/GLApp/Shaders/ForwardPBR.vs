@@ -11,7 +11,8 @@ out V2F
     vec2 TexCoords;
     vec3 WorldPos;
     vec4 FragPosLightSpace;
-} vs_Out;
+} 
+vs_Out;
 
 uniform mat4 model; //converts local object coords to camera coords
 uniform mat4 view; //converts normalised coordinates to window coordinates, aka what your window is
@@ -24,5 +25,5 @@ void main()
     vs_Out.WorldPos = vec3(model * vec4(position, 1.0f));
     vs_Out.Normal = mat3(transpose(inverse(model))) * normal;
     vs_Out.TexCoords = texCoords;
-    vs_Out.FragPosLightSpace = lightSpaceMatrix * vec4(vs_Out.WorldPos, 1.0f); 
+    vs_Out.FragPosLightSpace = lightSpaceMatrix * model * vec4(position, 1.0f); 
 };

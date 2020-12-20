@@ -11,6 +11,7 @@ class Quad;
 class SceneRenderTarget;
 class Shape;
 struct PostProcessSettings;
+struct Light;
 
 //-------------------------------------------------------------------
 
@@ -48,7 +49,7 @@ protected:
 	GLint AliasingCount = 4;
 	GLint NumberofLights = 3;
 
-
+	Light* Directional0;
 	Quad* PostProcessingQuad;
 };
 
