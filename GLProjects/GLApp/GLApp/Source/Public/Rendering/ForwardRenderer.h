@@ -15,7 +15,7 @@ public:
 
 	ForwardRenderer(int InScreenWidth, int InScreenHeight);
 
-	virtual void RenderLoop() override;
+	virtual void RenderLoop(float TimeLapsed) override;
 
 
 protected:
@@ -25,6 +25,7 @@ protected:
 private:
 
 	void DrawModel(Shader* ModelShader, Model* InModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap);
+	void DrawWater(Shader* ModelShader, Model* InModel, glm::mat4 model, Camera* Perspective, float TimeLapsed);
 
 	Shader* UnlitShader;
 	Shader* PBRshader;
@@ -32,9 +33,13 @@ private:
 	Shader* LampShader;
 	Shader* DepthShader;
 	Shader* ScreenShader;
+	Shader* WaterShader;
+
 	Model* Sponza;
 	Model* GizMo;
+	Model* WaterBlock;
 	Model* ArrowLight;
+
 	SkyBox* VisualSkybox;
 
 };

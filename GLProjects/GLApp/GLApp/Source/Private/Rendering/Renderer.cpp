@@ -19,24 +19,25 @@ Renderer::Renderer(GLint InScreenWidth, GLint InScreenHeight)
 	SCREEN_WIDTH = InScreenWidth;
 	SCREEN_HEIGHT = InScreenHeight;
 	MainCamera = new Camera(glm::vec3(0.0f, 10.0f, 0.0f));
-	LightingCamera = new Camera(TheMostStaticVertices::DebugSunPos, TheMostStaticVertices::SunDir, true,  4096 / 4096, -15.0f, 40.0f);
+//	LightingCamera = new Camera(TheMostStaticVertices::DebugSunPos, TheMostStaticVertices::SunDir, true,  4096 / 4096, -15.0f, 40.0f);
 
 }
 
 //-------------------------------------------------------------------
 
-void Renderer::RenderLoop()
+void Renderer::RenderLoop(float TimeLapsed)
 {
+	 GameTimeLapsed = TimeLapsed;
 }
 
 //-------------------------------------------------------------------
 
 void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 {
-	const float pointIntes = 35; const float directIntes = 35;
+	const float pointIntes = 25; const float directIntes = 25;
 	// Directional light
 	Directional0 = new DirectionalLight(lightShader, "dirLight");
-	Directional0->direction = TheMostStaticVertices::SunDir;//Camera::getFront(LightingCamera);
+	Directional0->direction = TheMostStaticVertices::SunDir;// Camera::GetFront(LightingCamera);
 	Directional0->ambient = glm::vec3(1);
 	Directional0->diffuse = glm::vec3(1.0f, 0.89f, 0.7f);
 	Directional0->specular = glm::vec3(1);

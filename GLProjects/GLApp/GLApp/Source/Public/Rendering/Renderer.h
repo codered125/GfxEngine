@@ -27,9 +27,9 @@ public:
 	Renderer(GLint InScreenWidth, GLint InScreenHeight);
 
 	Camera* MainCamera;
-	Camera* LightingCamera;
+	//Camera* LightingCamera;
 	PostProcessSettings* MainPostProcessSetting;
-	virtual void RenderLoop() = 0;
+	virtual void RenderLoop(float TimeLapsed) = 0;
 
 protected:
 
@@ -51,6 +51,7 @@ protected:
 
 	Light* Directional0;
 	Quad* PostProcessingQuad;
+	float GameTimeLapsed;
 };
 
 //-------------------------------------------------------------------

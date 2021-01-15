@@ -30,23 +30,22 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	MainPostProcessSetting->GRenderBuffer = GBuffer;
 
 	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
-	PBRshader = new Shader("Shaders/ForwardPBR.vs", "Shaders/ForwardPBR.frag");
 	SkyboxShader = new Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	LampShader = new Shader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	DepthShader = new Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
-	ScreenShader = new Shader("Shaders/DefferedScreen.vs", "Shaders/DefferedScreen.frag");
-	GBufferShader = new Shader("Shaders/DefferedGBufferFill.vs", "Shaders/DefferedGBufferFill.frag");
+	ScreenShader = new Shader("Shaders/Deffered/DefferedScreen.vs", "Shaders/Deffered/DefferedScreen.frag");
+	GBufferShader = new Shader("Shaders/Deffered/DefferedGBufferFill.vs", "Shaders/Deffered/DefferedGBufferFill.frag");
 
-	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);
+	Sponza = new Model("Models/SponzaTest/sponza.obj", GBufferShader);
 	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
 	VisualSkybox= new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
 	//ArrowLight = &Model("Models/ArrowLight/ArrowLight.obj");
 }
 
-void DefferedRenderer::RenderLoop()
+void DefferedRenderer::RenderLoop( float TimeLapsed)
 {
-//	Renderer::RenderLoop();
+	Renderer::RenderLoop(TimeLapsed);
 
 	//Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
@@ -57,7 +56,7 @@ void DefferedRenderer::RenderLoop()
 	glCullFace(GL_FRONT);
 
 	DepthShader->use();
-	RenderDemo(RenderStage::Depth, VisualSkybox, LightingCamera, nullptr);
+	RenderDemo(RenderStage::Depth, VisualSkybox, MainCamera, nullptr);
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, GBuffer->GetID());
@@ -81,8 +80,8 @@ void DefferedRenderer::RenderLoop()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
 	PostProcessingQuad->ThisShader->use();
-	PostProcessingQuad->ThisShader->setVec3("CamPos", Camera::getPosition(MainCamera));
-	PostProcessingQuad->ThisShader->setVec3("CamDir", Camera::getFront(MainCamera));
+	PostProcessingQuad->ThisShader->setVec3("CamPos",  Camera::GetPosition(MainCamera));
+	PostProcessingQuad->ThisShader->setVec3("CamDir",  Camera::GetFront(MainCamera));
 	PostProcessingQuad->ThisShader->SetSampler("PositionTexture", &GBuffer->GetColourAttachmentByIndex(0)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("NormalTexture", &GBuffer->GetColourAttachmentByIndex(1)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("DiffuseShadowTexture", &GBuffer->GetColourAttachmentByIndex(2)->GetID(), GL_TEXTURE_2D);
@@ -90,9 +89,12 @@ void DefferedRenderer::RenderLoop()
 	PostProcessingQuad->ThisShader->SetSampler("RMATexture", &GBuffer->GetColourAttachmentByIndex(4)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("ShadowMap", &DepthRenderBuffer->GetDepthTexture()->GetID(), GL_TEXTURE_2D);
 
-	glm::mat4 LightingFOV = Camera::GetProjection(LightingCamera);
-	glm::mat4 LightingView = Camera::GetViewMatrix(LightingCamera);
-	PostProcessingQuad->ThisShader->setMat4("lightSpaceMatrix", LightingFOV * LightingView);
+	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
+	{
+		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
+		glm::mat4 LightingView = Direction->GetLightSpaceViewMatrix();
+		PostProcessingQuad->ThisShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView);
+	}
 	InitialiseLightingDataForShader(PostProcessingQuad->ThisShader);
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
 }
@@ -137,20 +139,22 @@ void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat
 
 	ModelShader->setFloat("NearPlane", Camera::GetNearPlane(Perspective));
 	ModelShader->setFloat("FarPlane", Camera::GetFarPlane(Perspective));
-	ModelShader->setVec3("CamPos", Camera::getPosition(Perspective));
-	ModelShader->setVec3("CamDir", Camera::getFront(Perspective));
+	ModelShader->setVec3("CamPos",  Camera::GetPosition(Perspective));
+	ModelShader->setVec3("CamDir",  Camera::GetFront(Perspective));
+	
+	glm::mat4 FOV = Camera::GetProjection(Perspective);
+	glm::mat4 view = Camera::GetViewMatrix(Perspective);
+	ModelShader->setMat4("projection", FOV);
+	ModelShader->setMat4("view", view);
+	InitialiseLightingDataForShader(ModelShader);
+
 	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
 	{
-		glm::mat4 FOV = Direction->GetLightSpaceProjection();
-		glm::mat4 view = Direction->GetLightSpaceViewMatrix();
-		ModelShader->setMat4("projection", FOV);
-		ModelShader->setMat4("view", view);
-		InitialiseLightingDataForShader(ModelShader);
+		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
+		glm::mat4 LightingView = Direction->GetLightSpaceViewMatrix();
+		ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView);
 	}
 
-	glm::mat4 LightingFOV = Camera::GetProjection(LightingCamera);
-	glm::mat4 LightingView = Camera::GetViewMatrix(LightingCamera);
-	ModelShader->setMat4("lightSpaceMatrix", LightingFOV * LightingView);
 	ModelShader->setMat4("model", model);
 	InModel->Draw(ModelShader);
 }

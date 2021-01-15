@@ -1,3 +1,2 @@
 ﻿  DirectionalLight.cpp
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   GLApp.vcxproj -> D:\Development\DevelopmentProjects\GfxEngine\GLProjects\GLApp\Debug\GLApp.exe

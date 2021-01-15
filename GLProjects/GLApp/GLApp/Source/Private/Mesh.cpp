@@ -15,7 +15,7 @@ Mesh::Mesh(std::vector<Vertex> inVertices, std::vector<GLuint> inIndices, std::v
 
 //-------------------------------------------------------------------
 
-void Mesh::Draw(Shader * shader)
+void Mesh::Draw(Shader * shader, GLenum DrawType)
 {
 	GLuint diffuseNr = 1;
 	GLuint specularNR = 1;
@@ -74,7 +74,15 @@ void Mesh::Draw(Shader * shader)
 	}
 
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	if (DrawType == GL_PATCHES)
+	{
+		GLint MaxPatchVertices = 0;
+		glGetIntegerv(GL_MAX_PATCH_VERTICES, &MaxPatchVertices);
+		printf("Max supported patch vertices %d\n", MaxPatchVertices);
+		printf("Indicies Size %d\n", indices.size());
+		glPatchParameteri(GL_PATCH_VERTICES, MaxPatchVertices);
+	}
+	glDrawElements(DrawType, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 
 	for (GLuint i = 0; i < textures.size(); i++)

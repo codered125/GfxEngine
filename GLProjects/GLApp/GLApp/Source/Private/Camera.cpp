@@ -137,14 +137,14 @@ GLfloat Camera::GetZoom(Camera* Target)
 
 //-------------------------------------------------------------------
 
-glm::vec3 Camera::getPosition(Camera* Target)
+glm::vec3  Camera::GetPosition(Camera* Target)
 {
 	return Target->Position;
 }
 
 //-------------------------------------------------------------------
 
-glm::vec3 Camera::getFront(Camera* Target)
+glm::vec3  Camera::GetFront(Camera* Target)
 {
 	return Target->Front;
 }

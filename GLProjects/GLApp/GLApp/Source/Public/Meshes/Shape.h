@@ -17,6 +17,7 @@ public:
 	Shader* ThisShader;
 
 	GLuint ShapeID;
+	GLenum DrawType = GL_TRIANGLES;
 
 protected:
 
