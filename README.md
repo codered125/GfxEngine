@@ -1,5 +1,7 @@
 # OpenGL Forward / Deffered Rendering Engine
 
+Ignore the DirectX folder, it needs to be moved into another project
+
 Decided to make this public, this is my current project and it is still ongoing.
 The Graphics Engine currently has the following features implemented:
 - [x] HDR
