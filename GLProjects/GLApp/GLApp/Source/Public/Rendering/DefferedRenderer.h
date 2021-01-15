@@ -15,7 +15,7 @@ public:
 
 	DefferedRenderer(int InScreenWidth, int InScreenHeight);
 
-	virtual void RenderLoop() override;
+	virtual void RenderLoop(float TimeLapsed) override;
 
 
 protected:

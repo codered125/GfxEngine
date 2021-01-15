@@ -16,9 +16,9 @@ DirectionalLight::DirectionalLight(Shader* inShader, std::string inAccessor) : L
 
 glm::mat4 DirectionalLight::GetLightSpaceProjection()
 {
-	auto Left = 20.0f;
-	auto Top = 20.0f;
-	return  glm::ortho(-Left, Left, -Top, Top, -15.0f, 20.0f);
+	auto Left = 40.0f;
+	auto Top = 40.0f;
+	return glm::ortho(-Left, Left, -Top, Top, -15.0f, 20.0f);
 }
 
 //-------------------------------------------------------------------

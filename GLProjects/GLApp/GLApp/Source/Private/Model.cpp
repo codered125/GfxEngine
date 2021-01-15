@@ -21,7 +21,7 @@ void Model::Draw(Shader *shader)
 {
 	for (GLuint i = 0; i < this->meshes.size(); i++)
 	{
-		this->meshes[i].Draw(shader);
+		this->meshes[i].Draw(shader, DrawType);
 	}
 }
 

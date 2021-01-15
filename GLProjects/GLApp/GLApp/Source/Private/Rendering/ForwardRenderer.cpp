@@ -9,6 +9,8 @@
 #include "Source/Public/Lights/DirectionalLight.h"
 
 #include <vector>
+#include <glm.hpp>
+#include <gtx\matrix_decompose.hpp>
 
 //-------------------------------------------------------------------
 
@@ -27,21 +29,30 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer;
 
 	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
-	PBRshader = new Shader("Shaders/ForwardPBR.vs", "Shaders/ForwardPBR.frag");
+	PBRshader = new Shader("Shaders/Forward/ForwardPBR.vs", "Shaders/Forward/ForwardPBR.frag");
 	SkyboxShader = new Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	LampShader = new Shader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	DepthShader = new Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
-	ScreenShader = new Shader("Shaders/ForwardScreen.vs", "Shaders/ForwardScreen.frag");
-	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);
+	ScreenShader = new Shader("Shaders/Forward/ForwardScreen.vs", "Shaders/Forward/ForwardScreen.frag");
+	WaterShader = new Shader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
 
+	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);
 	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
-	VisualSkybox= new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
+	WaterBlock = new Model("Models/WaterBlock/SM_bathPoolSurface2.obj", WaterShader);
+	if (Tesselation)
+	{
+		WaterBlock->DrawType = GL_PATCHES;
+	}
+
+
+	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
+	
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
 }
 
-void ForwardRenderer::RenderLoop()
+void ForwardRenderer::RenderLoop(float TimeLapsed)
 {
-	Renderer::RenderLoop();
+	Renderer::RenderLoop( TimeLapsed);
 
 	//Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
@@ -89,6 +100,12 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	{
 		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
 		DrawLights(Perspective, LampShader);
+
+
+		auto ModelTransformation = glm::mat4();
+		ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, -0.75f, 0.0f));
+		ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
+		DrawWater(WaterShader, WaterBlock, ModelTransformation, MainCamera, GameTimeLapsed);
 	}
 
 	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : PBRshader;
@@ -105,12 +122,13 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.25f));
 	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, -2.50f, 0.0f));
 	DrawModel(LocalUnlitShader, GizMo, ModelTransformation, Perspective, ShadowMap);
-}
 
+	
+}
 
 //-------------------------------------------------------------------
 
-void ForwardRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat4 model, Camera * Perspective, GLuint * ShadowMap)
+void ForwardRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap)
 {
 	ModelShader->use();
 	if (ShadowMap)
@@ -118,8 +136,8 @@ void ForwardRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat4
 		ModelShader->SetSampler("ShadowMap", ShadowMap, GL_TEXTURE_2D);
 	}
 
-	ModelShader->setVec3("CamPos", Camera::getPosition(Perspective));
-	ModelShader->setVec3("CamDir", Camera::getFront(Perspective));
+	ModelShader->setVec3("CamPos",  Camera::GetPosition(Perspective));
+	ModelShader->setVec3("CamDir",  Camera::GetFront(Perspective));
 
 	glm::mat4 FOV = Camera::GetProjection(Perspective);
 	glm::mat4 view = Camera::GetViewMatrix(Perspective);
@@ -135,6 +153,35 @@ void ForwardRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat4
 		ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView);
 	}
 	ModelShader->setMat4("model", model);
+	InModel->Draw(ModelShader);
+}
+
+//-------------------------------------------------------------------
+
+void ForwardRenderer::DrawWater(Shader* ModelShader, Model* InModel, glm::mat4 model, Camera* Perspective, float TimeLapsed)
+{
+	ModelShader->use();
+	ModelShader->setFloat("TimeLapsed", TimeLapsed);
+	ModelShader->setVec3("CamPos", Camera::GetPosition(Perspective));
+	ModelShader->setVec3("gEyeWorldPos", Camera::GetPosition(Perspective));
+	ModelShader->setVec3("CamDir", Camera::GetFront(Perspective) -  Camera::GetPosition(Perspective));
+
+
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(model, scale, rotation, translation, skew, perspective);
+	ModelShader->setVec3("ActorPos", translation);
+
+	glm::mat4 FOV = Camera::GetProjection(Perspective);
+	glm::mat4 View = Camera::GetViewMatrix(Perspective);
+	ModelShader->setMat4("projection", FOV);
+	ModelShader->setMat4("view", View);
+	ModelShader->setMat4("model", model);
+
+	InitialiseLightingDataForShader(ModelShader);
 	InModel->Draw(ModelShader);
 }
 

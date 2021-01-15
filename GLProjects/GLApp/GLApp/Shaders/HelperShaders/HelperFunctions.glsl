@@ -28,6 +28,24 @@ float UE4SphereMask(vec3 a, vec3 b, float Radius, float Hardness)
 
 //-------------------------------------------------------------------
 
+float UE4Sine(float x)
+{
+	float result = x * M_PI * 2;
+	result = sin(result);
+	return clamp(result, -1.f, 1.f);
+}
+
+//-------------------------------------------------------------------
+
+float UE4Cos(float x)
+{
+	float result = x * M_PI * 2;
+	result = cos(result);
+	return clamp(result, -1.f, 1.f);
+}
+
+//-------------------------------------------------------------------
+
 vec2 Panner(float XSpeed, float YSpeed, vec2 InTexCoords, float TimeLapsed)
 {
 	vec2 OutCoords;

@@ -36,9 +36,9 @@ public:
 
 	static GLfloat GetZoom(Camera* Target);
 
-	static glm::vec3 getPosition(Camera* Target);
+	static glm::vec3 GetPosition(Camera* Target);
 
-	static glm::vec3 getFront(Camera* Target);
+	static glm::vec3 GetFront(Camera* Target);
 
 	static glm::mat4 GetViewMatrix(Camera* Target);
 

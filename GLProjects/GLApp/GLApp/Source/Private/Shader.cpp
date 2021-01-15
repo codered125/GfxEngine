@@ -2,18 +2,15 @@
 
 //-------------------------------------------------------------------
 
-Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
+Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath, const GLchar *ComputePath)
 {
 
 	//Recursively get shader source code from frag and vert path
-	std::string vertexCode;
-	std::string fragmentCode;
+	std::string vertexCode = ParseShaderForIncludes(vertexPath);
+	std::string fragmentCode = ParseShaderForIncludes(fragmentPath);
 
-	vertexCode = ParseShaderForIncludes(vertexPath);
-	fragmentCode = ParseShaderForIncludes(fragmentPath);
-
-	const GLchar *vShaderCode = vertexCode.c_str();
-	const GLchar *fShaderCode = fragmentCode.c_str();
+	const GLchar* vShaderCode = vertexCode.c_str();
+	const GLchar* fShaderCode = fragmentCode.c_str();
 
 	//2. Compile Shaders
 	GLint Success;
@@ -46,9 +43,53 @@ Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
 		std::cout << "frag  Fail\n" << infolog << std::endl;
 	}
 
+	GLuint EvaluationShader;
+	GLuint ControlShader;
+
+	if (ComputePath && Tesselation)
+	{
+		
+		std::string ControlPath = std::string(ComputePath) + ".cs";
+		std::string ControlCode = ParseShaderForIncludes(ControlPath.c_str());
+		const GLchar* cShaderCode = ControlCode.c_str();
+		//Create vertex shader
+		ControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
+		glShaderSource(ControlShader, 1, &cShaderCode, NULL);
+		glCompileShader(ControlShader);
+
+		//Vertex Safety check
+		glGetShaderiv(ControlShader, GL_COMPILE_STATUS, &Success);
+		if (!Success)
+		{
+			glGetShaderInfoLog(ControlShader, 512, NULL, infolog);
+			std::cout << "Control Compile Fail\n" << infolog << std::endl;
+		}
+
+		auto EvaluationPath = std::string(ComputePath) + ".es";
+		std::string EvaluationCode = ParseShaderForIncludes(EvaluationPath.c_str());
+		const GLchar* eShaderCode = EvaluationCode.c_str();
+		//Create vertex shader
+		EvaluationShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
+		glShaderSource(EvaluationShader, 1, &eShaderCode, NULL);
+		glCompileShader(EvaluationShader);
+
+		//Vertex Safety check
+		glGetShaderiv(EvaluationShader, GL_COMPILE_STATUS, &Success);
+		if (!Success)
+		{
+			glGetShaderInfoLog(EvaluationShader, 512, NULL, infolog);
+			std::cout << "Evaluation Compile Fail\n" << infolog << std::endl;
+		}
+	}
 
 	this->shaderProgram = glCreateProgram();
 	glAttachShader(this->shaderProgram, vertShader);
+
+	if (ComputePath && Tesselation)
+	{
+		glAttachShader(this->shaderProgram, ControlShader);
+		glAttachShader(this->shaderProgram, EvaluationShader);
+	}
 	glAttachShader(this->shaderProgram, fragShader);
 	glLinkProgram(this->shaderProgram);
 
@@ -58,10 +99,25 @@ Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath)
 		glGetProgramInfoLog(this->shaderProgram, 512, NULL, infolog);
 		std::cout << "program  Fail\n" << infolog << std::endl;
 		std::cout << vertexPath << std::endl;
+
+
+		if (ComputePath && Tesselation)
+		{
+			std::string ControlPath = std::string(ComputePath) + ".cs";
+			auto EvaluationPath = std::string(ComputePath) + ".es";
+
+			std::cout << ControlPath << std::endl;
+			std::cout << EvaluationPath << std::endl;
+		}
 		std::cout << fragmentPath << std::endl;
 	}
 
 	glDeleteShader(vertShader);
+	if (ComputePath && Tesselation)
+	{
+		glDeleteShader(ControlShader);
+		glDeleteShader(EvaluationShader);
+	}
 	glDeleteShader(fragShader);
 
 }
@@ -164,22 +220,13 @@ void Shader::SetSampler(const std::string & Accessor, GLuint* value, GLenum Text
 		glBindTexture(TextureType, *value);
 		glUniform1i(glGetUniformLocation(shaderProgram, Accessor.c_str()), SamplerLocation);
 	}
-
-	/*const auto SamplerLocation = GetUniformLocation(Accessor);
-	if (SamplerLocation != -1)
-	{
-		glActiveTexture(SamplerLocation);
-		glBindTexture(TextureType, *value);
-		glActiveTexture(GL_TEXTURE0);
-	}*/
 }
 
 //-------------------------------------------------------------------
 
 GLint Shader::GetUniformLocation(const std::string & Accessor)
 {
-	const auto SamplerLocation = glGetUniformLocation(shaderProgram, Accessor.c_str());
-	return SamplerLocation;
+	return glGetUniformLocation(shaderProgram, Accessor.c_str());
 }
 
 //-------------------------------------------------------------------

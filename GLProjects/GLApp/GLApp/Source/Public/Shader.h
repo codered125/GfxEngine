@@ -12,6 +12,9 @@
 #include <sstream>
 #include <iostream>
 
+//-------------------------------------------------------------------
+
+#define Tesselation 0
 
 //-------------------------------------------------------------------
 
@@ -22,7 +25,7 @@ public:
 
 	Shader() {};
 
-	Shader(const GLchar *vertexPath, const GLchar *fragmentPath);
+	Shader(const GLchar *vertexPath, const GLchar *fragmentPath, const GLchar *ComputePath = nullptr);
 
 	std::string ParseShaderForIncludes(const GLchar* CurrentShaderPath);
 

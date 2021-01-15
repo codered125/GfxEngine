@@ -1,1 +1,0 @@
-D:\Epic\UE_4.17\Engine\Binaries\DotNET\AutomationTool.exe BuildCookRun -project=D:\Moman\UnrealEngineProjects\UAT\UAT.uproject -noP4 -platform=Win64 -clientconfig=Development -serverconfig=Development -cook -maps=+LVL3+LVL4+LVL5+LVL6-build -stage -pak -archive -archivedirectory=D:\Moman\UnrealEngineProjects

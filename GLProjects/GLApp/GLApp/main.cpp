@@ -62,7 +62,7 @@ int main()
 		Tick();
 		Input::DoMovement(deltaTime, MainRenderer->MainCamera, Keys, keyboardlockout, MainRenderer->MainPostProcessSetting, InputMap);
 
-		MainRenderer->RenderLoop();
+		MainRenderer->RenderLoop(glfwGetTime());
 		
 		
 		//swap screen buffers
