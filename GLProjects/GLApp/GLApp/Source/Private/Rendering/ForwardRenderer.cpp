@@ -61,6 +61,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 	glCullFace(GL_FRONT);
+//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	DepthShader->use();
 	RenderDemo(RenderStage::Depth, VisualSkybox, MainCamera, nullptr);
@@ -86,6 +87,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	glClearColor(1.0f, 0.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	PostProcessingQuad->ThisShader->use();
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
 }
@@ -103,9 +105,10 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 
 
 		auto ModelTransformation = glm::mat4();
-		ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, -0.75f, 0.0f));
-		ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
+		ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 0.75f, 0.0f));
+		ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.005f));
 		DrawWater(WaterShader, WaterBlock, ModelTransformation, MainCamera, GameTimeLapsed);
+	//	std::cout << "GameTime: " << GameTimeLapsed << std::endl;
 	}
 
 	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : PBRshader;
@@ -121,7 +124,7 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	ModelTransformation = glm::mat4();
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.25f));
 	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, -2.50f, 0.0f));
-	DrawModel(LocalUnlitShader, GizMo, ModelTransformation, Perspective, ShadowMap);
+	//DrawModel(LocalUnlitShader, GizMo, ModelTransformation, Perspective, ShadowMap);
 
 	
 }
@@ -163,8 +166,7 @@ void ForwardRenderer::DrawWater(Shader* ModelShader, Model* InModel, glm::mat4 m
 	ModelShader->use();
 	ModelShader->setFloat("TimeLapsed", TimeLapsed);
 	ModelShader->setVec3("CamPos", Camera::GetPosition(Perspective));
-	ModelShader->setVec3("gEyeWorldPos", Camera::GetPosition(Perspective));
-	ModelShader->setVec3("CamDir", Camera::GetFront(Perspective) -  Camera::GetPosition(Perspective));
+	ModelShader->setVec3("CamDir", Camera::GetFront(Perspective) );
 
 
 	glm::vec3 scale;

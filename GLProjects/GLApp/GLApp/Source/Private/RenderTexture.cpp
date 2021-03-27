@@ -1,4 +1,5 @@
 #include "Source/Public/RenderTexture.h"
+#include "Source/Public/EngineDebugHelper.h"
 
 #include <iostream>
 
@@ -19,20 +20,20 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 	, InternalFormat(InInternalFormat)
 {
 	glGenTextures(1, &Id);
-	std::cout << "RenderTexture Gentexture: " << glGetError() << std::endl;
+	GLErrorCheck();
 	glBindTexture(TargetType, Id);
-	std::cout << "RenderTexture glBindTexture: " << glGetError() << std::endl;
+	GLErrorCheck();
 
 	if (InMSAA)
 	{
 		GLuint AliasingCount = 4;
 		glTexImage2DMultisample(TargetType, AliasingCount, InternalFormat, Width, Height, GL_TRUE);
-		std::cout << "RenderTexture glTexImage2DMultisample: " << glGetError() << std::endl;
+		GLErrorCheck();
 	}
 	else
 	{
 		glTexImage2D(TargetType, 0, InternalFormat, Width, Height, 0, Format, GL_FLOAT, NULL);
-		std::cout << "RenderTexture glTexImage2D : " << glGetError() << std::endl;
+		GLErrorCheck();
 	}
 	
 	if (Format == GL_DEPTH_COMPONENT)
@@ -43,17 +44,17 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 		MagFilter = GL_NEAREST;
 		float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-		std::cout << "RenderTexture glTexParameterfv: " << glGetError() << std::endl;
+		GLErrorCheck();
 	}
 
 	glTexParameteri(TargetType, GL_TEXTURE_MIN_FILTER, MinFilter);	
-	std::cout << "RenderTexture MinFilter: " << glGetError() << std::endl;
+	GLErrorCheck();
 	glTexParameteri(TargetType, GL_TEXTURE_MAG_FILTER, MagFilter);
-	std::cout << "RenderTexture MagFilter: " << glGetError() << std::endl;
+	GLErrorCheck();
 	glTexParameteri(TargetType, GL_TEXTURE_WRAP_S, WrapS);
-	std::cout << "RenderTexture WrapS: " << glGetError() << std::endl;
+	GLErrorCheck();
 	glTexParameteri(TargetType, GL_TEXTURE_WRAP_T, WrapT);
-	std::cout << "RenderTexture WrapT: " << glGetError() << std::endl;
+	GLErrorCheck();
 }
 
 //-------------------------------------------------------------------

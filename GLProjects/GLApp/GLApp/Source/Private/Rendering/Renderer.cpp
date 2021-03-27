@@ -27,7 +27,8 @@ Renderer::Renderer(GLint InScreenWidth, GLint InScreenHeight)
 
 void Renderer::RenderLoop(float TimeLapsed)
 {
-	 GameTimeLapsed = TimeLapsed;
+	GameTimeDelta = TimeLapsed - GameTimeLapsed;
+	GameTimeLapsed = TimeLapsed;
 }
 
 //-------------------------------------------------------------------
