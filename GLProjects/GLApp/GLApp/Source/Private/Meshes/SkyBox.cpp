@@ -1,5 +1,6 @@
 #include "Source/Public/Meshes/SkyBox.h"
 #include "Source/Public/Shader.h"
+#include "Source/Public/RenderTextureCubeMap.h"
 #include "Source/Public/TextureLoading.h"
 
 //-------------------------------------------------------------------
@@ -60,25 +61,8 @@ SkyBox::SkyBox(Shader* SkyboxShader, std::string InPath, std::string InFormat)
 {
 	// Cubemap (Skybox)
 	//Right, left, top, bottom, back, front
-	std::string Right = InPath + "posx" + InFormat;
-	SkyboxFaces.push_back(Right.c_str());
-	
-	std::string Left = InPath + "negx" + InFormat;
-	SkyboxFaces.push_back(Left.c_str());
-
-	std::string Top = InPath + "posy" + InFormat;
-	SkyboxFaces.push_back(Top.c_str());
-	
-	std::string Bottom = InPath + "negy" + InFormat;
-	SkyboxFaces.push_back(Bottom.c_str());
-	
-	std::string Front = InPath + "posz" + InFormat;
-	SkyboxFaces.push_back(Front.c_str());
-	
-	std::string Back = InPath + "negz" + InFormat;
-	SkyboxFaces.push_back(Back.c_str());
-
-	SkyboxTexture = TextureLoading::LoadCubemap(SkyboxFaces);
+	SkyboxFaces = RenderTextureCubeMap::LoadCubeMapFacesHelper(InPath, InFormat);
+	SkyboxTexture = new RenderTextureCubeMap(GL_TEXTURE_CUBE_MAP, GL_RGB, GL_RGB, SkyboxFaces);
 	ThisShader = SkyboxShader;
 }
 
@@ -105,7 +89,7 @@ void SkyBox::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView)
 
 		glBindVertexArray(ShapeVAO);
 		glActiveTexture(GL_TEXTURE0);
- 		glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxTexture);
+ 		glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxTexture->GetID());
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // Set depth function back to default

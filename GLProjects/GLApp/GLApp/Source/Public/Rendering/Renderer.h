@@ -52,6 +52,7 @@ protected:
 	Light* Directional0;
 	Quad* PostProcessingQuad;
 	float GameTimeLapsed;
+	float GameTimeDelta;
 };
 
 //-------------------------------------------------------------------

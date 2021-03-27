@@ -89,7 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../GLApp/GLApp/;$(SolutionDir)/../External Libraries/GLFW/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../GLApp/GLApp/;$(SolutionDir)/../External Libraries/GLFW/include;$(SolutionDir)/../External Libraries/STB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,6 +171,7 @@
     <ClCompile Include="Source\Private\Rendering\ForwardRenderer.cpp" />
     <ClCompile Include="Source\Private\Rendering\Renderer.cpp" />
     <ClCompile Include="Source\Private\RenderTexture.cpp" />
+    <ClCompile Include="Source\Private\RenderTextureCubeMap.cpp" />
     <ClCompile Include="Source\Private\SceneRenderTarget.cpp" />
     <ClCompile Include="Source\Private\Shader.cpp" />
     <ClCompile Include="Source\Private\TextureLoading.cpp" />
@@ -215,6 +216,7 @@
     <Image Include="Images\Spiral.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Public\EngineDebugHelper.h" />
     <ClInclude Include="Source\Public\Lights\PointLight.h" />
     <ClInclude Include="Source\Public\Lights\DirectionalLight.h" />
     <ClInclude Include="main.h" />
@@ -237,6 +239,7 @@
     <ClInclude Include="Source\Public\Rendering\Renderer.h" />
     <ClInclude Include="Source\Public\RenderTarget.h" />
     <ClInclude Include="Source\Public\RenderTexture.h" />
+    <ClInclude Include="Source\Public\RenderTextureCubeMap.h" />
     <ClInclude Include="Source\Public\resource.h" />
     <ClInclude Include="Source\Public\SceneRenderTarget.h" />
     <ClInclude Include="Source\Public\Shader.h" />

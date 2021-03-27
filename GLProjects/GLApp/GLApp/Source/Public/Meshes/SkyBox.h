@@ -7,6 +7,10 @@
 
 //-------------------------------------------------------------------
 
+class RenderTextureCubeMap;
+
+//-------------------------------------------------------------------
+
 class SkyBox : public Shape
 {
 
@@ -21,7 +25,7 @@ public:
 
 	std::vector<const GLchar*> SkyboxFaces;	// Cubemap (Skybox)
 
-	GLuint SkyboxTexture;
+	RenderTextureCubeMap* SkyboxTexture;
 
 };
 

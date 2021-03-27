@@ -1,6 +1,5 @@
-#version 330 core
+#version 430 core
 #define M_PI 3.14159265359
-
 
 //-------------------------------------------------------------------
 
@@ -15,6 +14,8 @@ layout (location = 2) in vec2 texCoords;
 
 out vec3 Normal;
 out vec3 GNormal;
+out vec3 GBitangent;
+out vec3 GTangent;
 out vec3 FragPos;
 out vec2 TexCoords;
 
@@ -22,23 +23,12 @@ uniform mat4 model; //converts local object coords to camera coords
 uniform mat4 view; //converts normalised coordinates to window coordinates, aka what your window is
 uniform mat4 projection; //converts those camera coordinates to normalised coordinates(0-1)
 uniform float TimeLapsed;
-uniform vec3 ActorPos;
 
-bool ripple = true;
-vec3 Wave(vec2 direct, float inwaves, vec2 inTexCoord, float inTime, float expo, float inheight);
 vec3 GertsnerWave(vec2 Direction, vec2 worldSpaceXY, float len, float time, float speed, float height, float steepness);
-vec3 GerstnerFunNormal(vec2 Direction, float len, float time, float speed, float height, float steepness, vec3 Point);
-
-//-------------------------------------------------------------------
-
-vec3 Wave(vec2 direct, float inwaves, vec2 inTexCoord, float inTime, float expo, float inheight)
-{
-	float dirAndWaves = dot(inTexCoord, direct) * inwaves;
-	//Because ue4 sine is different to hlsl function
-	float applyTime = UE4Sine(dirAndWaves + inTime);
-	float normToRange = pow((applyTime +1) / 2 , expo);		
-	return vec3(0.0f, 1.0f, 0.0f) * normToRange * inheight;
-}
+vec3 Equation9Wave(vec2 DDirection, vec2 XYHorizontalPos, float LLength, float TTime, float SSpeed, float AHeight, float QSteepness);
+vec3 Equation9WaveNormal(vec2 DDirection, float LLength, float TTime, float SSpeed, float AHeight, float QSteepness, vec3 PPoint);
+vec3 Equation9WaveBitangent(vec2 DDirection, float LLength, float TTime, float SSpeed, float AHeight, float QSteepness, vec3 PPoint);
+vec3 Equation9WaveTangent(vec2 DDirection, float LLength, float TTime, float SSpeed, float AHeight, float QSteepness, vec3 PPoint);
 
 //-------------------------------------------------------------------
 
@@ -57,44 +47,110 @@ vec3 GertsnerWave(vec2 Direction, vec2 worldSpaceXY, float len, float time, floa
 
 //-------------------------------------------------------------------
 
-vec3 GerstnerFunNormal(vec2 Direction, float len, float time, float speed, float height, float steepness, vec3 Point)
+vec3 Equation9Wave(vec2 DDirection, vec2 XYHorizontalPos, float LLength, float TTime, float SSpeed, float AHeight, float QSteepness)
 {
-	vec3 output;
-	float w = ((2 * M_PI) / len );
-	float pC = speed * ((2* M_PI) / len);
-	//float dDotT = dot(dir, inTexCoord);
-	float wa = w * height;
-	float Qi = steepness / (w * height);
-	float co = UE4Cos(w * dot(Direction, vec2(Point.x, Point.z)) + (pC * time));
-	float so = UE4Sine(w * dot(Direction, vec2(Point.x, Point.z)) + (pC * time));
-	output.x = -(Direction.x *  wa * co);
-	output.z = -(Direction.y *  wa * co);
-	output.y = 1 - (Qi * wa * so);
-	return normalize(output);
+	vec3 result;
+	float WFrequency = (2  / LLength);
+	float PhaseConstant = SSpeed * (2 / LLength);
+	float Qi = QSteepness / (WFrequency * AHeight);
+
+	float dDotXY = dot(DDirection, normalize(XYHorizontalPos));
+	result.x = (Qi * AHeight * DDirection.x * (cos(WFrequency * dDotXY + (PhaseConstant * TTime))));
+	result.z = (Qi * AHeight * DDirection.y * (cos(WFrequency * dDotXY + (PhaseConstant * TTime))));
+	result.y = AHeight * (sin(WFrequency * dot(DDirection, XYHorizontalPos) + (PhaseConstant * TTime)));
+	return result;
+}
+
+//-------------------------------------------------------------------
+
+vec3 Equation9WaveNormal(vec2 DDirection, float LLength, float TTime, float SSpeed, float AHeight, float QSteepness, vec3 PPoint)
+{
+	vec3 result;
+	float WFrequency = (2  / LLength);
+	float PhaseConstant = SSpeed * (2 / LLength);
+	float Qi = saturate(QSteepness / (WFrequency * AHeight));
+
+	float WA = WFrequency * AHeight;
+	vec2 PointXY = normalize(vec2(PPoint.x, PPoint.z));
+	float S0 = sin(WFrequency * dot(DDirection, PointXY) + (PhaseConstant * TTime));
+	float C0 = cos(WFrequency * dot(DDirection, PointXY) + (PhaseConstant * TTime));
+
+	result.x = DDirection.x *  WA * C0;
+	result.x = (result.x + 1) / 2;
+	result.x = -result.x;
+
+	result.z = DDirection.y *  WA * C0;
+	result.z = (result.z + 1) / 2;
+	result.z = -result.z;
+
+	result.y = Qi * WA * S0;
+	result.y = (result.y + 1) / 2;	
+	result.y = 1 - result.y;
+	
+	return normalize(result);
+}
+
+//-------------------------------------------------------------------
+
+vec3 Equation9WaveBitangent(vec2 DDirection, float LLength, float TTime, float SSpeed, float AHeight, float QSteepness, vec3 PPoint)
+{
+	vec3 result;
+	float WFrequency = (2  / LLength);
+	float PhaseConstant = SSpeed * (2 / LLength);
+	float Qi = saturate(QSteepness) / (WFrequency * AHeight);
+
+	float WA = WFrequency * AHeight;
+	vec3 NormalizedPPoint = normalize(PPoint);
+	float S0 = sin(WFrequency * dot(DDirection, vec2(NormalizedPPoint.x, NormalizedPPoint.z)) + (PhaseConstant * TTime));
+	float C0 = cos(WFrequency * dot(DDirection, vec2(NormalizedPPoint.x, NormalizedPPoint.z)) + (PhaseConstant * TTime));
+	result.x = 1 - (Qi * (DDirection.x * DDirection.x) * WA * S0);
+	result.z = -(Qi * DDirection.x * DDirection.y *  WA * S0);
+	result.y = (DDirection.x * WA * C0);
+	return normalize(result);
+}
+//-------------------------------------------------------------------
+
+vec3 Equation9WaveTangent(vec2 DDirection, float LLength, float TTime, float SSpeed, float AHeight, float QSteepness, vec3 PPoint)
+{
+	vec3 result;
+	float WFrequency = (2  / LLength);
+	float PhaseConstant = SSpeed * (2 / LLength);
+
+	float Qi = saturate(QSteepness) / (WFrequency * AHeight);
+
+	float WA = WFrequency * AHeight;
+	float S0 = sin(WFrequency * dot(DDirection, vec2(PPoint.x, PPoint.z)) + (PhaseConstant * TTime));
+	float C0 = cos(WFrequency * dot(DDirection, vec2(PPoint.x, PPoint.z)) + (PhaseConstant * TTime));
+	result.x = -(Qi * DDirection.x * DDirection.y *  WA * S0);
+	result.z = 1 - (Qi * (DDirection.y * DDirection.y) *  WA * S0);
+	result.y = 1 - (DDirection.y * WA * C0);
+	return normalize(result);
 }
 
 //-------------------------------------------------------------------
 
 void main()
 {
+	const vec2 Dir = vec2(0.0f, 0.0f);
+	const vec2 WorldXY = vec2(position.x, position.z);
+	const vec2 RelativeDir = normalize(Dir - WorldXY);
 
-//float applyRat = saturate(Bilerp(position.y, ActorPos.y, ActorPos.y + 30));
-const vec2 Dir = vec2(0.0f, 0.0f);
-vec2 WorldXY = vec2(position.x, position.z);
-const float Waves = 300;
-float Time = TimeLapsed;
-const float Speed = 2;
-const float Height = 5;
-const float Steepness = 0.5;
-//vec3 offset = Wave(vec2(1.0f, 0.5f), 2, texCoords, TimeLapsed, 8, 25);
-vec3 offset = GertsnerWave(normalize(Dir - WorldXY), WorldXY, Waves, Time, Speed, Height, Steepness);
+	const float WavesLength = 12;
+	const float Speed = 4;
+	const float Height = 5;
+	const float Steepness = 0.5;
+	const float Time = TimeLapsed;
+	const vec3 Offset = Equation9Wave(RelativeDir, WorldXY, WavesLength, Time, Speed, Height, Steepness);
 
-FragPos = vec3(model * vec4(position + offset, 1.0f));
-Normal = mat3(transpose(inverse(model))) * normal;
-GNormal = GerstnerFunNormal(Dir, Waves, Time, Speed, Height, Steepness, offset );
-TexCoords = texCoords;
+	FragPos = vec3(model * vec4(position + Offset, 1.0f));
+	Normal = mat3(transpose(inverse(model))) * normal;
+	GNormal = mat3(transpose(inverse(model))) * Equation9WaveNormal(RelativeDir, WavesLength, Time, Speed, Height, Steepness, FragPos );
+	GBitangent = mat3(transpose(inverse(model))) * Equation9WaveBitangent(RelativeDir, WavesLength, Time, Speed, Height, Steepness, FragPos );
+	GTangent = mat3(transpose(inverse(model))) * Equation9WaveTangent(RelativeDir, WavesLength, Time, Speed, Height, Steepness, FragPos );
+	TexCoords = texCoords;
 
-gl_Position =  projection * view * model * vec4 (position + offset, 1.0f);
+	gl_Position =  projection * view * model * vec4 (position + Offset, 1.0f);
+
 };
 
 //-------------------------------------------------------------------

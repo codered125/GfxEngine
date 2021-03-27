@@ -1,5 +1,6 @@
 #pragma once
 #include "Source/Public/GlfwInterface.h"
+#include "Source/Public/EngineDebugHelper.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -22,6 +23,13 @@ GLFWwindow * GlfwInterface::DefineAndCreaateWindow(int& InAntiAliasingCount, con
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 	glfwWindowHint(GLFW_SAMPLES, InAntiAliasingCount);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+	
+	//glEnable(GL_DEBUG_OUTPUT);
+	//glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	//glDebugMessageCallback(EngineDebugHelper::GLDebugOutput, nullptr);
+	//glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+	
 	glEnable(GL_MULTISAMPLE);
 
 	//Creating window

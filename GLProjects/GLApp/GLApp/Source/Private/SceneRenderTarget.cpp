@@ -1,4 +1,5 @@
 #include "Source/Public/SceneRenderTarget.h"
+#include "Source/Public/EngineDebugHelper.h"
 
 #include <iostream>
 
@@ -23,7 +24,7 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 		ColourAttachments.push_back(RT);
 		AttachmentEnums[i] = GL_COLOR_ATTACHMENT0 + i;
 		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentEnums[i], InTargetType, RT.GetID(), 0);
-		std::cout << "SceneRenderTarget glFramebufferTexture2D Id " << i << " : " << glGetError() << std::endl;
+		GLErrorCheck();
 	}
 
 	if (InNrColourAttachments > 1)
@@ -72,7 +73,7 @@ GLuint& SceneRenderTarget::GetID()
 
 RenderTexture* SceneRenderTarget::GetColourAttachmentByIndex(GLint Index)
 {
-	return ColourAttachments.size() > Index ? &ColourAttachments[Index] : nullptr;
+	return (GLint)ColourAttachments.size() > Index ? &ColourAttachments[Index] : nullptr;
 }
 
 //-------------------------------------------------------------------
