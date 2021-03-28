@@ -59,9 +59,6 @@ namespace StaticVerts
 
 SkyBox::SkyBox(Shader* SkyboxShader, std::string InPath, std::string InFormat)
 {
-	// Cubemap (Skybox)
-	//Right, left, top, bottom, back, front
-
 	RenderTextureCubeMap::LoadCubeMapFacesHelper(InPath, InFormat, SkyboxFaces);
 	SkyboxTexture = new RenderTextureCubeMap(GL_TEXTURE_CUBE_MAP, GL_RGB, GL_RGB, SkyboxFaces);
 	ThisShader = SkyboxShader;

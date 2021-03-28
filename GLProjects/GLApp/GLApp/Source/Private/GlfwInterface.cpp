@@ -43,12 +43,37 @@ GLFWwindow * GlfwInterface::DefineAndCreaateWindow(int& InAntiAliasingCount, con
 	return window;
 }
 
+//-------------------------------------------------------------------
+
 void GlfwInterface::GetFramebufferSize(GLFWwindow* InWindow, int& InWidth, int& InHeight)
 {
 	//Going to get the real size and height of the screen and store it to our storage
 	//helps with high density displays. Will use it when creating viewport
 	glfwGetFramebufferSize(InWindow, &InWidth, &InHeight);
 }
+
+//-------------------------------------------------------------------
+
+void GlfwInterface::ResetScreen(glm::vec4 InClearColour, GLbitfield InThingsToClear, GLbitfield InThingsToEnable, GLbitfield InThingsToDisable)
+{
+	glClearColor(InClearColour.x, InClearColour.y, InClearColour.z, InClearColour.w);
+	if (InThingsToClear != GL_NONE);
+	{
+		glClear(InThingsToClear);
+	}
+	
+	if (InThingsToEnable != GL_NONE)
+	{
+		glEnable(InThingsToEnable);
+	}
+
+	if (InThingsToDisable != GL_NONE)
+	{
+		glDisable(InThingsToDisable);
+	}
+}
+
+//-------------------------------------------------------------------
 
 void GlfwInterface::SetInputCallbackFunctions(GLFWwindow* InWindow, GLFWkeyfun Keyfunc, GLFWscrollfun Scrollfunc, GLFWcursorposfun Cursorfunc)
 {
@@ -58,6 +83,8 @@ void GlfwInterface::SetInputCallbackFunctions(GLFWwindow* InWindow, GLFWkeyfun K
 	glfwSetScrollCallback(InWindow, Scrollfunc);
 	glfwSetInputMode(InWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
+
+//-------------------------------------------------------------------
 
 bool GlfwInterface::WindowShouldClose(GLFWwindow* InWindow)
 {
