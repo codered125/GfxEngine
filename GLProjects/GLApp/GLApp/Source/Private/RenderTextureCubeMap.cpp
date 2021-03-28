@@ -77,29 +77,42 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 
 //-------------------------------------------------------------------
 
-std::vector<const GLchar*> RenderTextureCubeMap::LoadCubeMapFacesHelper(std::string InPath, std::string InFormat)
+void RenderTextureCubeMap::LoadCubeMapFacesHelper(std::string InPath, std::string InFormat, std::vector<const GLchar*>& InArray)
 {
 	//Right, left, top, bottom, back, front
 
 	std::vector<const GLchar*> OutCubeMapFaces;
-	static std::string Right = InPath + "posx" + InFormat;
-	OutCubeMapFaces.push_back(Right.c_str());
+	auto lenth = std::strlen(std::string(InPath + "posx" + InFormat).c_str()) + 10;
 
-	static std::string Left = InPath + "negx" + InFormat;
-	OutCubeMapFaces.push_back(Left.c_str());
+	char* RightRaw = new char[lenth]; char* LeftRaw = new char[lenth];	char* TopRaw = new char[lenth];
+	char* BottomRaw = new char[lenth];	char* FrontRaw = new char[lenth]; 	char* BackRaw = new char[lenth];
 
-	static std::string Top = InPath + "posy" + InFormat;
-	OutCubeMapFaces.push_back(Top.c_str());
+	std::string Right = InPath + "posx" + InFormat;
+	strcpy_s(RightRaw, lenth, Right.c_str());
+	OutCubeMapFaces.push_back(RightRaw);
 
-	static std::string Bottom = InPath + "negy" + InFormat;
-	OutCubeMapFaces.push_back(Bottom.c_str());
+	std::string Left = InPath + "negx" + InFormat;
+	strcpy_s(LeftRaw, lenth, Left.c_str());
+	OutCubeMapFaces.push_back(LeftRaw);
 
-	static std::string Front = InPath + "posz" + InFormat;
-	OutCubeMapFaces.push_back(Front.c_str());
+	std::string Top = InPath + "posy" + InFormat;
+	strcpy_s(TopRaw, lenth, Top.c_str());
+	OutCubeMapFaces.push_back(TopRaw);
 
-	static std::string Back = InPath + "negz" + InFormat;
-	OutCubeMapFaces.push_back(Back.c_str());
-	return OutCubeMapFaces;
+	std::string Bottom = InPath + "negy" + InFormat;
+	strcpy_s(BottomRaw, lenth, Bottom.c_str());
+	OutCubeMapFaces.push_back(BottomRaw);
+
+	std::string Front = InPath + "posz" + InFormat;
+	strcpy_s(FrontRaw, lenth, Front.c_str());
+	OutCubeMapFaces.push_back(FrontRaw);
+
+	std::string Back = InPath + "negz" + InFormat;
+	strcpy_s(BackRaw, lenth, Back.c_str());
+	OutCubeMapFaces.push_back(BackRaw);
+
+	InArray.reserve(sizeof(OutCubeMapFaces));
+	InArray = move(OutCubeMapFaces);
 }
 
 //-------------------------------------------------------------------

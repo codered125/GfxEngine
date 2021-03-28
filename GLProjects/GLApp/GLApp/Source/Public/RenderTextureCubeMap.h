@@ -15,7 +15,7 @@ public:
 	RenderTextureCubeMap();
 	RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, std::vector<const GLchar*> InFaces);
 	RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const GLchar* InHDRPath);
-	static std::vector<const GLchar*> LoadCubeMapFacesHelper(std::string InPath, std::string InFormat);
+	static void LoadCubeMapFacesHelper(std::string InPath, std::string InFormat, std::vector<const GLchar*>& InArray);
 
 	GLuint& GetID();
 
