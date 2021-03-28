@@ -1,16 +1,17 @@
 #include "Source/Public/Rendering/ForwardRenderer.h"
-#include "Source/Public/SceneRenderTarget.h"
-#include "Source/Public/PostProcessing.h"
-#include "Source/Public/Shader.h"
-#include "Source/Public/Model.h"
-#include "Source/Public/Meshes/SkyBox.h"
-#include "Source/Public/Meshes/Quad.h"
 #include "Source/Public/Camera.h"
+#include "Source/Public/GlfwInterface.h"
 #include "Source/Public/Lights/DirectionalLight.h"
+#include "Source/Public/Meshes/Quad.h"
+#include "Source/Public/Meshes/SkyBox.h"
+#include "Source/Public/Model.h"
+#include "Source/Public/PostProcessing.h"
+#include "Source/Public/SceneRenderTarget.h"
+#include "Source/Public/Shader.h"
 
-#include <vector>
 #include <glm.hpp>
 #include <gtx\matrix_decompose.hpp>
+#include <vector>
 
 //-------------------------------------------------------------------
 
@@ -54,25 +55,20 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 {
 	Renderer::RenderLoop( TimeLapsed);
 
-	//Shadow Render Pass
+	//Begin Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
+	GlfwInterface::ResetScreen(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	DepthShader->use();
 	RenderDemo(RenderStage::Depth, VisualSkybox, MainCamera, nullptr);
+	//End Shadow Render Pass
 
+	//Begin Main Pass
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, MainRenderBuffer->GetID());
-
-	glClearColor(0.05f, 0.05f, 0.05f, 1.0f);// make sure we clear the framebuffer's content
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)	
-	//glCullFace(GL_BACK);
+	GlfwInterface::ResetScreen(glm::vec4(0.05f, 0.05f, 0.05f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	RenderDemo(RenderStage::Main, VisualSkybox, MainCamera, &DepthRenderBuffer->GetDepthTexture()->GetID());
 
 	//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
@@ -80,16 +76,17 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, MainRenderBuffer->GetID());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IntermediateRenderBuffer->GetID());
 	glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	//End Main pass
 
-	//PostProcess Render Pass
-	// clear all relevant buffers
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-	glClearColor(1.0f, 0.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	//Begin PostProcess Render Pass
+	// clear all relevant buffers and disable depth test so screen-space quad isn't discarded due to depth test.
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	GlfwInterface::ResetScreen(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NONE, GL_DEPTH_TEST);
+
 	PostProcessingQuad->ThisShader->use();
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
+	//End PostProcess Render Pass
 }
 
 //-------------------------------------------------------------------

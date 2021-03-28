@@ -1,3 +1,5 @@
+#include <glm.hpp>
+#include <gl/glew.h>
 #pragma once
 
 //-------------------------------------------------------------------
@@ -15,6 +17,7 @@ public:
 
 	static GLFWwindow* DefineAndCreaateWindow(int& InAntiAliasingCount, const GLint& inHeight, const GLint& inWidth);
 	static void GetFramebufferSize(GLFWwindow* InWindow, int& InWidth, int& InHeight);
+	static void ResetScreen(glm::vec4 InClearColour, GLbitfield InThingsToClear = GL_NONE, GLbitfield InThingsToEnable = GL_NONE, GLbitfield InThingsToDisable = GL_NONE);
 	static void SetInputCallbackFunctions(GLFWwindow* InWindow, GLFWkeyfun Keyfunc, GLFWscrollfun Scrollfunc, GLFWcursorposfun Cursorfunc);
 	static bool WindowShouldClose(GLFWwindow* InWindow);
 
