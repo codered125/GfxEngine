@@ -14,19 +14,19 @@ class Shape
 {
 public:
 
-	Shader* ThisShader;
+	Shape();
 
+	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView) = 0;
+	virtual void Draw(Shader *shader) {};
+
+	Shader* ThisShader;
 	GLuint ShapeID;
 	GLenum DrawType = GL_TRIANGLES;
 
 protected:
 
 	GLuint ShapeVAO;
-
 	GLuint ShapeVBO;
-
-	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView) = 0;
-
 };
 
 //-------------------------------------------------------------------

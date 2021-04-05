@@ -1,11 +1,14 @@
 #include "Source/Public/Rendering/ForwardRenderer.h"
 #include "Source/Public/Camera.h"
+#include "Source/Public/EngineDebugHelper.h"
 #include "Source/Public/GlfwInterface.h"
 #include "Source/Public/Lights/DirectionalLight.h"
+#include "Source/Public/Meshes/Cube.h"
 #include "Source/Public/Meshes/Quad.h"
 #include "Source/Public/Meshes/SkyBox.h"
 #include "Source/Public/Model.h"
 #include "Source/Public/PostProcessing.h"
+#include "Source/Public/RenderTextureCubeMap.h"
 #include "Source/Public/SceneRenderTarget.h"
 #include "Source/Public/Shader.h"
 
@@ -36,18 +39,19 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	DepthShader = new Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
 	ScreenShader = new Shader("Shaders/Forward/ForwardScreen.vs", "Shaders/Forward/ForwardScreen.frag");
 	WaterShader = new Shader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
+	IrradenceMapShader = new Shader("Shaders/IrradenceMapCapture/EquirectangularToCubemap.vs", "Shaders/IrradenceMapCapture/EquirectangularToCubemap.frag");
 
-	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);
+
+	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
 	WaterBlock = new Model("Models/WaterBlock/SM_bathPoolSurface2.obj", WaterShader);
-	if (Tesselation)
-	{
-		WaterBlock->DrawType = GL_PATCHES;
-	}
 
+	std::vector<const GLchar*> IrradenceFaces;
+	RenderTextureCubeMap::LoadCubeMapFacesHelper("Images/WaveEngineIBL/", ".bmp", IrradenceFaces);
+	IrradenceMap = new RenderTextureCubeMap(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, IrradenceFaces);
+	EquirectangularMap = new RenderTextureCubeMap(GL_TEXTURE_2D, GL_RGB16F, GL_RGB,"Images/newport_loft.hdr");
 
 	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
-	
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
 }
 
@@ -70,6 +74,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, MainRenderBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.05f, 0.05f, 0.05f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	RenderDemo(RenderStage::Main, VisualSkybox, MainCamera, &DepthRenderBuffer->GetDepthTexture()->GetID());
+	//DrawGizmos(MainCamera);
 
 	//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
 	//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)
@@ -98,18 +103,21 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	if (RenderStage != RenderStage::Depth)
 	{
 		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
-		DrawLights(Perspective, LampShader);
-
+		//DrawLights(Perspective, LampShader);
 
 		auto ModelTransformation = glm::mat4();
-		ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 0.75f, 0.0f));
-		ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.005f));
-		DrawWater(WaterShader, WaterBlock, ModelTransformation, MainCamera, GameTimeLapsed);
-	//	std::cout << "GameTime: " << GameTimeLapsed << std::endl;
+		ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 5.75f, 0.0f));
+		ModelTransformation = glm::scale(ModelTransformation, glm::vec3(10.005f));
+		//DrawWater(WaterShader, WaterBlock, ModelTransformation, MainCamera, GameTimeLapsed);
+		
+		auto IrradenceCube = new Cube();
+		IrradenceCube->ThisShader = IrradenceMapShader;
+		IrradenceMapShader->use();
+		IrradenceMapShader->SetSampler("EquirectangularMap", &EquirectangularMap->GetID(), GL_TEXTURE_2D);
+		IrradenceCube->Draw(ModelTransformation, Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
 	}
 
 	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : PBRshader;
-	auto LocalUnlitShader = RenderStage == RenderStage::Depth ? DepthShader : UnlitShader;
 	 
 	//Room Model
 	auto ModelTransformation = glm::mat4();
@@ -117,18 +125,11 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
 	ModelTransformation = glm::rotate(ModelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	DrawModel(LocalPBRShader, Sponza, ModelTransformation, Perspective, ShadowMap);
-
-	ModelTransformation = glm::mat4();
-	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.25f));
-	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, -2.50f, 0.0f));
-	//DrawModel(LocalUnlitShader, GizMo, ModelTransformation, Perspective, ShadowMap);
-
-	
 }
 
 //-------------------------------------------------------------------
 
-void ForwardRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap)
+void ForwardRenderer::DrawModel(Shader * ModelShader, Shape* InModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap)
 {
 	ModelShader->use();
 	if (ShadowMap)
@@ -153,6 +154,7 @@ void ForwardRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat4
 		ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView);
 	}
 	ModelShader->setMat4("model", model);
+	ModelShader->SetSampler("IrradenceMap", &IrradenceMap->GetID(), GL_TEXTURE_CUBE_MAP);
 	InModel->Draw(ModelShader);
 }
 
@@ -164,7 +166,6 @@ void ForwardRenderer::DrawWater(Shader* ModelShader, Model* InModel, glm::mat4 m
 	ModelShader->setFloat("TimeLapsed", TimeLapsed);
 	ModelShader->setVec3("CamPos", Camera::GetPosition(Perspective));
 	ModelShader->setVec3("CamDir", Camera::GetFront(Perspective) );
-
 
 	glm::vec3 scale;
 	glm::quat rotation;
@@ -182,6 +183,29 @@ void ForwardRenderer::DrawWater(Shader* ModelShader, Model* InModel, glm::mat4 m
 
 	InitialiseLightingDataForShader(ModelShader);
 	InModel->Draw(ModelShader);
+}
+
+//-------------------------------------------------------------------
+
+void ForwardRenderer::DrawGizmos(Camera* Perspective)
+{
+	Renderer::DrawGizmos(Perspective);
+	glDisable(GL_DEPTH_TEST);
+	UnlitShader->use();
+
+	auto ModelTransformation = glm::mat4();
+	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.025f));
+
+	UnlitShader->setVec3("CamPos", Camera::GetPosition(Perspective));
+	UnlitShader->setVec3("CamDir", Camera::GetFront(Perspective));
+	UnlitShader->setMat4("model", ModelTransformation);
+
+	glm::mat4 FOV = Camera::GetProjection(Perspective);
+	glm::mat4 view = glm::mat4(glm::mat3(Camera::GetViewMatrix(Perspective)));	// Remove any translation component of the view matrix
+	UnlitShader->setMat4("projection", FOV);
+	UnlitShader->setMat4("view", view);
+	GizMo->Draw(UnlitShader);
+	glEnable(GL_DEPTH_TEST);
 }
 
 //-------------------------------------------------------------------

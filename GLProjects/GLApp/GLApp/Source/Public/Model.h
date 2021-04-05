@@ -28,7 +28,7 @@ class Model : public Shape
 public:
 	Model(GLchar * inpath, Shader* InShader);
 
-	void Draw(Shader *shader);
+	void Draw(Shader *shader) override;
 
 private:
 	std::vector<Mesh> meshes;

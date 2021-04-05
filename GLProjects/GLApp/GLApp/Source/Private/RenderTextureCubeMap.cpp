@@ -27,7 +27,7 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 
 	int imageWidth, imageHeight;
 	unsigned char *image;
-
+	stbi_set_flip_vertically_on_load(false);
 	for (GLuint i = 0; i < Faces.size(); i++)
 	{
 		image = SOIL_load_image(Faces[i], &imageWidth, &imageHeight, 0, SOIL_LOAD_RGB);
@@ -43,6 +43,8 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 	GLErrorCheck();
 	glTexParameteri(TargetType, GL_TEXTURE_WRAP_T, WrapT);
 	GLErrorCheck();
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	stbi_set_flip_vertically_on_load(false);
 }
 
 //-------------------------------------------------------------------
@@ -55,7 +57,6 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 	stbi_set_flip_vertically_on_load(true);
 	int width, height, nrComponents;
 	float *data = stbi_loadf(InHDRPath, &width, &height, &nrComponents, 0);
-	unsigned int hdrTexture;
 	if (data)
 	{
 		glGenTextures(1, &Id);
@@ -71,8 +72,9 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 	}
 	else
 	{
-		std::cout << "Failed to load HDR image." << std::endl;
+		MoMessageLogger("Faled to load HDR Image");
 	}
+	stbi_set_flip_vertically_on_load(false);
 }
 
 //-------------------------------------------------------------------

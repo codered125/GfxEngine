@@ -4,8 +4,10 @@
 
 //-------------------------------------------------------------------
 
+class Shape;
 class Model;
 class SkyBox;
+class RenderTextureCubeMap;
 
 //-------------------------------------------------------------------
 
@@ -24,8 +26,9 @@ protected:
 
 private:
 
-	void DrawModel(Shader* ModelShader, Model* InModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap);
+	void DrawModel(Shader* ModelShader, Shape* InModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap);
 	void DrawWater(Shader* ModelShader, Model* InModel, glm::mat4 model, Camera* Perspective, float TimeLapsed);
+	virtual void DrawGizmos(Camera* Perspective) override;
 
 	Shader* UnlitShader;
 	Shader* PBRshader;
@@ -34,6 +37,7 @@ private:
 	Shader* DepthShader;
 	Shader* ScreenShader;
 	Shader* WaterShader;
+	Shader* IrradenceMapShader;
 
 	Model* Sponza;
 	Model* GizMo;
@@ -41,6 +45,8 @@ private:
 	Model* ArrowLight;
 
 	SkyBox* VisualSkybox;
+	RenderTextureCubeMap* IrradenceMap;
+	RenderTextureCubeMap* EquirectangularMap;
 
 };
 

@@ -57,6 +57,7 @@ Quad::Quad(Shader* InShader, PostProcessSettings* InPPS, bool InNDC)
 	ShapeID = ShapeVAO;
 	ThisShader = InShader;
 	ThisPPS = InPPS;
+	
 }
 
 void Quad::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView)

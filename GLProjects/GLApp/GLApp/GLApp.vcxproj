@@ -151,13 +151,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Private\Inputs.cpp" />
     <ClCompile Include="Source\Private\Lights\PointLight.cpp" />
     <ClCompile Include="Source\Private\Lights\DirectionalLight.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Private\Actor.cpp" />
     <ClCompile Include="Source\Private\Camera.cpp" />
     <ClCompile Include="Source\Private\GlfwInterface.cpp" />
-    <ClCompile Include="Source\Private\Inputs.cpp" />
     <ClCompile Include="Source\Private\Lights\Light.cpp" />
     <ClCompile Include="Source\Private\Math.cpp" />
     <ClCompile Include="Source\Private\Mesh.cpp" />
