@@ -19,6 +19,8 @@ Model::Model(GLchar* inpath, Shader* InShader)
 
 void Model::Draw(Shader *shader)
 {
+	Shape::Draw(shader);
+
 	for (GLuint i = 0; i < this->meshes.size(); i++)
 	{
 		this->meshes[i].Draw(shader, DrawType);

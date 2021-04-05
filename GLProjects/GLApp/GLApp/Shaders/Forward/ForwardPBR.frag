@@ -26,6 +26,7 @@ uniform DirLight dirLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform vec3 CamPos;
 uniform vec3 CamDir;
+uniform samplerCube IrradenceMap;
 
 vec3 GetNormalFromMap();
 
@@ -85,6 +86,7 @@ void main()
  	vec3 color = ambient + L0; 
 	//color = vec3(Shadow);s
 	FragColor = vec4(color, parse.alpha);    
+//	FragColor = texture(IrradenceMap, fs_in.WorldPos).rgba;
 }
 
 //-------------------------------------------------------------------

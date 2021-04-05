@@ -1,6 +1,7 @@
 #pragma once
 #include <gl/glew.h>
 #include <glm.hpp>
+#include <string>
 
 //-------------------------------------------------------------------
 
@@ -30,12 +31,14 @@ public:
 	//Camera* LightingCamera;
 	PostProcessSettings* MainPostProcessSetting;
 	virtual void RenderLoop(float TimeLapsed) = 0;
+	virtual void DrawGizmos(Camera* Perspective);
 
 protected:
 
 	void InitialiseLightingDataForShader(Shader * lightShader);
 
 	void DrawLights(Camera* Perspective, Shader* LightShader);
+	std::string GetGameTimeAsString();
 
 	GLint SCREEN_WIDTH;
 	GLint SCREEN_HEIGHT;
@@ -53,6 +56,7 @@ protected:
 	Quad* PostProcessingQuad;
 	float GameTimeLapsed;
 	float GameTimeDelta;
+	
 };
 
 //-------------------------------------------------------------------

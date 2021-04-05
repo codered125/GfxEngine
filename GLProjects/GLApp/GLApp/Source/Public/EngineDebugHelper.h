@@ -9,6 +9,7 @@
 //-------------------------------------------------------------------
 
 #define GLErrorCheck()EngineDebugHelper::GLErrorCheckWrapper_(__FILE__, __LINE__) 
+#define MoMessageLogger(LogText)EngineDebugHelper::MessageLogger(__FILE__, __LINE__, LogText) 
 #define GLDebugOutputCallback()EngineDebugHelper::GLDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char *message, const void *userParam) 
 
 class EngineDebugHelper
@@ -30,10 +31,13 @@ public:
 			case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
 			case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
 			}
-			std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+			std::cout << std::endl << error << " | " << file << " (" << line << ")" << std::endl;
 		}
 		return errorCode;
 	}
+
+	//-------------------------------------------------------------------
+
 	static void GLAPIENTRY GLDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char *message, const void *userParam)
 	{
 		// ignore non-significant error/warning codes
@@ -71,12 +75,18 @@ public:
 		case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: medium"; break;
 		case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: low"; break;
 		case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
-		} std::cout << std::endl;
+		}
+		std::cout << std::endl;
 		std::cout << std::endl;
 	}
+
+	//-------------------------------------------------------------------
+
+	static void MessageLogger(const char* file, int line, std::string LogText)
+	{
+		std::cout << std::endl << LogText << " | " << file << " (" << line << ")" << std::endl;
+	}
 };
-
-
 
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------

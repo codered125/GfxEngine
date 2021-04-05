@@ -9,6 +9,8 @@
 #include "Source/Public/Shader.h"
 #include "Source/Public/Meshes/Cube.h"
 
+#include <GLFW/glfw3.h>
+
 
 #include <string>
 
@@ -29,6 +31,12 @@ void Renderer::RenderLoop(float TimeLapsed)
 {
 	GameTimeDelta = TimeLapsed - GameTimeLapsed;
 	GameTimeLapsed = TimeLapsed;
+}
+
+//-------------------------------------------------------------------
+
+void Renderer::DrawGizmos(Camera* Perspective)
+{
 }
 
 //-------------------------------------------------------------------
@@ -59,6 +67,8 @@ void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 	}
 }
 
+//-------------------------------------------------------------------
+
 void Renderer::DrawLights(Camera * Perspective, Shader* LightShader)
 {
 	LightShader->use();
@@ -81,6 +91,13 @@ void Renderer::DrawLights(Camera * Perspective, Shader* LightShader)
 		LightCube.Colour = TheMostStaticVertices::pointLightColours[i];
 		LightCube.Draw(Model, FOV, View);
 	}
+}
+
+//-------------------------------------------------------------------
+
+std::string Renderer::GetGameTimeAsString()
+{
+	return std::to_string(glfwGetTime());
 }
 
 
