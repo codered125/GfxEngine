@@ -21,8 +21,6 @@ Renderer::Renderer(GLint InScreenWidth, GLint InScreenHeight)
 	SCREEN_WIDTH = InScreenWidth;
 	SCREEN_HEIGHT = InScreenHeight;
 	MainCamera = new Camera(glm::vec3(0.0f, 10.0f, 0.0f));
-//	LightingCamera = new Camera(TheMostStaticVertices::DebugSunPos, TheMostStaticVertices::SunDir, true,  4096 / 4096, -15.0f, 40.0f);
-
 }
 
 //-------------------------------------------------------------------

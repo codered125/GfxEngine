@@ -56,7 +56,7 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 {
 	stbi_set_flip_vertically_on_load(true);
 	int width, height, nrComponents;
-	float *data = stbi_loadf(InHDRPath, &width, &height, &nrComponents, 0);
+	float* data = stbi_loadf(InHDRPath, &width, &height, &nrComponents, 0);
 	if (data)
 	{
 		glGenTextures(1, &Id);

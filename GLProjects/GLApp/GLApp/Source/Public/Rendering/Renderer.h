@@ -18,7 +18,6 @@ struct Light;
 
 enum RenderStage {Depth, Main, PostProcess, GBuffer};
 
-
 //-------------------------------------------------------------------
 
 class Renderer
