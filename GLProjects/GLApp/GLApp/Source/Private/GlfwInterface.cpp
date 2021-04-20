@@ -57,7 +57,7 @@ void GlfwInterface::GetFramebufferSize(GLFWwindow* InWindow, int& InWidth, int& 
 void GlfwInterface::ResetScreen(glm::vec4 InClearColour, GLbitfield InThingsToClear, GLbitfield InThingsToEnable, GLbitfield InThingsToDisable)
 {
 	glClearColor(InClearColour.x, InClearColour.y, InClearColour.z, InClearColour.w);
-	if (InThingsToClear != GL_NONE);
+	if (InThingsToClear != GL_NONE)
 	{
 		glClear(InThingsToClear);
 	}

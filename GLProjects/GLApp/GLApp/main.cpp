@@ -1,21 +1,22 @@
 #include "main.h"
 
-#include <iostream>
-#include <thread>
-#include <future>
-
 //-------------------------------------------------------------------------------------
 
-#include <SOIL2\src\SOIL2\SOIL2.h>
-
-//-------------------------------------------------------------------------------------
+#include "Source/Public/Camera.h"
 #include "Source/Public/GlfwInterface.h"
 #include "Source/Public/Inputs.h"
-#include "Source/Public/Camera.h"
-#include "Source/Public/PostProcessing.h"
 #include "Source/Public/Lights/Light.h"
-#include "Source/Public/Rendering/ForwardRenderer.h"
+#include "Source/Public/PostProcessing.h"
 #include "Source/Public/Rendering/DefferedRenderer.h"
+#include "Source/Public/Rendering/ForwardRenderer.h"
+
+
+//-------------------------------------------------------------------------------------
+
+#include <future>
+#include <iostream>
+#include <SOIL2\src\SOIL2\SOIL2.h>
+#include <thread>
 
 //-------------------------------------------------------------------------------------
 
