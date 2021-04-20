@@ -10,6 +10,7 @@
 #include "Source/Public/Model.h"
 #include "Source/Public/PostProcessing.h"
 #include "Source/Public/RenderTextureCubeMap.h"
+#include "Source/Public/RenderTextureCubeMapIrradence.h"
 #include "Source/Public/SceneRenderTarget.h"
 #include "Source/Public/Shader.h"
 
@@ -47,14 +48,13 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
 	WaterBlock = new Model("Models/WaterBlock/SM_bathPoolSurface2.obj", WaterShader);
 
-	std::vector<const GLchar*> IrradenceFaces;
-	RenderTextureCubeMap::LoadCubeMapFacesHelper("Images/WaveEngineIBL/", ".bmp", IrradenceFaces);
-	IrradenceMap = new RenderTextureCubeMap(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, IrradenceFaces);
-	EquirectangularMap = new RenderTextureCubeMap(GL_TEXTURE_2D, GL_RGB16F, GL_RGB,"Images/newport_loft.hdr");
+	EquirectangularMap = new RenderTextureCubeMapIrradence(GL_TEXTURE_2D, GL_RGB16F, GL_RGB, "Images/newport_loft.hdr");
 
 	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
 }
+
+//-------------------------------------------------------------------
 
 void ForwardRenderer::RenderLoop(float TimeLapsed)
 {
@@ -147,7 +147,6 @@ void ForwardRenderer::DrawModel(Shader * ModelShader, Shape* InModel, glm::mat4 
 	ModelShader->setMat4("view", view);
 	InitialiseLightingDataForShader(ModelShader);
 	
-
 	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
 	{
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
@@ -155,7 +154,7 @@ void ForwardRenderer::DrawModel(Shader * ModelShader, Shape* InModel, glm::mat4 
 		ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView);
 	}
 	ModelShader->setMat4("model", model);
-	ModelShader->SetSampler("IrradenceMap", &IrradenceMap->GetID(), GL_TEXTURE_CUBE_MAP);
+//	ModelShader->SetSampler("IrradenceMap", &IrradenceMap->GetID(), GL_TEXTURE_CUBE_MAP);
 	InModel->Draw(ModelShader);
 }
 

@@ -8,6 +8,7 @@ class Shape;
 class Model;
 class SkyBox;
 class RenderTextureCubeMap;
+class RenderTextureCubeMapIrradence;
 
 //-------------------------------------------------------------------
 
@@ -45,8 +46,7 @@ private:
 	Model* ArrowLight;
 
 	SkyBox* VisualSkybox;
-	RenderTextureCubeMap* IrradenceMap;
-	RenderTextureCubeMap* EquirectangularMap;
+	RenderTextureCubeMapIrradence* EquirectangularMap;
 
 };
 

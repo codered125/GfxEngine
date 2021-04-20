@@ -19,7 +19,7 @@ public:
 
 	GLuint& GetID();
 
-private:
+protected:
 	GLuint Id;
 	GLenum WrapS = GL_CLAMP_TO_EDGE;
 	GLenum WrapT = GL_CLAMP_TO_EDGE;
