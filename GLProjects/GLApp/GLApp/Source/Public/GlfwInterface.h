@@ -1,6 +1,7 @@
-#include <glm.hpp>
-#include <gl/glew.h>
 #pragma once
+
+#include <gl/glew.h>
+#include <glm.hpp>
 
 //-------------------------------------------------------------------
 

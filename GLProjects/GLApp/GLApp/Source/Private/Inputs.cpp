@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Source/Public/Inputs.h"
 #include "Source/Public/Camera.h"
+#include "Source/Public/Inputs.h"
 #include "Source/Public/PostProcessing.h"
 
 //-------------------------------------------------------------------

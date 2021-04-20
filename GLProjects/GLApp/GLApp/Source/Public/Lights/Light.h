@@ -1,7 +1,8 @@
 #pragma once
+
+#include <glm.hpp>
 #include <iostream>
 #include <string.h>
-#include <glm.hpp>
 
 //-------------------------------------------------------------------
 
@@ -18,7 +19,7 @@ enum LightType
 
 struct Light
 {
-	Shader * ShaderRef = nullptr;
+	Shader* ShaderRef = nullptr;
 	float cutOff = glm::cos(glm::radians(7.5f));
 	float outerCutOff = glm::cos(glm::radians(11.0f));
 	float constant = 1.0f; // keep at one stops denominator dropping below 1 in the equation
@@ -35,7 +36,7 @@ struct Light
 	LightType ltype = LightType::nulls;
 	std::string accessor, pos, dir, ambi, diff, spec, cutff, outCutOff, cons, lin, quad , intense= "";
 
-	Light(Shader * inShader, std::string inAccessor);
+	Light(Shader* inShader, std::string inAccessor);
 
 	void setUpShader();
 
