@@ -23,6 +23,7 @@ protected:
 	GLuint Id;
 	GLenum WrapS = GL_CLAMP_TO_EDGE;
 	GLenum WrapT = GL_CLAMP_TO_EDGE;
+	GLenum WrapR = GL_CLAMP_TO_EDGE;
 	GLenum MinFilter = GL_LINEAR;
 	GLenum MagFilter = GL_LINEAR;
 	GLenum TargetType;
