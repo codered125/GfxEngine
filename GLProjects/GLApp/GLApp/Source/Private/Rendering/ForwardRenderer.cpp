@@ -41,8 +41,6 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	DepthShader = new Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
 	ScreenShader = new Shader("Shaders/Forward/ForwardScreen.vs", "Shaders/Forward/ForwardScreen.frag");
 	WaterShader = new Shader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
-	IrradenceMapShader = new Shader("Shaders/IrradenceMapCapture/EquirectangularToCubemap.vs", "Shaders/IrradenceMapCapture/EquirectangularToCubemap.frag");
-
 
 	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
@@ -112,11 +110,6 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 		ModelTransformation = glm::scale(ModelTransformation, glm::vec3(10.005f));
 		//DrawWater(WaterShader, WaterBlock, ModelTransformation, MainCamera, GameTimeLapsed);
 		
-		auto IrradenceCube = new Cube();
-		IrradenceCube->ThisShader = IrradenceMapShader;
-		IrradenceMapShader->use();
-		IrradenceMapShader->SetSampler("EquirectangularMap", &EquirectangularMap->GetID(), GL_TEXTURE_2D);
-		IrradenceCube->Draw(ModelTransformation, Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
 	}
 
 	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : PBRshader;
@@ -155,7 +148,7 @@ void ForwardRenderer::DrawModel(Shader * ModelShader, Shape* InModel, glm::mat4 
 		ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView);
 	}
 	ModelShader->setMat4("model", model);
-//	ModelShader->SetSampler("IrradenceMap", &IrradenceMap->GetID(), GL_TEXTURE_CUBE_MAP);
+	ModelShader->SetSampler("IrradenceMap", &EquirectangularMap->GetID(), GL_TEXTURE_CUBE_MAP);
 	InModel->Draw(ModelShader);
 }
 
