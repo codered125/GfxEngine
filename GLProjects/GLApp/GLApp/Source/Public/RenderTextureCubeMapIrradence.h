@@ -18,6 +18,7 @@ public:
 protected:
 
 	RenderTextureCubeMap* HDRRenderTexture;
+	RenderTextureCubeMap* UnConvolutedMap;
 	SceneRenderTarget* IrrandenceRenderBuffer;
 
 };
