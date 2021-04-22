@@ -38,7 +38,6 @@ private:
 	Shader* DepthShader;
 	Shader* ScreenShader;
 	Shader* WaterShader;
-	Shader* IrradenceMapShader;
 
 	Model* Sponza;
 	Model* GizMo;
