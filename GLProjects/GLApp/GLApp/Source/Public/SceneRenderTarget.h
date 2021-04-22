@@ -18,11 +18,15 @@ public:
 	GLuint& GetID();
 	RenderTexture* GetColourAttachmentByIndex(GLint Index);
 	RenderTexture* GetDepthTexture();
+	void ResizeRenderTarget(GLint InWidth, GLint InHeight);
+
 private:
 
 	GLuint Id;
 	GLint Height;
 	GLint Width;
+	GLuint Rbo;
+
 
 	GLenum TargetType;
 

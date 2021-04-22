@@ -79,6 +79,24 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 
 //-------------------------------------------------------------------
 
+RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, GLint InWidth, GLint InHeight)
+{
+	glGenTextures(1, &Id);
+	glBindTexture(InTargetType, Id);
+	for (GLuint i = 0; i < 6; ++i)
+	{
+		// note that we store each face with 16 bit floating point values
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, InInternalFormat, InWidth, InHeight, 0, InFormat, GL_FLOAT, nullptr);
+	}
+	glTexParameteri(InTargetType, GL_TEXTURE_WRAP_S, WrapS);
+	glTexParameteri(InTargetType, GL_TEXTURE_WRAP_T, WrapT);
+	glTexParameteri(InTargetType, GL_TEXTURE_WRAP_R, WrapR);
+	glTexParameteri(InTargetType, GL_TEXTURE_MIN_FILTER, MinFilter);
+	glTexParameteri(InTargetType, GL_TEXTURE_MAG_FILTER, MagFilter);
+}
+
+//-------------------------------------------------------------------
+
 void RenderTextureCubeMap::LoadCubeMapFacesHelper(std::string InPath, std::string InFormat, std::vector<const GLchar*>& InArray)
 {
 	//Right, left, top, bottom, back, front

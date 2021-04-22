@@ -33,9 +33,8 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 	}
 	if (InRbo)
 	{
-		GLuint rbo;
-		glGenRenderbuffers(1, &rbo);
-		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glGenRenderbuffers(1, &Rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, Rbo);
 		if (InMSAA)
 		{
 			glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, InWidth, InHeight);
@@ -45,7 +44,7 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, InWidth, InHeight);
 		}
 
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, Rbo);
 	}
 
 	if (InMakeDepth)
@@ -81,6 +80,18 @@ RenderTexture* SceneRenderTarget::GetColourAttachmentByIndex(GLint Index)
 RenderTexture* SceneRenderTarget::GetDepthTexture()
 {
 	return &Depth;
+}
+
+//-------------------------------------------------------------------
+
+void SceneRenderTarget::ResizeRenderTarget(GLint InWidth, GLint InHeight)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, Id);
+	glBindRenderbuffer(GL_RENDERBUFFER, Rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, InWidth, InHeight);
+
+	Height = InHeight;
+	Width = InWidth;
 }
 
 //-------------------------------------------------------------------
