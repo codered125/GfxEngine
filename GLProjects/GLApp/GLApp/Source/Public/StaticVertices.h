@@ -24,9 +24,9 @@ namespace TheMostStaticVertices
 	{
 		glm::vec3(0.2f, 0.5f, 0.2f),//Green,
 
-		glm::vec3(0.5f, 0.2f, 0.2f),//red
+		glm::vec3(0.2f, 0.2f, 0.5f),//blue
 
-		glm::vec3(0.2f, 0.2f, 0.5f)//blue
+		glm::vec3(0.5f, 0.2f, 0.2f)//red
 	};
 
 	

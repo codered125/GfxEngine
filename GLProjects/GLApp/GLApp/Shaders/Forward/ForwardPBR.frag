@@ -18,16 +18,15 @@ in V2F
 	vec4 FragPosLightSpace;
 } fs_in;
 
-layout (location = 0) out vec4 FragColor;
-layout (location = 1) uniform sampler2D ShadowMap;
-layout (location = 2) uniform samplerCube IrradenceMap;
+out vec4 FragColor;
+layout (location = 5) uniform sampler2D ShadowMap;
+layout (location = 6) uniform samplerCube IrradenceMap;
 
 uniform Material material;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform vec3 CamPos;
 uniform vec3 CamDir;
-//uniform samplerCube IrradenceMap;
 
 vec3 GetNormalFromMap();
 
@@ -76,20 +75,21 @@ void main()
 		L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
 	}
 	
-	// ambient lighting (we now use IBL as the ambient term)
+	// IBL Ambient
     const vec3 kS = fresnelSchlick(saturate(dot(Norm, View)), F0);
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - parse.metallic;	  
   	const vec3 Irradiance = texture(IrradenceMap, Norm).rgb;
     const vec3 Diffuse = Irradiance * parse.diffuse;
     const vec3 Ambient = (kD * Diffuse) * parse.ao;
+
 	//Directional Lights
-	//vec3 r = dirLight.diffuse;
-	//vec3 L = normalize(-dirLight.direction);
-	//float Shadow = 1.0 - DetermineShadow(fs_in.FragPosLightSpace, Norm, L, ShadowMap);
-	//L0 += (ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity) *max(Shadow, 0.1)) ;
+	vec3 r = dirLight.diffuse;
+	vec3 L = normalize(-dirLight.direction);
+	float Shadow = 1.0 - DetermineShadow(fs_in.FragPosLightSpace, Norm, L, ShadowMap);
+	L0 += (ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity) *max(Shadow, 0.1)) ;
  	
-	const vec3 OutputColour = vec3(Ambient ); 
+	const vec3 OutputColour = vec3(L0 + Ambient); 
 	FragColor = vec4(OutputColour, parse.alpha);   
 }
 
