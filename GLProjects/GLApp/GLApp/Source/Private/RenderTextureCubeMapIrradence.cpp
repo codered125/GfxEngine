@@ -40,7 +40,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 	EquirectangleToCubemapShader->use();
 	EquirectangleToCubemapShader->SetSampler("EquirectangularMap", &HDRRenderTexture->GetID(), GL_TEXTURE_2D);
 
-	glViewport(0, 0, 512, 512); // don't forget to configure the viewport to the capture dimensions.
+	glViewport(0, 0, 512, 512);
 	glBindFramebuffer(GL_FRAMEBUFFER, IrrandenceRenderBuffer->GetID());
 	for (unsigned int i = 0; i < 6; ++i)
 	{
@@ -49,12 +49,9 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 
 		Cube Box;
 		Box.ThisShader = EquirectangleToCubemapShader;
-		glm::mat4 Val;
-		Box.Draw(Val, CaptureProjection, CaptureViews[i]);
-		//renderCube(); // renders a 1x1 cube
+		Box.Draw(glm::mat4(), CaptureProjection, CaptureViews[i]);
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 
 
 	glGenTextures(1, &Id);
@@ -76,7 +73,6 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 	ConvolutionShader->use();
 	ConvolutionShader->SetSampler("UnConvolutedMap", &UnConvolutedMap->GetID(), GL_TEXTURE_CUBE_MAP);
 
-
 	glViewport(0, 0, 32, 32);
 	glBindFramebuffer(GL_FRAMEBUFFER, IrrandenceRenderBuffer->GetID());
 	for (unsigned int i = 0; i < 6; ++i)
@@ -86,11 +82,16 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 
 		Cube Box;
 		Box.ThisShader = ConvolutionShader;
-		glm::mat4 Val;
-		Box.Draw(Val, CaptureProjection, CaptureViews[i]);
+		Box.Draw(glm::mat4(), CaptureProjection, CaptureViews[i]);
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  //put the whole capture process in here, might be a little suss but we'll make it work then clean it up
+}
+
+//-------------------------------------------------------------------
+
+RenderTextureCubeMap* RenderTextureCubeMapIrradence::GetUnConvolutedRenderTexture()
+{
+	return UnConvolutedMap;
 }
 
 //-------------------------------------------------------------------

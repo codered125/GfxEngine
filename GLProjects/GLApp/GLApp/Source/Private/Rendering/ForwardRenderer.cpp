@@ -101,7 +101,7 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	//skip this for depth pass
 	if (RenderStage != RenderStage::Depth)
 	{
-		InSkybox->SkyboxTexture = EquirectangularMap;
+		InSkybox->SkyboxTexture = EquirectangularMap->GetUnConvolutedRenderTexture();
 		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
 		//DrawLights(Perspective, LampShader);
 

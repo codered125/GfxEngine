@@ -13,21 +13,21 @@ void main()
 	const vec3 N = normalize(LocalPosition);
 	vec3 I = vec3(0.0f);
 
-	const vec3 TangentRight = normalize(cross(WorldUp, N));
-	const vec3 TangentUp = normalize(cross(N, TangentRight));
+	const vec3 LocalRight = normalize(cross(WorldUp, N));
+	const vec3 LocalUp = normalize(cross(N, LocalRight));
 	const float SampleDelta = 0.025f;
 	int NumberOfSamples = 0;
 
 	for(float Phi = 0.0; Phi < 2.0 * PI; Phi += SampleDelta)
     {
-        for(float theta = 0.0; theta < 0.5 * PI; theta += SampleDelta)
+        for(float Theta = 0.0; Theta < 0.5 * PI; Theta += SampleDelta)
         {
-            // spherical to cartesian (in tangent space)
-            vec3 tangentSample = vec3(sin(theta) * cos(Phi),  sin(theta) * sin(Phi), cos(theta));
+            // spherical to cartesian
+            vec3 TangentSToC = vec3(sin(Theta) * cos(Phi),  sin(Theta) * sin(Phi), cos(Theta));
             // tangent space to world
-            vec3 sampleVec = tangentSample.x * TangentRight + tangentSample.y * TangentUp + tangentSample.z * N; 
+            vec3 TSpaceToWorldSpace = TangentSToC.x * LocalRight + TangentSToC.y * LocalUp + TangentSToC.z * N; 
 
-            I += texture(UnConvolutedMap, sampleVec).rgb * cos(theta) * sin(theta);
+            I += texture(UnConvolutedMap, TSpaceToWorldSpace).rgb * cos(Theta) * sin(Theta);
             NumberOfSamples++;
         }
     }
