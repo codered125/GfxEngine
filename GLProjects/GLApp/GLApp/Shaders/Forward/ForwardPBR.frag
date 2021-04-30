@@ -16,6 +16,7 @@ in V2F
 	vec2 TexCoords;
 	vec3 WorldPos;
 	vec4 FragPosLightSpace;
+	mat3 TBN;
 } fs_in;
 
 out vec4 FragColor;
@@ -34,21 +35,10 @@ vec3 GetNormalFromMap();
 
 vec3 GetNormalFromMap()
 {
-	//normalise it to 0-1
-    vec3 tangentNormal = (texture(material.texture_normal, fs_in.TexCoords).xyz * 2.0) - 1.0;
-
-    vec3 Q1  = dFdx(fs_in.WorldPos);
-    vec3 Q2  = dFdy(fs_in.WorldPos);
-    vec2 st1 = dFdx(fs_in.TexCoords);
-    vec2 st2 = dFdy(fs_in.TexCoords);
-
-    vec3 N   = normalize(fs_in.Normal);
-    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
-    vec3 B  = -normalize(cross(N, T));
-    mat3 TBN = mat3(T, B, N);
-
-    return normalize(TBN * tangentNormal);
-}
+	//normalise it to -1, 1
+    vec3 tangentNormal = ((texture(material.texture_normal, fs_in.TexCoords).rgb * 2.0) - 1.0);
+	return normalize(fs_in.TBN * tangentNormal);
+ }
 
 //-------------------------------------------------------------------
 
