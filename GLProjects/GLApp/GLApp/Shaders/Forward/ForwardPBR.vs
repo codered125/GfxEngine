@@ -11,6 +11,7 @@ out V2F
     vec2 TexCoords;
     vec3 WorldPos;
     vec4 FragPosLightSpace;
+    mat3 TBN;
 } 
 vs_Out;
 
@@ -23,7 +24,15 @@ void main()
 {
     gl_Position =  projection * view * model * vec4 (position, 1.0f);
     vs_Out.WorldPos = vec3(model * vec4(position, 1.0f));
-    vs_Out.Normal = mat3(transpose(inverse(model))) * normal;
+    //vs_Out.Normal = mat3(transpose(inverse(model))) * normal;
+    vs_Out.Normal = mat3(model) * normal;
     vs_Out.TexCoords = texCoords;
     vs_Out.FragPosLightSpace = lightSpaceMatrix * model * vec4(position, 1.0f); 
+
+    //Push vectors into WS
+    vec3 T = normalize(vec3(model * vec4(Tangent, 0.0)));
+    const vec3 N = normalize(vec3(model * vec4(normal, 0.0)));
+    T = normalize(T - dot(T, N) * N);
+    const vec3 B = cross(N, T);
+    vs_Out.TBN = mat3(T, B, N);
 };

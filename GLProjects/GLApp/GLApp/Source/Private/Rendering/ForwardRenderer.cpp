@@ -46,7 +46,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
 	WaterBlock = new Model("Models/WaterBlock/SM_bathPoolSurface2.obj", WaterShader);
 
-	EquirectangularMap = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/newport_loft.hdr");
+	EquirectangularMap = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
 
 	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
@@ -103,7 +103,7 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 	{
 		InSkybox->SkyboxTexture = EquirectangularMap->GetUnConvolutedRenderTexture();
 		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
-		//DrawLights(Perspective, LampShader);
+		DrawLights(Perspective, LampShader);
 
 		auto ModelTransformation = glm::mat4();
 		ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 5.75f, 0.0f));
