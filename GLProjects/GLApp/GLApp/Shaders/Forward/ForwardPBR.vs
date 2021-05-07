@@ -24,8 +24,7 @@ void main()
 {
     gl_Position =  projection * view * model * vec4 (position, 1.0f);
     vs_Out.WorldPos = vec3(model * vec4(position, 1.0f));
-    //vs_Out.Normal = mat3(transpose(inverse(model))) * normal;
-    vs_Out.Normal = mat3(model) * normal;
+    vs_Out.Normal = mat3(transpose(inverse(model))) * normal; // vs_Out.Normal = mat3(model) * normal; Removing non uniform scales @todo move this to cpu
     vs_Out.TexCoords = texCoords;
     vs_Out.FragPosLightSpace = lightSpaceMatrix * model * vec4(position, 1.0f); 
 

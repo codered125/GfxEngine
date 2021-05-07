@@ -143,5 +143,6 @@ vec4 CalculateLight()
 	
 	//color = color / (color + vec3(1.0));
 	//color = pow(color, vec3(1.0/2.2)); 
+	return vec4(FragRMA, 1.0f);   
 	return vec4(color, Parse.alpha);    
 }

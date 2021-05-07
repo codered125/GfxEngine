@@ -47,7 +47,7 @@ void main()
 	//we normalise this result before returning it
 	const vec3 Norm = GetNormalFromMap();
 	const vec3 View = normalize(CamPos - fs_in.WorldPos);
-	const float RnMPExponent = 1.0f;
+	const float RnMPExponent = 	1.0f;
 	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, fs_in.TexCoords);
 
 	//Metelic ratio
