@@ -41,7 +41,7 @@ void Renderer::DrawGizmos(Camera* Perspective)
 
 void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 {
-	const float pointIntes = 5; const float directIntes = 15;
+	const float pointIntes = 10; const float directIntes = 25;
 	// Directional light
 	Directional0 = new DirectionalLight(lightShader, "dirLight");
 	Directional0->direction = TheMostStaticVertices::SunDir;// Camera::GetFront(LightingCamera);
@@ -57,7 +57,7 @@ void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 	{
 		auto Point = PointLight(lightShader, "pointLights[" + std::to_string(i) + "]");
 		Point.diffuse = TheMostStaticVertices::pointLightColours[i];
-		Point.position = TheMostStaticVertices::pointLightPositions[i]; // MyLerp(pointLightPositions[1], pointLightPositions[0], SecondCounter);
+		Point.position = TheMostStaticVertices::pointLightPositions[i]; 
 		Point.ambient = glm::vec3(1.0f);
 		Point.specular = glm::vec3(1.0f);
 		Point.intensity = pointIntes;
