@@ -6,7 +6,6 @@
 #include "Source/Public/RenderTexture.h"
 
 #include <SOIL2/src\SOIL2\SOIL2.h>
-#include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
@@ -34,16 +33,28 @@ void Model::Draw(Shader *shader)
 
 //-------------------------------------------------------------------
 
+Assimp::Importer* Model::GetImporterSingleTon()
+{
+	static Assimp::Importer* ImporterToReturn;
+	if (ImporterToReturn == nullptr)
+	{
+		ImporterToReturn = new Assimp::Importer();
+	}
+	return ImporterToReturn;
+}
+
+//-------------------------------------------------------------------
+
 void Model::loadModel(std::string path)
 {
-	Assimp::Importer importer;
+	Assimp::Importer* importer = GetImporterSingleTon();
 	MoMessageLogger("Sponza:ReadFileStart " + std::to_string(glfwGetTime()));
-	const aiScene * scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_FlipUVs);
+	const aiScene * scene = importer->ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_FlipUVs);
 	MoMessageLogger("Sponza:ReadFileEnd " + std::to_string(glfwGetTime()));
 
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		std::cout << "Failed Assimp load" << importer.GetErrorString() << std::endl;
+		std::cout << "Failed Assimp load" << importer->GetErrorString() << std::endl;
 		return;
 	}
 	//Because directories end with '/'
@@ -210,6 +221,8 @@ GLint Model::TextureFromFile(const char* path, std::string directory)
 
 	return RT.GetID();
 }
+
+//-------------------------------------------------------------------
 
 void Model::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView)
 {

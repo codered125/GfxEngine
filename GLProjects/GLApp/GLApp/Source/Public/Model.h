@@ -2,14 +2,16 @@
 
 #include "Source/Public/Math.h"
 #include "Source/Public/Mesh.h"
+#include "Source/Public/Meshes/Shape.h"
 
+#include <assimp/Importer.hpp>
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <map> 
 
-#include "Source/Public/Meshes/Shape.h"
+
 
 //-------------------------------------------------------------------
 
@@ -32,6 +34,8 @@ public:
 
 	void Draw(Shader *shader) override;
 
+	static Assimp::Importer* GetImporterSingleTon();
+
 private:
 	std::vector<Mesh> meshes;
 	std::string directory;
@@ -49,7 +53,6 @@ private:
 
 	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView) override;
 
-	static Importer GetImporterSingleTon;
 
 };
 
