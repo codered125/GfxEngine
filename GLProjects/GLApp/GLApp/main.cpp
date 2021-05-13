@@ -6,6 +6,7 @@
 #include "Source/Public/GlfwInterface.h"
 #include "Source/Public/Inputs.h"
 #include "Source/Public/Lights/Light.h"
+#include "Source/Public/Model.h"
 #include "Source/Public/PostProcessing.h"
 #include "Source/Public/Rendering/DefferedRenderer.h"
 #include "Source/Public/Rendering/ForwardRenderer.h"
@@ -23,6 +24,8 @@
 #define DEFFERED 0
 int main()
 {
+	//Model::GetImporterSingleTon();
+
 	//WindowSetup
 	auto* window = GlfwInterface::DefineAndCreaateWindow(AliasingCount, height, width);
 	if (window == nullptr) 
