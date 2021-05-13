@@ -9,10 +9,8 @@
 class TextureLoading
 {
 public:
-	static GLuint LoadTexture(GLchar *path);
+	static GLuint LoadTexture(const GLchar *path);
 	
-	static void SetupDPMapTex(GLuint * depthMapFBO, GLuint *depthMap);
-
 	static GLuint LoadCubemap(std::vector<const GLchar * > faces);
 };
 

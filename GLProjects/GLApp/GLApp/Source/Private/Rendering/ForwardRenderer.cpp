@@ -25,7 +25,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	MainPostProcessSetting = new PostProcessSettings();
 	MainPostProcessSetting->HDR = EffectStatus::Active;
 
-	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true, true);
+	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_RGBA, 2, false, true, true);
 	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer;
 
 	IntermediateRenderBuffer= new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
@@ -34,8 +34,9 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	DepthRenderBuffer = new SceneRenderTarget(4096, 4096, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
 	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer;
 
-	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 	PBRshader = new Shader("Shaders/Forward/ForwardPBR.vs", "Shaders/Forward/ForwardPBR.frag");
+	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
+
 	SkyboxShader = new Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	LampShader = new Shader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	DepthShader = new Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
@@ -45,11 +46,12 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
 	WaterBlock = new Model("Models/WaterBlock/SM_bathPoolSurface2.obj", WaterShader);
-
+	
 	EquirectangularMap = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
 
 	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
+
 }
 
 //-------------------------------------------------------------------

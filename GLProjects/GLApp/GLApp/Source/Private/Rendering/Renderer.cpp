@@ -41,7 +41,7 @@ void Renderer::DrawGizmos(Camera* Perspective)
 
 void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 {
-	const float pointIntes = 10; const float directIntes = 25;
+	const float pointIntes = 15; const float directIntes = 25;
 	// Directional light
 	Directional0 = new DirectionalLight(lightShader, "dirLight");
 	Directional0->direction = TheMostStaticVertices::SunDir;// Camera::GetFront(LightingCamera);
