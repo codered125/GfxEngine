@@ -14,7 +14,7 @@ layout (location = 0) out vec4 FragColor;
 layout (location = 1) uniform sampler2D screenTexture;
 uniform PostProcessEffects currentPostProcessEffect;
 
-const float exposure = 1.5;
+const float exposure = 1.0;
 const float offset = 1 /300.0f;
 
 vec3 PostProcessEffect(vec3 untouchedColour);
@@ -22,17 +22,13 @@ vec3 ApplyKernal();
 
 void main()
 { 	
-	const float gamma = 1.0f; 
-	//const float gamma = 2.2f;
+	const float gamma = 1.f; 
 	vec3 hdrColor = texture(screenTexture, TexCoords).rgb;
 	if(currentPostProcessEffect.HDR)
     {
-        //vec3 result = hdrColor / (hdrColor + vec3(1.0)); // reinhard
-		vec3 result = vec3(1.0) - exp(-hdrColor * exposure); // exposure    
-        FragColor = vec4( PostProcessEffect(result), 1.0);
-	    float brightness = dot(normalize(FragColor.rgb),  vec3(0.2126, 0.7152, 0.0722));
-		FragColor = brightness > 01.0? vec4(ApplyKernal(), 1.0f) : FragColor;
-		FragColor = pow(FragColor, vec4(1.0 / gamma));
+        hdrColor *= exposure;
+		hdrColor = hdrColor / (hdrColor + vec3(1.0));
+        FragColor = vec4(pow(hdrColor, vec3(1.0 / gamma)), 1.0);
     }
 
     else

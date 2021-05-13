@@ -12,12 +12,14 @@ RenderTexture::RenderTexture()
 
 //-------------------------------------------------------------------
 
-RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA)
+RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA, GLenum InMinFilter, GLenum InMagFilter)
 	: Height(InHeight)
 	, Width (InWidth)
 	, TargetType(InTargetType)
 	, Format(InFormat)
 	, InternalFormat(InInternalFormat)
+	, MinFilter(InMinFilter)
+	, MagFilter(InMagFilter)
 {
 	glGenTextures(1, &Id);
 	GLErrorCheck();
@@ -55,6 +57,48 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 	GLErrorCheck();
 	glTexParameteri(TargetType, GL_TEXTURE_WRAP_T, WrapT);
 	GLErrorCheck();
+	glBindTexture(TargetType, 0);
+}
+
+//-------------------------------------------------------------------
+
+RenderTexture::RenderTexture(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const void* InPixels, GLenum InBufferType, GLenum InMinFilter, GLenum InMagFilter)
+	: Height(InHeight)
+	, Width(InWidth)
+	, TargetType(InTargetType)
+	, Format(InFormat)
+	, InternalFormat(InInternalFormat)
+	, MinFilter(InMinFilter)
+	, MagFilter(InMagFilter)
+	, WrapR(GL_REPEAT)
+	, WrapS(GL_REPEAT)
+	, WrapT(GL_REPEAT)
+{
+	glGenTextures(1, &Id);
+	GLErrorCheck();
+	glBindTexture(TargetType, Id);
+	GLErrorCheck();
+
+	glTexImage2D(TargetType, 0, InternalFormat, Width, Height, 0, Format, InBufferType, InPixels);
+	GLErrorCheck();
+
+	if (MinFilter == GL_LINEAR_MIPMAP_LINEAR || MagFilter == GL_LINEAR_MIPMAP_LINEAR)
+	{
+		glGenerateMipmap(TargetType);
+		GLErrorCheck();
+	}
+
+	glTexParameteri(TargetType, GL_TEXTURE_MIN_FILTER, MinFilter);
+	GLErrorCheck();
+	glTexParameteri(TargetType, GL_TEXTURE_MAG_FILTER, MagFilter);
+	GLErrorCheck();
+	glTexParameteri(TargetType, GL_TEXTURE_WRAP_S, WrapS);
+	GLErrorCheck();
+	glTexParameteri(TargetType, GL_TEXTURE_WRAP_T, WrapT);
+	GLErrorCheck();	
+	glTexParameteri(TargetType, GL_TEXTURE_WRAP_R, WrapR);
+	GLErrorCheck();
+	glBindTexture(TargetType, 0);
 }
 
 //-------------------------------------------------------------------
