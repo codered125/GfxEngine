@@ -13,13 +13,15 @@
 
 //-------------------------------------------------------------------
 
+class Shader;
+class Importer;
+
+enum aiTextureType;
+
 struct aiScene;
 struct aiMaterial;
 struct aiMesh;
 struct aiNode;
-class Shader;
-enum aiTextureType;
-
 
 //-------------------------------------------------------------------
 
@@ -46,6 +48,8 @@ private:
 	GLint TextureFromFile(const char * path, std::string directory);
 
 	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView) override;
+
+	static Importer GetImporterSingleTon;
 
 };
 

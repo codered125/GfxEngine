@@ -77,32 +77,6 @@ int main()
 
 //-------------------------------------------------------------------
 
-void DrawLights(Shader * lampShader, Camera* Perspective, Model* InModel)
-{
-	//lampShader->use();
-	//Cube LightCube;
-	//LightCube.Colour = glm::vec3(50, 50, 50);
-
-	//glm::mat4 FOV = Camera::GetProjection(Perspective);
-	//glm::mat4 View = Camera::GetViewMatrix(Perspective);
-	//glm::mat4 Model = glm::mat4();
-	//Model = glm::translate(Model, TheMostStaticVertices::SunPos); //pointLightPositions[i]);
-	//Model = glm::scale(Model, glm::vec3(2.f));
-	//LightCube.ThisShader = lampShader;
-	//LightCube.Draw(Model, FOV, View);
-
-	//for (GLuint i = 0; i < sizeof(TheMostStaticVertices::pointLightPositions); i++)
-	//{
-	//	Model = glm::mat4();
-	//	Model = glm::translate(Model, TheMostStaticVertices::pointLightPositions[i]); //pointLightPositions[i]);
-	//	Model = glm::scale(Model, glm::vec3(0.2f));
-	//	LightCube.Colour = TheMostStaticVertices::pointLightColours[i];
-	//	LightCube.Draw(Model, FOV, View);
-	//}
-}
-
-//-------------------------------------------------------------------
-
 void Tick()
 {
 	const auto currentFrame = (GLfloat)glfwGetTime();
