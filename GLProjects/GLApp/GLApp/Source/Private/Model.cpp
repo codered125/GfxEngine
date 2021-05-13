@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Source/Public/Model.h"
+#include "Source/Public/EngineDebugHelper.h"
+#include "Source/Public/GlfwInterface.h"
 #include "Source/Public/RenderTexture.h"
 
 #include <SOIL2/src\SOIL2\SOIL2.h>
@@ -13,7 +15,9 @@
 Model::Model(GLchar* inpath, Shader* InShader)
 {
 	ThisShader = InShader;
+	MoMessageLogger("Sponza:LoadModelStart " + std::to_string(glfwGetTime()));
 	this->loadModel(inpath);
+	MoMessageLogger("Sponza:LoadModelEnd " + std::to_string(glfwGetTime()));
 }
 
 //-------------------------------------------------------------------
@@ -33,7 +37,9 @@ void Model::Draw(Shader *shader)
 void Model::loadModel(std::string path)
 {
 	Assimp::Importer importer;
+	MoMessageLogger("Sponza:ReadFileStart " + std::to_string(glfwGetTime()));
 	const aiScene * scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_FlipUVs);
+	MoMessageLogger("Sponza:ReadFileEnd " + std::to_string(glfwGetTime()));
 
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
