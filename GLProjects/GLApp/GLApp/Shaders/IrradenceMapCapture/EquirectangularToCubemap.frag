@@ -9,6 +9,8 @@ uniform sampler2D EquirectangularMap;
 //0.1591 = 1/6.28319(=>2PI) = 360 degrees in radians //0.3183 = 1/3.14159(=>PI) = 180 degrees in radians
 const vec2 InvAtan = vec2(0.1591, 0.3183);
 
+//-------------------------------------------------------------------
+
 vec2 SampleSphericalMap( vec3 InVec)
 {
 	vec2 uv = vec2(atan(InVec.z, InVec.x), asin(InVec.y));
@@ -16,6 +18,9 @@ vec2 SampleSphericalMap( vec3 InVec)
 	uv+= 0.5f;
 	return uv;
 }
+
+//-------------------------------------------------------------------
+
 void main ()
 {
 

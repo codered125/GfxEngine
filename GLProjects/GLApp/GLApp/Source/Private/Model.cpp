@@ -154,16 +154,19 @@ Mesh Model::proccesMesh(aiMesh * mesh, const aiScene * scene)
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
 		//vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_specular");
-		std::vector<Texture> metalicMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_metallic");
+		std::vector<Texture> metalicMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "material.texture_metallic");
 		textures.insert(textures.end(), metalicMaps.begin(), metalicMaps.end());
 
 		std::vector<Texture> normalMaps = this->loadMaterialTextures(material, aiTextureType_HEIGHT, "material.texture_normal");
 		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+		
+		std::vector<Texture> DisplacementMaps = this->loadMaterialTextures(material, aiTextureType_DISPLACEMENT, "material.texture_height");
+		textures.insert(textures.end(), DisplacementMaps.begin(), DisplacementMaps.end());
 
 		std::vector<Texture> roughnessMaps = this->loadMaterialTextures(material, aiTextureType_SHININESS, "material.texture_roughness");
 		textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
 
-		std::vector<Texture> aoMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "material.texture_ao");
+		std::vector<Texture> aoMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_ao");
 		textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
 	}
 	return Mesh(vertices, indices, textures);

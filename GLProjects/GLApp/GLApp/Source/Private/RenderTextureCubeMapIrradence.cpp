@@ -23,7 +23,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 {
 	IrrandenceRenderBuffer = new SceneRenderTarget(512, 512, GL_TEXTURE_2D, InInternalFormat, InFormat, 1, false, false, true);
 	HDRRenderTexture = new RenderTextureCubeMap(GL_TEXTURE_2D, InInternalFormat, InFormat, InHDRPath);
-	UnConvolutedMap = new RenderTextureCubeMap(GL_TEXTURE_CUBE_MAP, InInternalFormat, InFormat, 512, 512);
+	UnConvolutedMap = new RenderTextureCubeMap(GL_TEXTURE_CUBE_MAP, InInternalFormat, InFormat, 512, 512, false);
 
 	auto CaptureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 	glm::mat4 CaptureViews[] =

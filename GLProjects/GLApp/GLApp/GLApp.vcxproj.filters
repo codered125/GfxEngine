@@ -108,6 +108,9 @@
     <ClCompile Include="Source\Private\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\RenderTextureCubeMapIrradenceSpecular.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Lamp.frag">
@@ -293,6 +296,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\RenderTextureCubeMapIrradenceSpecular.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

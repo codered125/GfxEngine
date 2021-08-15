@@ -11,6 +11,8 @@ out V2F
     vec2 TexCoords;
     vec3 WorldPos;
     vec4 FragPosLightSpace;
+    vec3 TangentViewPos;
+	vec3 TangentFragPos;
     mat3 TBN;
 } 
 vs_Out;
@@ -19,6 +21,7 @@ uniform mat4 model; //converts local object coords to camera coords
 uniform mat4 view; //converts normalised coordinates to window coordinates, aka what your window is
 uniform mat4 projection; //converts those camera coordinates to normalised coordinates(0-1)
 uniform mat4 lightSpaceMatrix;
+uniform vec3 CamPos;
 
 void main()
 {
@@ -34,4 +37,6 @@ void main()
     T = normalize(T - dot(T, N) * N);
     const vec3 B = cross(N, T);
     vs_Out.TBN = mat3(T, B, N);
+    vs_Out.TangentViewPos = vs_Out.TBN * CamPos;
+	vs_Out.TangentFragPos = vs_Out.TBN * vs_Out.WorldPos;
 };

@@ -79,7 +79,7 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 
 //-------------------------------------------------------------------
 
-RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, GLint InWidth, GLint InHeight)
+RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, GLint InWidth, GLint InHeight, bool InGenerateMipMaps)
 {
 	glGenTextures(1, &Id);
 	glBindTexture(InTargetType, Id);
@@ -91,8 +91,13 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 	glTexParameteri(InTargetType, GL_TEXTURE_WRAP_S, WrapS);
 	glTexParameteri(InTargetType, GL_TEXTURE_WRAP_T, WrapT);
 	glTexParameteri(InTargetType, GL_TEXTURE_WRAP_R, WrapR);
-	glTexParameteri(InTargetType, GL_TEXTURE_MIN_FILTER, MinFilter);
+	glTexParameteri(InTargetType, GL_TEXTURE_MIN_FILTER, InGenerateMipMaps? MinFilterMipMap : MinFilter);
 	glTexParameteri(InTargetType, GL_TEXTURE_MAG_FILTER, MagFilter);
+
+	if (InGenerateMipMaps)
+	{
+		glGenerateMipmap(InTargetType);
+	}
 }
 
 //-------------------------------------------------------------------
