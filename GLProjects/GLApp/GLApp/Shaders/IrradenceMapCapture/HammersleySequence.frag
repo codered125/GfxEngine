@@ -1,18 +1,18 @@
-#version 430 core
-
 //Source for Hammersley approach 
 //http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
 
-in vec3 Colour;
+#version 430 core
+
 layout(location = 0) out vec4 FragColour;
 layout(location = 1) in vec3 LocalPosition;
 
+uniform samplerCube UnConvolutedMap;
 const float PI = 3.14159265359;
 const vec3 WorldUp = vec3(0.0f, 1.0f, 0.0f);
 
 float RadicalInverse_VanDerCorputBitOperator(uint InBits);
-//float RadicalInverse_VanDerCorputNoneOperator(uint InBits);
 vec2 Hammersley2d(uint i, uint N);
+vec3 ImportanceSampleCombineWithGGXNDF(vec2 Xi, vec3 N, float Roughness);
 
 //-------------------------------------------------------------------
 
@@ -42,9 +42,23 @@ vec2 Hammersley2d(uint i, uint N)
 
 //-------------------------------------------------------------------
 
-vec3 ImportanceSample(vec2 Xi, vec3 N, float roughness)
+vec3 ImportanceSampleCombineWithGGXNDF(vec2 Xi, vec3 N, float Roughness)
 {
+    const float R2 = Roughness * Roughness;
+    const float Phi = 2 * PI * Xi.x;
+    float CosTheta = sqrt((1.0 - Xi.y) / (1.0 + (R2*R2 - 1.0) * Xi.y));
+    float SinTheta = sqrt(1.0 - cosTheta*cosTheta);
 
+    vec3 H = vec3(cos(phi) * sinTheta, sin(phi) * sinTheta, cosTheta);
+
+    vec3 Up        = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+    vec3 Tangent   = normalize(cross(Up, N));
+    vec3 Bitangent = cross(N, Tangent);
+	
+    vec3 OutputSampleVec = Tangent * H.x + Bitangent * H.y + N * H.z;
+    return normalize(OutputSampleVec);
 }
 
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
 //-------------------------------------------------------------------
