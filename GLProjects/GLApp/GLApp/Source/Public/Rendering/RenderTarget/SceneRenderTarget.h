@@ -3,7 +3,7 @@
 #include <gl/glew.h>
 #include <vector>
 
-#include "Source/Public/RenderTexture.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTexture.h"
 
 //-------------------------------------------------------------------
 

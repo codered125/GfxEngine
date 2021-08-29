@@ -1,8 +1,8 @@
 #include "Source/Public/Meshes/Quad.h"
 #include "Source/Public/Shader.h"
 #include "Source/Public/PostProcessing.h"
-#include "Source/Public/SceneRenderTarget.h"
-#include "Source/Public/RenderTexture.h"
+#include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTexture.h"
 
 //-------------------------------------------------------------------
 

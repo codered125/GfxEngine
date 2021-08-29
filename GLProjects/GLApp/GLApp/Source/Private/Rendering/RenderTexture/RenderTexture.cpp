@@ -1,4 +1,4 @@
-#include "Source/Public/RenderTexture.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTexture.h"
 #include "Source/Public/EngineDebugHelper.h"
 
 #include <iostream>

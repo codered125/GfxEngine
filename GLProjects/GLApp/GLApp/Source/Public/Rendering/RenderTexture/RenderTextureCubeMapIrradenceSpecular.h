@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Source/Public/RenderTextureCubeMap.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTextureCubeMap.h"
 
 //-------------------------------------------------------------------
 

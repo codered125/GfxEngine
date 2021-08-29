@@ -1,6 +1,6 @@
 #include "Source/Public/Meshes/SkyBox.h"
 #include "Source/Public/Shader.h"
-#include "Source/Public/RenderTextureCubeMap.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTextureCubeMap.h"
 #include "Source/Public/TextureLoading.h"
 
 //-------------------------------------------------------------------

@@ -57,12 +57,6 @@
     <ClCompile Include="Source\Private\Actor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\SceneRenderTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\RenderTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Meshes\Cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -96,19 +90,25 @@
     <ClCompile Include="Source\Private\Lights\SpotLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\RenderTextureCubeMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Inputs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\RenderTextureCubeMapIrradence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\RenderTextureCubeMapIrradenceSpecular.cpp">
+    <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMapIrradence.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMapIrradenceSpecular.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Rendering\RenderTarget\SceneRenderTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -241,13 +241,7 @@
     <ClInclude Include="Source\Public\RenderTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\SceneRenderTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Public\Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\RenderTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\Meshes\StaticVertices.h">
@@ -289,16 +283,22 @@
     <ClInclude Include="Source\Public\EngineDebugHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\RenderTextureCubeMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\RenderTextureCubeMapIrradence.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Public\ResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\RenderTextureCubeMapIrradenceSpecular.h">
+    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMapIrradenceSpecular.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMapIrradence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Rendering\RenderTarget\SceneRenderTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

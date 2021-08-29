@@ -7,7 +7,7 @@
 #include "Source/Public/Meshes/SkyBox.h"
 #include "Source/Public/Model.h"
 #include "Source/Public/PostProcessing.h"
-#include "Source/Public/SceneRenderTarget.h"
+#include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
 #include "Source/Public/Shader.h"
 
 #include <glm.hpp>

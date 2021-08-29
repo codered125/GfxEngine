@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Source/Public/RenderTextureCubeMapIrradence.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTextureCubeMapIrradence.h"
 
 //-------------------------------------------------------------------
 
 #include "Source/Public/Meshes/Cube.h"
 #include "Source/Public/EngineDebugHelper.h"
-#include "Source/Public/SceneRenderTarget.h"
+#include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
 #include "Source/Public/Shader.h"
 
 //-------------------------------------------------------------------

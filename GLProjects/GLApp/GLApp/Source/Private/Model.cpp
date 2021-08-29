@@ -3,7 +3,7 @@
 #include "Source/Public/Model.h"
 #include "Source/Public/EngineDebugHelper.h"
 #include "Source/Public/GlfwInterface.h"
-#include "Source/Public/RenderTexture.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTexture.h"
 
 #include <SOIL2/src\SOIL2\SOIL2.h>
 #include <assimp/scene.h>
