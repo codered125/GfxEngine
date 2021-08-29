@@ -20,7 +20,7 @@ Renderer::Renderer(GLint InScreenWidth, GLint InScreenHeight)
 {
 	SCREEN_WIDTH = InScreenWidth;
 	SCREEN_HEIGHT = InScreenHeight;
-	MainCamera = new Camera(glm::vec3(0.0f, 10.0f, 0.0f));
+	SetMainCamera( new Camera(glm::vec3(0.0f, 10.0f, 0.0f)));
 }
 
 //-------------------------------------------------------------------
@@ -35,6 +35,20 @@ void Renderer::RenderLoop(float TimeLapsed)
 
 void Renderer::DrawGizmos(Camera* Perspective)
 {
+}
+
+//-------------------------------------------------------------------
+
+void Renderer::SetMainCamera(Camera* InCamera)
+{
+	MainCamera = InCamera;
+}
+
+//-------------------------------------------------------------------
+
+Camera* Renderer::GetMainCamera()
+{
+	return MainCamera;
 }
 
 //-------------------------------------------------------------------
@@ -98,6 +112,16 @@ std::string Renderer::GetGameTimeAsString()
 	return std::to_string(glfwGetTime());
 }
 
+//-------------------------------------------------------------------
+
+Renderer::~Renderer()
+{
+	delete MainCamera;
+	MainCamera = nullptr;
+
+	delete Directional0;
+	Directional0 = nullptr;
+}
 
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------

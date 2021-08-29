@@ -205,5 +205,62 @@ void ForwardRenderer::DrawGizmos(Camera* Perspective)
 }
 
 //-------------------------------------------------------------------
+
+ForwardRenderer::~ForwardRenderer()
+{
+	delete MainPostProcessSetting;
+	MainPostProcessSetting = nullptr;
+
+	delete MainRenderBuffer;
+	MainRenderBuffer = nullptr;
+
+	delete IntermediateRenderBuffer;
+	IntermediateRenderBuffer = nullptr;
+
+	delete DepthRenderBuffer;
+	DepthRenderBuffer = nullptr;
+
+	delete PBRshader;
+	PBRshader = nullptr;
+
+	delete UnlitShader;
+	UnlitShader = nullptr;
+
+	delete SkyboxShader;
+	SkyboxShader = nullptr;
+
+	delete LampShader;
+	LampShader = nullptr;
+
+	delete DepthShader;
+	DepthShader = nullptr;
+
+	delete ScreenShader;
+	ScreenShader = nullptr;
+
+	delete WaterShader;
+	WaterShader = nullptr;
+
+	delete Sponza;
+	Sponza = nullptr;
+
+	delete GizMo;
+	GizMo = nullptr;
+
+	delete WaterBlock;
+	WaterBlock = nullptr;
+
+	delete EquirectangularMap;
+	EquirectangularMap = nullptr;
+
+	delete VisualSkybox;
+	VisualSkybox = nullptr;
+
+	delete PostProcessingQuad;
+	PostProcessingQuad = nullptr;
+
+}
+
+//-------------------------------------------------------------------
 //-------------------------------------------------------------------
 //-------------------------------------------------------------------

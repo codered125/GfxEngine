@@ -48,11 +48,11 @@ int main()
 
 	if (DEFFERED)
 	{
-		MainRenderer = &DefferedRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+		MainRenderer = new DefferedRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 	else
 	{
-		MainRenderer = &ForwardRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+		MainRenderer = new ForwardRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 
 	Input::InitializeInputMap(InputMap);
@@ -64,7 +64,7 @@ int main()
 
 		//INPUTS
 		Tick();
-		Input::DoMovement(deltaTime, MainRenderer->MainCamera, Keys, keyboardlockout, MainRenderer->MainPostProcessSetting, InputMap);
+		Input::DoMovement(deltaTime, MainRenderer->GetMainCamera(), Keys, keyboardlockout, MainRenderer->MainPostProcessSetting, InputMap);
 
 		MainRenderer->RenderLoop(static_cast<float>(glfwGetTime()));
 		
@@ -73,6 +73,9 @@ int main()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	delete MainRenderer;
+	MainRenderer = nullptr;
 
 	glfwTerminate();
 	return EXIT_SUCCESS;
@@ -92,21 +95,21 @@ void Tick()
 
 void KeyCallback(GLFWwindow * window, int key, int scancode, int action, int mode)
 {
-	Input::KeyCallback(window, key, scancode, action, mode, MainRenderer->MainCamera, Keys);
+	Input::KeyCallback(window, key, scancode, action, mode, MainRenderer->GetMainCamera(), Keys);
 }
 
 //-------------------------------------------------------------------
 
 void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset)
 {
-	Input::ScrollCallback(window, xOffset, yOffset, MainRenderer->MainCamera);
+	Input::ScrollCallback(window, xOffset, yOffset, MainRenderer->GetMainCamera());
 }
 
 //-------------------------------------------------------------------
 
 void MouseCallback(GLFWwindow * window, double xPos, double yPos)
 {
-	Input::MouseCallback(window, xPos, yPos, MainRenderer->MainCamera, lastX, lastY, firstMouse);
+	Input::MouseCallback(window, xPos, yPos, MainRenderer->GetMainCamera(), lastX, lastY, firstMouse);
 }
 
 //-------------------------------------------------------------------

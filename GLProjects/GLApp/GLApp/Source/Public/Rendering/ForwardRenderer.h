@@ -19,6 +19,7 @@ public:
 	ForwardRenderer(int InScreenWidth, int InScreenHeight);
 
 	virtual void RenderLoop(float TimeLapsed) override;
+	virtual ~ForwardRenderer();
 
 
 protected:

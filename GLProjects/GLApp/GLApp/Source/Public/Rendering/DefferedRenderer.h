@@ -17,6 +17,8 @@ public:
 
 	virtual void RenderLoop(float TimeLapsed) override;
 
+	virtual ~DefferedRenderer();
+
 
 protected:
 
