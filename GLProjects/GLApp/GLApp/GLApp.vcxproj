@@ -240,6 +240,8 @@
     <ClInclude Include="Source\Public\Rendering\DefferedRenderer.h" />
     <ClInclude Include="Source\Public\Rendering\ForwardRenderer.h" />
     <ClInclude Include="Source\Public\Rendering\Renderer.h" />
+    <ClInclude Include="Source\Public\Rendering\RenderTarget\RenderTargetParams.h" />
+    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureParams.h" />
     <ClInclude Include="Source\Public\RenderTarget.h" />
     <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMap.h" />

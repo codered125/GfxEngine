@@ -301,5 +301,11 @@
     <ClInclude Include="Source\Public\Rendering\RenderTarget\SceneRenderTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureParams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Rendering\RenderTarget\RenderTargetParams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
