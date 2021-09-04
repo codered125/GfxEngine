@@ -32,21 +32,21 @@ private:
 	void DrawWater(Shader* ModelShader, Model* InModel, glm::mat4 model, Camera* Perspective, float TimeLapsed);
 	virtual void DrawGizmos(Camera* Perspective) override;
 
-	Shader* UnlitShader;
-	Shader* PBRshader;
-	Shader* SkyboxShader;
-	Shader* LampShader;
-	Shader* DepthShader;
-	Shader* ScreenShader;
-	Shader* WaterShader;
+	Shader* UnlitShader = nullptr;
+	Shader* PBRshader = nullptr;
+	Shader* SkyboxShader = nullptr;
+	Shader* LampShader = nullptr;
+	Shader* DepthShader = nullptr;
+	Shader* ScreenShader = nullptr;
+	Shader* WaterShader = nullptr;
 
-	Model* Sponza;
-	Model* GizMo;
-	Model* WaterBlock;
-	Model* ArrowLight;
+	Model* Sponza = nullptr;
+	Model* GizMo = nullptr;
+	Model* WaterBlock = nullptr;
+	Model* ArrowLight = nullptr;
 
-	SkyBox* VisualSkybox;
-	RenderTextureCubeMapIrradence* EquirectangularMap;
+	SkyBox* VisualSkybox = nullptr;
+	RenderTextureCubeMapIrradence* EquirectangularMap = nullptr;
 
 };
 

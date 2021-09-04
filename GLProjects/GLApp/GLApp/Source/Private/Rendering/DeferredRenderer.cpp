@@ -41,8 +41,8 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	ScreenShader = new Shader("Shaders/Deffered/DefferedScreen.vs", "Shaders/Deffered/DefferedScreen.frag");
 	GBufferShader = new Shader("Shaders/Deffered/DefferedGBufferFill.vs", "Shaders/Deffered/DefferedGBufferFill.frag");
 
-	Sponza = new Model("Models/SponzaTest/sponza.obj", GBufferShader);
-	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
+	Sponza = new Model(GET_VARIABLE_NAME(Sponza),"Models/SponzaTest/sponza.obj", GBufferShader);
+	GizMo = new Model(GET_VARIABLE_NAME(GizMo),"Models/Gizmo/GizmoForMo.obj", UnlitShader);
 	VisualSkybox= new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
 	//ArrowLight = &Model("Models/ArrowLight/ArrowLight.obj");
@@ -166,47 +166,95 @@ void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat
 
 DefferedRenderer::~DefferedRenderer()
 {
-	delete MainPostProcessSetting;
-	MainPostProcessSetting = nullptr;
+	if (MainPostProcessSetting)
+	{
+		delete MainPostProcessSetting;
+		MainPostProcessSetting = nullptr;
+	}
 
-	delete MainRenderBuffer;
-	MainRenderBuffer = nullptr;
+	if (MainRenderBuffer)
+	{
+		delete MainRenderBuffer;
+		MainRenderBuffer = nullptr;
+	}
 
-	delete IntermediateRenderBuffer;
-	IntermediateRenderBuffer = nullptr;
+	if (GBuffer)
+	{
+		delete GBuffer;
+		GBuffer = nullptr;
+	}
 
-	delete DepthRenderBuffer;
-	DepthRenderBuffer = nullptr;
+	if (IntermediateRenderBuffer)
+	{
+		delete IntermediateRenderBuffer;
+		IntermediateRenderBuffer = nullptr;
+	}
 
-	delete PBRshader;
-	PBRshader = nullptr;
+	if (DepthRenderBuffer)
+	{
+		delete DepthRenderBuffer;
+		DepthRenderBuffer = nullptr;
+	}
 
-	delete UnlitShader;
-	UnlitShader = nullptr;
+	if (PBRshader)
+	{
+		delete PBRshader;
+		PBRshader = nullptr;
+	}
 
-	delete SkyboxShader;
-	SkyboxShader = nullptr;
+	if (UnlitShader)
+	{
+		delete UnlitShader;
+		UnlitShader = nullptr;
+	}
 
-	delete LampShader;
-	LampShader = nullptr;
+	if (SkyboxShader)
+	{
+		delete SkyboxShader;
+		SkyboxShader = nullptr;
+	}
 
-	delete DepthShader;
-	DepthShader = nullptr;
+	if (LampShader)
+	{
+		delete LampShader;
+		LampShader = nullptr;
+	}
 
-	delete ScreenShader;
-	ScreenShader = nullptr;
+	if (DepthShader)
+	{
+		delete DepthShader;
+		DepthShader = nullptr;
+	}
 
-	delete Sponza;
-	Sponza = nullptr;
+	if (ScreenShader)
+	{
+		delete ScreenShader;
+		ScreenShader = nullptr;
+	}
 
-	delete GizMo;
-	GizMo = nullptr;
+	if (Sponza)
+	{
+		delete Sponza;
+		Sponza = nullptr;
+	}
 
-	delete VisualSkybox;
-	VisualSkybox = nullptr;
+	if (GizMo)
+	{
+		delete GizMo;
+		GizMo = nullptr;
+	}
 
-	delete PostProcessingQuad;
-	PostProcessingQuad = nullptr;
+	if (VisualSkybox)
+	{
+		delete VisualSkybox;
+		VisualSkybox = nullptr;
+	}
+
+	if (PostProcessingQuad)
+	{
+		delete PostProcessingQuad;
+		PostProcessingQuad = nullptr;
+	}
 }
 
 //-------------------------------------------------------------------

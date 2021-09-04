@@ -30,7 +30,7 @@ struct aiNode;
 class Model : public Shape
 {
 public:
-	Model(GLchar * inpath, Shader* InShader);
+	Model(std::string InActorName, GLchar* inpath, Shader* InShader);
 
 	void Draw(Shader *shader) override;
 
@@ -43,11 +43,11 @@ private:
 
 	void loadModel(std::string path);
 
-	void proccessNode(aiNode * node, const aiScene * scene);
+	void proccessNode(aiNode* node, const aiScene* scene);
 
-	Mesh proccesMesh(aiMesh * mesh, const aiScene * scene);
+	Mesh proccesMesh(aiMesh* mesh, const aiScene* scene);
 	
-	std::vector<Texture> loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName);
+	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 
 	GLint TextureFromFile(const char * path, std::string directory);
 

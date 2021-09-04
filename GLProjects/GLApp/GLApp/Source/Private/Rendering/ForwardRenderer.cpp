@@ -43,9 +43,9 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	ScreenShader = new Shader("Shaders/Forward/ForwardScreen.vs", "Shaders/Forward/ForwardScreen.frag");
 	WaterShader = new Shader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
 
-	Sponza = new Model("Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
-	GizMo = new Model("Models/Gizmo/GizmoForMo.obj", UnlitShader);
-	WaterBlock = new Model("Models/WaterBlock/SM_bathPoolSurface2.obj", WaterShader);
+	Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
+	//GizMo = new Model(GET_VARIABLE_NAME(GizMo),"Models/Gizmo/GizmoForMo.obj", UnlitShader);
+	//WaterBlock = new Model(GET_VARIABLE_NAME(WaterBlock),"Models/WaterBlock/SM_bathPoolSurface2.obj", WaterShader);
 	
 	EquirectangularMap = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
 
@@ -208,56 +208,107 @@ void ForwardRenderer::DrawGizmos(Camera* Perspective)
 
 ForwardRenderer::~ForwardRenderer()
 {
-	delete MainPostProcessSetting;
-	MainPostProcessSetting = nullptr;
+	if (MainPostProcessSetting)
+	{
+		delete MainPostProcessSetting;
+		MainPostProcessSetting = nullptr;
+	}
 
-	delete MainRenderBuffer;
-	MainRenderBuffer = nullptr;
+	if (MainRenderBuffer)
+	{
+		delete MainRenderBuffer;
+		MainRenderBuffer = nullptr;
+	}
 
-	delete IntermediateRenderBuffer;
-	IntermediateRenderBuffer = nullptr;
+	if (IntermediateRenderBuffer)
+	{
+		delete IntermediateRenderBuffer;
+		IntermediateRenderBuffer = nullptr;
+	}
+	
+	if (DepthRenderBuffer)
+	{
+		delete DepthRenderBuffer;
+		DepthRenderBuffer = nullptr;
+	}
 
-	delete DepthRenderBuffer;
-	DepthRenderBuffer = nullptr;
+	if (PBRshader)
+	{
+		delete PBRshader;
+		PBRshader = nullptr;
+	}
 
-	delete PBRshader;
-	PBRshader = nullptr;
+	if (UnlitShader)
+	{
+		delete UnlitShader;
+		UnlitShader = nullptr;
+	}
 
-	delete UnlitShader;
-	UnlitShader = nullptr;
+	if (SkyboxShader)
+	{
+		delete SkyboxShader;
+		SkyboxShader = nullptr;
+	}
 
-	delete SkyboxShader;
-	SkyboxShader = nullptr;
+	if (LampShader)
+	{
+		delete LampShader;
+		LampShader = nullptr;
+	}
 
-	delete LampShader;
-	LampShader = nullptr;
+	if (DepthShader)
+	{
+		delete DepthShader;
+		DepthShader = nullptr;
+	}
 
-	delete DepthShader;
-	DepthShader = nullptr;
+	if (ScreenShader)
+	{
+		delete ScreenShader;
+		ScreenShader = nullptr;
+	}
 
-	delete ScreenShader;
-	ScreenShader = nullptr;
+	if (WaterShader)
+	{
+		delete WaterShader;
+		WaterShader = nullptr;
+	}
 
-	delete WaterShader;
-	WaterShader = nullptr;
+	if (Sponza)
+	{
+		delete Sponza;
+		Sponza = nullptr;
+	}
 
-	delete Sponza;
-	Sponza = nullptr;
+	if (GizMo)
+	{
+		delete GizMo;
+		GizMo = nullptr;
+	}
 
-	delete GizMo;
-	GizMo = nullptr;
+	if (WaterBlock)
+	{
+		delete WaterBlock;
+		WaterBlock = nullptr;
+	}
 
-	delete WaterBlock;
-	WaterBlock = nullptr;
+	if (EquirectangularMap)
+	{
+		delete EquirectangularMap;
+		EquirectangularMap = nullptr;
+	}
 
-	delete EquirectangularMap;
-	EquirectangularMap = nullptr;
+	if (VisualSkybox)
+	{
+		delete VisualSkybox;
+		VisualSkybox = nullptr;
+	}
 
-	delete VisualSkybox;
-	VisualSkybox = nullptr;
-
-	delete PostProcessingQuad;
-	PostProcessingQuad = nullptr;
+	if (PostProcessingQuad)
+	{
+		delete PostProcessingQuad;
+		PostProcessingQuad = nullptr;
+	}
 
 }
 

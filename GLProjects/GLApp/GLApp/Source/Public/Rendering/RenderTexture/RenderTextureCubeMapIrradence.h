@@ -16,13 +16,11 @@ public:
 	RenderTextureCubeMapIrradence(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const GLchar* InHDRPath);
 	RenderTextureCubeMap* GetUnConvolutedRenderTexture();
 
-
 protected:
 
 	RenderTextureCubeMap* HDRRenderTexture;
 	RenderTextureCubeMap* UnConvolutedMap;
 	SceneRenderTarget* IrrandenceRenderBuffer;
-
 };
 
 //-------------------------------------------------------------------

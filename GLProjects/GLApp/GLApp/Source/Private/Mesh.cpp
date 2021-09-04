@@ -15,7 +15,7 @@ Mesh::Mesh(std::vector<Vertex> inVertices, std::vector<GLuint> inIndices, std::v
 
 //-------------------------------------------------------------------
 
-void Mesh::Draw(Shader * shader, GLenum DrawType)
+void Mesh::Draw(Shader* shader, GLenum DrawType)
 {
 	GLuint diffuseNr = 1;
 	GLuint specularNR = 1;
@@ -68,7 +68,7 @@ void Mesh::Draw(Shader * shader, GLenum DrawType)
 		}
 
 		number = ss.str();
-		glUniform1i(glGetUniformLocation(shader->shaderProgram, name.c_str()), i);
+		shader->setInt(name.c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 
 	}

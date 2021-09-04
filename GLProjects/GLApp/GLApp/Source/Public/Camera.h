@@ -26,29 +26,17 @@ public:
 	// Constructor with exposed values for fake views
 	Camera(glm::vec3 InPosition, glm::vec3 InDirection, bool InIsOrthagraphic, GLfloat InAspectRatio, GLfloat InNearPlane, GLfloat InFarPlane, glm::vec3 InUp = glm::vec3(0.0f, 1.0f, 0.0f));
 
-	// Constructor with scalar values
-	//Camera(GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch);
-
 	void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime);
-
 	void ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true);
-
 	void ProessMouseSroll(GLfloat yOffset);
 
 	static GLfloat GetZoom(Camera* Target);
-
 	static glm::vec3 GetPosition(Camera* Target);
-
 	static glm::vec3 GetFront(Camera* Target);
-
 	static glm::mat4 GetViewMatrix(Camera* Target);
-
 	static glm::mat4 GetProjection(Camera* Target);
-
 	static GLfloat GetAspectRatio(Camera* Target);
-
 	static GLfloat GetNearPlane(Camera* Target);
-
 	static GLfloat GetFarPlane(Camera* Target);
 
 

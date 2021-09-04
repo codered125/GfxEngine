@@ -53,22 +53,7 @@ Camera::Camera(glm::vec3 InPosition, glm::vec3 InDirection, bool InIsOrthagraphi
 	FarPlane = InFarPlane;
 }
 
-/*/-------------------------------------------------------------------
-
-Camera::Camera(GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat Yaw, GLfloat Pitch) 
-	: Front(glm::vec3(0.0f, 0.0f, -1.0f))
-	, MovementSpeed(CameraStatics::SPEED)
-	, MouseSensitivity(CameraStatics::SENSITIVTY)
-	, Zoom(CameraStatics::ZOOM)
-{
-	Position = glm::vec3(posX, posY, posZ);
-	WorldUp = glm::vec3(upX, upY, upZ);
-	Yaw = Yaw;
-	Pitch = Pitch;
-	updateCameraVectors();
-}
-
-//-------------------------------------------------------------------*/
+//-------------------------------------------------------------------
 
 void Camera::updateCameraVectors()
 {
@@ -122,10 +107,6 @@ void Camera::ProessMouseSroll(GLfloat yOffset)
 {
 	this->Zoom -= (yOffset / 5);
 	this->Zoom = MoMath::MoClamp(this->Zoom, 1.0f, 45.0f);
-
-	//if (this->zoom >= 1.0f && this->zoom <= 45.0f) this->zoom -= (yOffset / 5);
-	//if (this->zoom <= 1.0f) this->zoom = 1.0f;
-	//if (this->zoom >= 45.0f) this->zoom = 45.0f;
 }
 
 //-------------------------------------------------------------------
@@ -137,14 +118,14 @@ GLfloat Camera::GetZoom(Camera* Target)
 
 //-------------------------------------------------------------------
 
-glm::vec3  Camera::GetPosition(Camera* Target)
+glm::vec3 Camera::GetPosition(Camera* Target)
 {
 	return Target->Position;
 }
 
 //-------------------------------------------------------------------
 
-glm::vec3  Camera::GetFront(Camera* Target)
+glm::vec3 Camera::GetFront(Camera* Target)
 {
 	return Target->Front;
 }
@@ -153,7 +134,6 @@ glm::vec3  Camera::GetFront(Camera* Target)
 
 glm::mat4 Camera::GetProjection(Camera * Target)
 {
-
 	if (Target->IsOrthagraphic)
 	{
 
@@ -189,7 +169,6 @@ glm::mat4 Camera::GetViewMatrix(Camera* Target)
 {
 	if (Target->IsOrthagraphic)
 	{
-//		return glm::lookAt(Target->Position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::vec3 SunDir(glm::vec3(0.45f, 1.50f, 0.05f));
 		return glm::lookAt(-SunDir * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	}

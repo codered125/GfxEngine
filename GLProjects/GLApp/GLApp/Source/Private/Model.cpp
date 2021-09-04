@@ -11,12 +11,10 @@
 
 //-------------------------------------------------------------------
 
-Model::Model(GLchar* inpath, Shader* InShader)
+Model::Model(std::string InActorName, GLchar* inpath, Shader* InShader)
+	: Shape(InActorName, InShader)
 {
-	ThisShader = InShader;
-	MoMessageLogger("Sponza:LoadModelStart " + std::to_string(glfwGetTime()));
 	this->loadModel(inpath);
-	MoMessageLogger("Sponza:LoadModelEnd " + std::to_string(glfwGetTime()));
 }
 
 //-------------------------------------------------------------------
@@ -48,9 +46,9 @@ Assimp::Importer* Model::GetImporterSingleTon()
 void Model::loadModel(std::string path)
 {
 	Assimp::Importer* importer = GetImporterSingleTon();
-	MoMessageLogger("Sponza:ReadFileStart " + std::to_string(glfwGetTime()));
+	MoMessageLogger(ActorName + "::ReadFileBegin " + std::to_string(glfwGetTime()));
 	const aiScene * scene = importer->ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_FlipUVs);
-	MoMessageLogger("Sponza:ReadFileEnd " + std::to_string(glfwGetTime()));
+	MoMessageLogger(ActorName + "::ReadFileEnd " + std::to_string(glfwGetTime()));
 
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -59,13 +57,15 @@ void Model::loadModel(std::string path)
 	}
 	//Because directories end with '/'
 	this->directory = path.substr(0, path.find_last_of('/'));
+	MoMessageLogger(ActorName + "::ProcessNodeBegin " + std::to_string(glfwGetTime()));
 	this->proccessNode(scene->mRootNode, scene);
+	MoMessageLogger(ActorName + "::ProcessNodeEnd " + std::to_string(glfwGetTime()));
 
 }
 
 //-------------------------------------------------------------------
 
-void Model::proccessNode(aiNode * node, const aiScene * scene)
+void Model::proccessNode(aiNode* node, const aiScene* scene)
 {
 	for (GLuint i = 0; i < node->mNumMeshes; i++)
 	{
@@ -81,7 +81,7 @@ void Model::proccessNode(aiNode * node, const aiScene * scene)
 
 //-------------------------------------------------------------------
 
-Mesh Model::proccesMesh(aiMesh * mesh, const aiScene * scene)
+Mesh Model::proccesMesh(aiMesh* mesh, const aiScene* scene)
 {
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
@@ -174,7 +174,7 @@ Mesh Model::proccesMesh(aiMesh * mesh, const aiScene * scene)
 
 //-------------------------------------------------------------------
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName)
+std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 {
 	std::vector<Texture> textures;
 	for (GLuint i = 0; i < mat->GetTextureCount(type); i++)
@@ -182,11 +182,11 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType
 		aiString str;
 		mat->GetTexture(type, i, &str);
 
-		GLboolean skip = false;
+		bool skip = false;
 
 		for (GLuint j = 0; j < textures_loaded.size(); j++)
 		{
-			if (textures_loaded[j].path == str)
+			if (textures_loaded[j].path == str.C_Str())
 			{
 				textures.push_back(textures_loaded[j]);
 				skip = true;
@@ -201,7 +201,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType
 
 			texture.type = typeName;
 
-			texture.path = str;
+			texture.path = str.C_Str();
 			textures.push_back(texture);
 			this->textures_loaded.push_back(texture);
 
