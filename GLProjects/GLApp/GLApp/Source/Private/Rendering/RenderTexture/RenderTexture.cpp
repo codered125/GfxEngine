@@ -14,7 +14,6 @@ RenderTexture::RenderTexture()
 
 RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA, GLenum InMinFilter, GLenum InMagFilter)
 {
-
 	Params.TargetType = InTargetType;
 	Params.Width = InWidth;
 	Params.Height = InHeight;

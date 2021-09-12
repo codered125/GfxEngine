@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Source/Public/Rendering/RenderTexture/RenderTextureParams.h"
 #include <gl/glew.h>
 #include <vector>
 #include <tuple>
@@ -16,11 +17,14 @@ public:
 	RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, std::vector<const GLchar*> InFaces);
 	RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const GLchar* InHDRPath);
 	RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, GLint InWidth, GLint InHeight, bool InGenerateMipMaps);
+	
 	static void LoadCubeMapFacesHelper(std::string InPath, std::string InFormat, std::vector<const GLchar*>& InArray);
-
 	GLuint& GetID();
 
 protected:
+
+	void InitialiseRenderTexture(RenderTextureCubeMapParam& InParams);
+
 	GLuint Id;
 	GLenum WrapS = GL_CLAMP_TO_EDGE;
 	GLenum WrapT = GL_CLAMP_TO_EDGE;
@@ -34,6 +38,8 @@ protected:
 	bool MipMap;
 	bool MSAA;
 	std::vector<const GLchar*> Faces;
+
+	RenderTextureCubeMapParam Params;
 
 };
 
