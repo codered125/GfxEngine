@@ -2,6 +2,7 @@
 #include "Source/Public/EngineDebugHelper.h"
 
 #include <iostream>
+#include <stb_image.h>
 
 //-------------------------------------------------------------------
 
@@ -51,6 +52,36 @@ RenderTexture::RenderTexture(GLuint InWidth, GLuint InHeight, GLenum InTargetTyp
 	Params.Pixels = InPixels;
 	InitialiseRenderTexture(Params);
 
+}
+
+//-------------------------------------------------------------------
+
+RenderTexture::RenderTexture(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const GLchar* InHDRPath, GLenum InBufferType)
+{
+	Params.TargetType = InTargetType;
+	Params.Format = InFormat;
+	Params.InternalFormat = InInternalFormat;
+	Params.MinFilter = GL_LINEAR;
+	Params.MagFilter = GL_LINEAR;
+	Params.WrapR = GL_CLAMP_TO_EDGE;
+	Params.WrapS = GL_CLAMP_TO_EDGE;
+	Params.WrapT = GL_CLAMP_TO_EDGE;
+
+	stbi_set_flip_vertically_on_load(true);
+	int nrComponents;
+	float* data = stbi_loadf(InHDRPath, &Params.Width, &Params.Height, &nrComponents, 0);
+	if (data)
+	{
+		Params.BufferType = InBufferType;
+		Params.Pixels = data;
+		InitialiseRenderTexture(Params);
+		stbi_image_free(data);
+	}
+	else
+	{
+		MoMessageLogger("Faled to load HDR Image");
+	}
+	stbi_set_flip_vertically_on_load(false);
 }
 
 //-------------------------------------------------------------------

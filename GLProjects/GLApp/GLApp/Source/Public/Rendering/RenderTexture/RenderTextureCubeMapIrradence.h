@@ -5,22 +5,30 @@
 //-------------------------------------------------------------------
 
 class SceneRenderTarget;
+class RenderTexture;
 
 //-------------------------------------------------------------------
 
-class RenderTextureCubeMapIrradence : public RenderTextureCubeMap
+class RenderTextureCubeMapIrradence 
 {
 public:
 
 	RenderTextureCubeMapIrradence(){};
 	RenderTextureCubeMapIrradence(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const GLchar* InHDRPath);
 	RenderTextureCubeMap* GetUnConvolutedRenderTexture();
-
+	RenderTextureCubeMap* GetPrefilteredEnvironmentMap();
+	RenderTextureCubeMap* GetIrradenceDiffuse();
+	RenderTextureCubeMap* GetIrradenceSpecular();
+	virtual ~RenderTextureCubeMapIrradence();
 protected:
 
-	RenderTextureCubeMap* HDRRenderTexture;
+	RenderTexture* HDRRenderTexture;
 	RenderTextureCubeMap* UnConvolutedMap;
+	RenderTextureCubeMap* PreFilteredEnvironmentMap;
+	RenderTextureCubeMap* IrradenceDiffuse;
+	RenderTextureCubeMap* IrradenceSpecular;
 	SceneRenderTarget* IrrandenceRenderBuffer;
+	RenderTextureCubeMapParam Params;
 };
 
 //-------------------------------------------------------------------

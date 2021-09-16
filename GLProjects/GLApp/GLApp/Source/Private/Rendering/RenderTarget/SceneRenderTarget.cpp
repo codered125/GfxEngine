@@ -84,11 +84,11 @@ RenderTexture* SceneRenderTarget::GetDepthTexture()
 
 //-------------------------------------------------------------------
 
-void SceneRenderTarget::ResizeRenderTarget(GLint InWidth, GLint InHeight)
+void SceneRenderTarget::ResizeRenderTarget(GLint InWidth, GLint InHeight, GLenum InRBOType)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, Id);
 	glBindRenderbuffer(GL_RENDERBUFFER, Rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, InWidth, InHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, InRBOType, InWidth, InHeight);
 
 	Height = InHeight;
 	Width = InWidth;

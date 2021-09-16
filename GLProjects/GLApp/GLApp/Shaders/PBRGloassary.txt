@@ -1,0 +1,46 @@
+l = light vector
+v = view vector
+h = halfway vector ( halfway between light and view) = norm(v + l)
+ks = reflection / specular 
+kd = refraction / diffuse
+L = Radiance = magnitude / strength of light coming from a direction
+w = solid angle = size or area of shape projected onto a unit sphere
+cosθ = cosTheta = dot(lightDir, N)
+
+If we consider the solid angle ω and the area A to be infinitely small
+
+wi = incoming light direction vector
+w0 = the outgoing view direction
+p = point in area A
+Ω = hemisphere centered around point p, aligned to the surfaces normal
+fr = BRDF = bidirectional reflective distribution function 
+n = surface normal
+a = microsurfaces roughness value
+dωi = Mathematically = Is the continuous symbol over which we calculate the integral
+dW = In Code = Is a discrete step of the Riemann sum
+c = albedo / diffuse
+
+
+
+The Cook-Torrance BRDF contains both a diffuse and specular part:
+fr = kdflambert + ksfcook−torrance = (Diffuse + Specular)
+
+flambert = c / π = The divide by pi is there to normalize the diffuse light as the earlier denoted integral that contains the BRDF is scaled by π 
+
+fCookTorrance = DFG / 4 * dot(ωo,⋅n) * dot(ωi, ⋅n)
+
+
+Normal distribution function: approximates the amount the surface's microfacets are aligned to the halfway vector, influenced by the roughness of the surface; this is the primary function approximating the microfacets.
+NDFGGXTR(n,h,α) = α2 / π(dot(n , h)^2 *(α^2 − 1) + 1)^2
+
+Geometry function: describes the self-shadowing property of the microfacets. When a surface is relatively rough, the surface's microfacets can overshadow other microfacets reducing the light the surface reflects.
+GSchlickGGX(n, v, k) = n⋅v / ((n⋅v)(1−k) + k)
+
+k = direct lighting pbr = ((α+1)^2)  / 8
+k = ibl = (a^2) / 2
+
+GeometrySmith: To effectively approximate the geometry we need to take account of both the view direction (geometry obstruction) and the light direction vector (geometry shadowing). We can take both into account using Smith's method:
+G(n, v, l, k)= GSchlickGGX(n, v, k) * GSchlickGGX(n, l, k)
+
+Fresnel equation: The Fresnel equation describes the ratio of surface reflection at different surface angles.
+FSchlick(h, v, F0) = F0 + (1 − F0) * ( 1− dot(h⋅v))^5

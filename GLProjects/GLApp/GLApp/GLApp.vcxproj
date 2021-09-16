@@ -172,7 +172,6 @@
     <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMap.cpp" />
     <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMapIrradence.cpp" />
-    <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMapIrradenceSpecular.cpp" />
     <ClCompile Include="Source\Private\ResourceManager.cpp" />
     <ClCompile Include="Source\Private\Rendering\RenderTarget\SceneRenderTarget.cpp" />
     <ClCompile Include="Source\Private\Shader.cpp" />
@@ -244,7 +243,6 @@
     <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMap.h" />
     <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMapIrradence.h" />
-    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMapIrradenceSpecular.h" />
     <ClInclude Include="Source\Public\resource.h" />
     <ClInclude Include="Source\Public\ResourceManager.h" />
     <ClInclude Include="Source\Public\Rendering\RenderTarget\SceneRenderTarget.h" />

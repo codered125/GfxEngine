@@ -20,8 +20,8 @@ public:
 	GLenum InternalFormat;
 	GLenum BufferType;
 	const void* Pixels;
-	bool MipMap;
-	bool MSAA;
+	bool MipMap = true;
+	bool MSAA = false;
 };
 
 //-------------------------------------------------------------------

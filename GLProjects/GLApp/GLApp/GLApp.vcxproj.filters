@@ -102,9 +102,6 @@
     <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMapIrradence.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMapIrradenceSpecular.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Rendering\RenderTarget\SceneRenderTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -278,9 +275,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\ResourceManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMapIrradenceSpecular.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMapIrradence.h">

@@ -31,6 +31,7 @@ GLFWwindow * GlfwInterface::DefineAndCreaateWindow(int& InAntiAliasingCount, con
 	//glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	
 	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	//Creating window
 	auto window = glfwCreateWindow(inWidth, inHeight, "Moses Playboy Mansion", nullptr, nullptr);

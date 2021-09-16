@@ -26,12 +26,10 @@ public:
 
 	Renderer(GLint InScreenWidth, GLint InScreenHeight);
 	
-
-	
-	//Camera* LightingCamera;
 	PostProcessSettings* MainPostProcessSetting;
 	virtual void RenderLoop(float TimeLapsed) = 0;
 	virtual void DrawGizmos(Camera* Perspective);
+	
 	void SetMainCamera(Camera* InCamera);
 	Camera* GetMainCamera();
 

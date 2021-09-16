@@ -29,9 +29,9 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 	int imageWidth, imageHeight;
 	unsigned char *image;
 	stbi_set_flip_vertically_on_load(false);
-	for (GLuint i = 0; i < Faces.size(); i++)
+	for (GLuint i = 0; i < Params.Faces.size(); i++)
 	{
-		image = SOIL_load_image(Faces[i], &imageWidth, &imageHeight, 0, SOIL_LOAD_RGB);
+		image = SOIL_load_image(Params.Faces[i], &imageWidth, &imageHeight, 0, SOIL_LOAD_RGB);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, Params.InternalFormat, imageWidth, imageHeight, 0, Params.Format, GL_UNSIGNED_BYTE, image);
 		SOIL_free_image_data(image);
 	}
@@ -50,36 +50,6 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 
 //-------------------------------------------------------------------
 
-RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const GLchar* InHDRPath)
-{
-	Params.TargetType = InTargetType;
-	Params.Format = InFormat;
-	Params.InternalFormat = InInternalFormat;
-	stbi_set_flip_vertically_on_load(true);
-	int nrComponents;
-	float* data = stbi_loadf(InHDRPath, &Params.Width, &Params.Height, &nrComponents, 0);
-	if (data)
-	{
-		glGenTextures(1, &Id);
-		glBindTexture(Params.TargetType, Id);
-		glTexImage2D(Params.TargetType, 0, Params.InternalFormat, Params.Width, Params.Height, 0, Params.Format, GL_FLOAT, data);
-
-		glTexParameteri(Params.TargetType, GL_TEXTURE_WRAP_S, Params.WrapT);
-		glTexParameteri(Params.TargetType, GL_TEXTURE_WRAP_T, Params.WrapT);
-		glTexParameteri(Params.TargetType, GL_TEXTURE_MIN_FILTER, Params.MinFilter);
-		glTexParameteri(Params.TargetType, GL_TEXTURE_MAG_FILTER, Params.MagFilter);
-
-		stbi_image_free(data);
-	}
-	else
-	{
-		MoMessageLogger("Faled to load HDR Image");
-	}
-	stbi_set_flip_vertically_on_load(false);
-}
-
-//-------------------------------------------------------------------
-
 RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, GLint InWidth, GLint InHeight, bool InGenerateMipMaps)
 {
 	Params.TargetType = InTargetType;
@@ -89,6 +59,7 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 	Params.Height = InHeight;
 	Params.MipMap = InGenerateMipMaps;
 	Params.MinFilter = InGenerateMipMaps? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+	Params.BufferType = GL_FLOAT;
 
 
 	glGenTextures(1, &Id);
@@ -96,7 +67,7 @@ RenderTextureCubeMap::RenderTextureCubeMap(GLenum InTargetType, GLenum InInterna
 	for (GLuint i = 0; i < 6; ++i)
 	{
 		// note that we store each face with 16 bit floating point values
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, Params.InternalFormat, Params.Width, Params.Height, 0, Params.Format, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, Params.InternalFormat, Params.Width, Params.Height, 0, Params.Format, Params.BufferType, nullptr);
 	}
 	glTexParameteri(Params.TargetType, GL_TEXTURE_WRAP_S, Params.WrapS);
 	glTexParameteri(Params.TargetType, GL_TEXTURE_WRAP_T, Params.WrapT);
@@ -162,6 +133,12 @@ GLuint& RenderTextureCubeMap::GetID()
 void RenderTextureCubeMap::InitialiseRenderTexture(RenderTextureCubeMapParam& InParams)
 {
 
+}
+
+//-------------------------------------------------------------------
+
+RenderTextureCubeMap::~RenderTextureCubeMap()
+{
 }
 
 //-------------------------------------------------------------------

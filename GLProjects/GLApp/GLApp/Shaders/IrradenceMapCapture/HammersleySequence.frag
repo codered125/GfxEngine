@@ -1,17 +1,18 @@
 //Source for Hammersley approach 
 //http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
 
-#include Shaders/HelperShaders/HelperFunctions.glsl
-
 #version 430 core
 
-layout(location = 0) out vec4 FragColour;
+#include Shaders/HelperShaders/Common.glsl
+#include Shaders/HelperShaders/HelperFunctions.glsl
+#include Shaders/HelperShaders/IBLPBR.glsl
+
 layout(location = 1) in vec3 LocalPosition;
+out vec4 FragColour;
 
 uniform samplerCube UnConvolutedMap;
 uniform float MipMapRoughness;
 const float PI = 3.14159265359;
-
 
 float RadicalInverse_VanDerCorputBitOperator(uint InBits);
 vec2 Hammersley2d(uint i, uint N);
@@ -31,19 +32,32 @@ void main()
 
     for(uint i = 0u; i < Sample_Count; ++i)
     {
-        vec2 Xi = Hammersley2d(i, Sample_Count);
-        vec3 H = ImportanceSampleCombineWithGGXNDF(Xi, N, MipMapRoughness);
-        vec3 L = normalize(2.0 * dot(V, H) * H - V);
+        vec2 Xi = Hammersley2d(uint(i), uint(Sample_Count));
+        vec3 Halfway = ImportanceSampleCombineWithGGXNDF(Xi, N, MipMapRoughness);
+        vec3 LightVec = normalize(2.0 * dot(V, Halfway) * Halfway - V);
 
-        float NdotL = Saturate(dot(N, L));
+        float NdotL = saturate(dot(N, LightVec));
+        float NdotH = saturate(dot(N, Halfway));
+        float HdotV = saturate(dot(Halfway, V));
         if(NdotL > 0.0f)
         {
-            PrefilteredColour += texture(UnConvolutedMap, L).rgb * NdotL;
+            float D  = DistributionGGX(N, Halfway, MipMapRoughness);
+            float PDF = (D * NdotH / (4.0 * HdotV)) + 0.0001; 
+
+            float TexWidth = 512;
+            float SATexel = 4.0f * PI / (6.0f * TexWidth * TexWidth);
+            float SaSample = 1.0 / float(Sample_Count) * PDF * 0.0001;
+
+            float MipLevel = MipMapRoughness == 0.0f? 0.0f : 0.5f * log2(SaSample / SATexel);
+
+            //PrefilteredColour += texture(UnConvolutedMap, LightVec).rgb * NdotL;
+            PrefilteredColour += textureLod(UnConvolutedMap, LightVec, MipLevel).rgb * NdotL;
             TotalWeight += NdotL;
         }
     }
     PrefilteredColour = PrefilteredColour / TotalWeight;
     FragColour = vec4(PrefilteredColour, 1.0); 
+ 
 };
 
 //-------------------------------------------------------------------
