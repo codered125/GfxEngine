@@ -55,12 +55,14 @@ Camera* Renderer::GetMainCamera()
 
 void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 {
-	const float pointIntes = 15; const float directIntes = 25;
+	//const float pointIntes = 15; const float directIntes = 25;
+	//const float pointIntes = 2.5; const float directIntes = 5;
+	const float pointIntes = 1; const float directIntes = 1;
 	// Directional light
 	Directional0 = new DirectionalLight(lightShader, "dirLight");
 	Directional0->direction = TheMostStaticVertices::SunDir;// Camera::GetFront(LightingCamera);
 	Directional0->ambient = glm::vec3(1);
-	Directional0->diffuse = glm::vec3(1.0f, 1.f, 1.f);
+	Directional0->diffuse = glm::vec3(1.0f, 1.f, 1.f) * 25.0f;
 	Directional0->specular = glm::vec3(1);
 	Directional0->position = TheMostStaticVertices::DebugSunPos;
 	Directional0->intensity = directIntes;
@@ -70,7 +72,7 @@ void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 	for (int i = 0; TheMostStaticVertices::pointLightColours->length() > i; i++)
 	{
 		auto Point = PointLight(lightShader, "pointLights[" + std::to_string(i) + "]");
-		Point.diffuse = TheMostStaticVertices::pointLightColours[i];
+		Point.diffuse = TheMostStaticVertices::pointLightColours[i] * 15.5f;
 		Point.position = TheMostStaticVertices::pointLightPositions[i]; 
 		Point.ambient = glm::vec3(1.0f);
 		Point.specular = glm::vec3(1.0f);

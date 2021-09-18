@@ -5,6 +5,7 @@
 //-------------------------------------------------------------------
 
 #include "Source/Public/Meshes/Cube.h"
+#include "Source/Public/Meshes/Quad.h"
 #include "Source/Public/EngineDebugHelper.h"
 #include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
 #include "Source/Public/Rendering/RenderTexture/RenderTexture.h"
@@ -62,8 +63,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 
 
 	PreFilteredEnvironmentMap = new RenderTextureCubeMap(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, 128, 128, true);
-
-	auto PrefilterShader = &Shader("Shaders/IrradenceMapCapture/EquirectangularToCubemap.vs", "Shaders/IrradenceMapCapture/HammersleySequence.frag");
+	auto PrefilterShader = &Shader("Shaders/IrradenceMapCapture/EquirectangularToCubemap.vs", "Shaders/IrradenceMapCapture/PreFilterEnvironmentMap.frag");
 	PrefilterShader->use();
 	PrefilterShader->SetSampler("UnConvolutedMap", &UnConvolutedMap->GetID(), GL_TEXTURE_CUBE_MAP);
 
@@ -93,6 +93,24 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 		}
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+
+	BRDFLookUpTexture = new RenderTexture(512, 512, GL_TEXTURE_2D, GL_RG16F, GL_RG, false, GL_LINEAR, GL_LINEAR);
+	auto BRDFLookUpShader = &Shader("Shaders/IrradenceMapCapture/BRDFLookUpTexture.vs", "Shaders/IrradenceMapCapture/BRDFLookUpTexture.frag");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, IrrandenceRenderBuffer->GetID());
+	IrrandenceRenderBuffer->ResizeRenderTarget(512, 512, GL_DEPTH24_STENCIL8);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, BRDFLookUpTexture->GetID(), 0);
+	glViewport(0, 0, 512, 512);
+	BRDFLookUpShader->use();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	Quad* Plane = new Quad(BRDFLookUpShader);
+	Plane->Draw(BRDFLookUpShader);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+
 
 
 	IrradenceDiffuse = new RenderTextureCubeMap();
@@ -154,9 +172,16 @@ RenderTextureCubeMap* RenderTextureCubeMapIrradence::GetIrradenceDiffuse()
 
 //-------------------------------------------------------------------
 
-RenderTextureCubeMap* RenderTextureCubeMapIrradence::GetIrradenceSpecular()
+RenderTexture* RenderTextureCubeMapIrradence::GetBRDFLookUpTexture()
 {
-	return IrradenceSpecular;
+	return BRDFLookUpTexture;
+}
+
+//-------------------------------------------------------------------
+
+RenderTexture * RenderTextureCubeMapIrradence::GetHDRRenderTexture()
+{
+	return HDRRenderTexture;
 }
 
 //-------------------------------------------------------------------

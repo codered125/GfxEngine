@@ -32,6 +32,14 @@ namespace SV
 		1.0f, -1.0f,  1.0f, 0.0f,
 		1.0f,  1.0f,  1.0f, 1.0f
 	};
+
+	float Basic2DQuadVerts[20] = {
+		// positions        // texture Coords
+		   -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+		   -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+	};
 }
 
 //-------------------------------------------------------------------
@@ -60,6 +68,31 @@ Quad::Quad(Shader* InShader, PostProcessSettings* InPPS, bool InNDC)
 	
 }
 
+//-------------------------------------------------------------------
+
+Quad::Quad(Shader* InShader)
+{
+	glGenVertexArrays(1, &ShapeVAO);
+	glGenBuffers(1, &ShapeVBO);
+
+	glBindVertexArray(ShapeVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, ShapeVBO);
+
+	//Feels bad need to look into array copy semantics that I actually like
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(InNDC ? SV::NDCPlaneVertices : SV::PlaneVertices), &InNDC ? SV::NDCPlaneVertices : SV::PlaneVertices , GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(SV::Basic2DQuadVerts), &SV::Basic2DQuadVerts, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	ThisShader = InShader;
+	ShapeID = ShapeVAO;
+}
+
+//-------------------------------------------------------------------
+
 void Quad::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView)
 {
 	glBindVertexArray(ShapeID);
@@ -77,6 +110,8 @@ void Quad::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView)
 	glBindVertexArray(0);
 }
 
+//-------------------------------------------------------------------
+
 void Quad::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView, GLuint* Sampler)
 {
 	glBindVertexArray(ShapeID);
@@ -92,6 +127,16 @@ void Quad::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView, GLuint* Sa
 		glBindTexture(GL_TEXTURE_2D, ThisPPS->DepthRenderBuffer->GetDepthTexture()->GetID());	// use the color attachment texture as the texture of the quad plane
 	}
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+}
+
+//-------------------------------------------------------------------
+
+void Quad::Draw(Shader* InShader)
+{
+	glBindVertexArray(ShapeID);
+	InShader->use();
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
 

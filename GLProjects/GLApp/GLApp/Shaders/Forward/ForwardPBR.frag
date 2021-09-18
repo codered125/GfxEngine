@@ -24,6 +24,8 @@ in V2F
 out vec4 FragColor;
 layout (location = 5) uniform sampler2D ShadowMap;
 layout (location = 6) uniform samplerCube IrradenceMap;
+layout (location = 7) uniform samplerCube PrefilterMap;
+layout (location = 8) uniform sampler2D BrdfLUT;
 
 uniform Material material;
 uniform DirLight dirLight;
@@ -89,16 +91,19 @@ void main()
     kD *= 1.0 - parse.metallic;	  
   	const vec3 Irradiance = texture(IrradenceMap, Norm).rgb;
     const vec3 Diffuse = Irradiance * parse.diffuse;
-    const vec3 Ambient = (kD * Diffuse) * parse.ao;
+	const vec3 Specular = IBLAmbientSpecular(Norm, View, parse, BrdfLUT, IrradenceMap, PrefilterMap);
+    const vec3 Ambient = (kD * Diffuse + Specular) * parse.ao;
 
 	//Directional Lights
 	vec3 r = dirLight.diffuse;
 	vec3 L = normalize(-dirLight.direction);
 	float Shadow = 1.0 - DetermineShadow(fs_in.FragPosLightSpace, Norm, L, ShadowMap);
-	L0 += (ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity) *max(Shadow, 0.1)) ;
- 	
+	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
+	L0 *= max(Shadow, 0.1);
+	
 	vec3 OutputColour = vec3(Ambient + L0); 
-	FragColor = vec4(OutputColour, parse.alpha);   
+	FragColor = vec4(OutputColour, 1.0);   
+	//FragColor = vec4(parse.diffuse, 1.0f);
 }
 
 //-------------------------------------------------------------------

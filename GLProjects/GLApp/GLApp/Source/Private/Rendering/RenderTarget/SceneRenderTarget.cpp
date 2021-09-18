@@ -49,7 +49,7 @@ SceneRenderTarget::SceneRenderTarget( GLuint InWidth, GLuint InHeight, GLenum In
 
 	if (InMakeDepth)
 	{
-		Depth = RenderTexture(InWidth, InHeight, InTargetType, InInternalFormat, InInternalFormat);
+		Depth = RenderTexture(InWidth, InHeight, InTargetType, InInternalFormat, Format);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, InTargetType, Depth.GetID(), 0);
 	}
 

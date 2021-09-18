@@ -18,15 +18,17 @@ public:
 	RenderTextureCubeMap* GetUnConvolutedRenderTexture();
 	RenderTextureCubeMap* GetPrefilteredEnvironmentMap();
 	RenderTextureCubeMap* GetIrradenceDiffuse();
-	RenderTextureCubeMap* GetIrradenceSpecular();
+	RenderTexture* GetBRDFLookUpTexture();
+	RenderTexture* GetHDRRenderTexture();
 	virtual ~RenderTextureCubeMapIrradence();
 protected:
 
 	RenderTexture* HDRRenderTexture;
+	RenderTexture* BRDFLookUpTexture;
 	RenderTextureCubeMap* UnConvolutedMap;
 	RenderTextureCubeMap* PreFilteredEnvironmentMap;
 	RenderTextureCubeMap* IrradenceDiffuse;
-	RenderTextureCubeMap* IrradenceSpecular;
+	//RenderTextureCubeMap* IrradenceSpecular;
 	SceneRenderTarget* IrrandenceRenderBuffer;
 	RenderTextureCubeMapParam Params;
 };

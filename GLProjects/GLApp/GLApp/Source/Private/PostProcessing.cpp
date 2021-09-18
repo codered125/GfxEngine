@@ -5,9 +5,13 @@
 
 //-------------------------------------------------------------------
 
-void PostProcessing::ApplyEffects(Shader * FBShader, PostProcessSettings *PPS)
+void PostProcessing::ApplyEffects(Shader* FBShader, PostProcessSettings *PPS)
 {
 //	FBShader->use();
+	if (!PPS || !FBShader)
+	{
+		return;
+	}
 	FBShader->setBool("currentPostProcessEffect.HDR", PPS->HDR);
 	FBShader->setFloat("exposure", 0.50f);
 	FBShader->setInt("currentPostProcessEffect.Invert", PPS->InvertedColours);

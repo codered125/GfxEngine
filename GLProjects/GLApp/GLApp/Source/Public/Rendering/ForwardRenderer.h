@@ -46,7 +46,7 @@ private:
 	Model* ArrowLight = nullptr;
 
 	SkyBox* VisualSkybox = nullptr;
-	RenderTextureCubeMapIrradence* EquirectangularMap = nullptr;
+	RenderTextureCubeMapIrradence* IrradenceCapturer = nullptr;
 
 };
 
