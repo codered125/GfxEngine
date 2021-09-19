@@ -82,7 +82,7 @@ void main()
 		//per light radiance
 		const vec3 L = normalize(pointLights[i].position - fs_in.WorldPos);
 		const vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(fs_in.WorldPos, pointLights[i].position);	
-		L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
+		//L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
 	}
 	
 	// IBL Ambient

@@ -63,7 +63,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	//Begin Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
-	GlfwInterface::ResetScreen(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
+	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 
 	DepthShader->use();
@@ -110,7 +110,6 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 		ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 5.75f, 0.0f));
 		ModelTransformation = glm::scale(ModelTransformation, glm::vec3(10.005f));
 		//DrawWater(WaterShader, WaterBlock, ModelTransformation, MainCamera, GameTimeLapsed);
-		
 	}
 
 	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : PBRshader;

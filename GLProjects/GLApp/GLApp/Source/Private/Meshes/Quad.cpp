@@ -103,8 +103,7 @@ void Quad::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView)
 
 	if (DEBUGSHADOWMAP)
 	{
-		ThisShader->SetSampler("screenTexture", &ThisPPS->DepthRenderBuffer->GetDepthTexture()->GetID(), GL_TEXTURE_2D);
-		// use the color attachment texture as the texture of the quad plane
+		ThisShader->SetSampler("screenTexture", &ThisPPS->DepthRenderBuffer->GetDepthTexture()->GetID(), GL_TEXTURE_2D);	// use the color attachment texture as the texture of the quad plane
 	}
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -120,11 +119,9 @@ void Quad::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView, GLuint* Sa
 	PostProcessing::ApplyEffects(ThisShader, ThisPPS);
 	ThisShader->SetSampler("screenTexture", Sampler, GL_TEXTURE_2D);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, *Sampler);
 	if (DEBUGSHADOWMAP)
 	{
-		glBindTexture(GL_TEXTURE_2D, ThisPPS->DepthRenderBuffer->GetDepthTexture()->GetID());	// use the color attachment texture as the texture of the quad plane
+		ThisShader->SetSampler("screenTexture", &ThisPPS->DepthRenderBuffer->GetDepthTexture()->GetID(), GL_TEXTURE_2D);	// use the color attachment texture as the texture of the quad plane
 	}
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
