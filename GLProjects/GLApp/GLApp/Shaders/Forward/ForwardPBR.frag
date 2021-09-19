@@ -99,9 +99,10 @@ void main()
 	vec3 L = normalize(-dirLight.direction);
 	float Shadow = 1.0 - DetermineShadow(fs_in.FragPosLightSpace, Norm, L, ShadowMap);
 	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
-	L0 *= max(Shadow, 0.1);
+	//L0 *= max(Shadow, 0.01);
 	
 	vec3 OutputColour = vec3(Ambient + L0); 
+	OutputColour *= max(Shadow, 0.025);
 	FragColor = vec4(OutputColour, 1.0);   
 	//FragColor = vec4(parse.diffuse, 1.0f);
 }

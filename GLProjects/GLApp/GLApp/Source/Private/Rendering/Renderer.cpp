@@ -72,7 +72,7 @@ void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 	for (int i = 0; TheMostStaticVertices::pointLightColours->length() > i; i++)
 	{
 		auto Point = PointLight(lightShader, "pointLights[" + std::to_string(i) + "]");
-		Point.diffuse = TheMostStaticVertices::pointLightColours[i] * 15.5f;
+		Point.diffuse = TheMostStaticVertices::pointLightPositions[i] * 15.5f;
 		Point.position = TheMostStaticVertices::pointLightPositions[i]; 
 		Point.ambient = glm::vec3(1.0f);
 		Point.specular = glm::vec3(1.0f);
@@ -87,7 +87,7 @@ void Renderer::DrawLights(Camera * Perspective, Shader* LightShader)
 {
 	LightShader->use();
 	Cube LightCube;
-	LightCube.Colour = glm::vec3(50, 50, 50);
+	LightCube.Colour = glm::vec3(1.0f, 1.f, 1.f) * 25.0f;
 
 	glm::mat4 FOV = Camera::GetProjection(Perspective);
 	glm::mat4 View = Camera::GetViewMatrix(Perspective);
@@ -102,7 +102,7 @@ void Renderer::DrawLights(Camera * Perspective, Shader* LightShader)
 		Model = glm::mat4();
 		Model = glm::translate(Model, TheMostStaticVertices::pointLightPositions[i]); //pointLightPositions[i]);
 		Model = glm::scale(Model, glm::vec3(0.2f));
-		LightCube.Colour = TheMostStaticVertices::pointLightColours[i];
+		LightCube.Colour = TheMostStaticVertices::pointLightColours[i] * 15.5f;
 		LightCube.Draw(Model, FOV, View);
 	}
 }

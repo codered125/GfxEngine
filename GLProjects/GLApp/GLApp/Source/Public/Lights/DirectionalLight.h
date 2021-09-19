@@ -16,11 +16,13 @@ public:
 	//glm::mat4 SetLightSpaceProjection(glm::mat4 InProjection);
 
 	glm::mat4 GetLightSpaceViewMatrix();
-	//glm::mat4 SetLightSpaceViewMatrix(glm::mat4* InMatrix);
+
+
 
 private:
 
 	glm::mat4 LightSpaceProjection;
+	glm::mat4 LightSpaceViewMatrix;
 };
 
 //-------------------------------------------------------------------

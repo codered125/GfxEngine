@@ -1,6 +1,5 @@
 #version 330 core
 
-in vec3 Colour;
 layout(location = 0) out vec4 FragColour;
 layout(location = 1) out vec4 BrightColour;
 
@@ -17,9 +16,11 @@ const float offset = 1 /300.0f;
 void main ()
 {
 
-	vec3 hdrColor = Colour * 100;
-	vec3 result = vec3(1.0) - exp(-hdrColor * exposure); // exposure
-	FragColour = vec4(result, 1.0f);
+	//vec3 hdrColor = inColour;
+	//vec3 result = vec3(1.0) - exp(-hdrColor * exposure); // exposure
+	FragColour = vec4(inColour, 1.0f);
+
+	BrightColour = FragColour;
 			
 
 };

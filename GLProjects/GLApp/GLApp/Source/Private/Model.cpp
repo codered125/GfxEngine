@@ -217,9 +217,21 @@ GLint Model::TextureFromFile(const char* path, std::string directory)
 	std::string filename = std::string(path);
 	filename = directory + '/' + filename;
 
-	int imageWidth, imageHeight;
-	unsigned char *image = SOIL_load_image(filename.c_str(), &imageWidth, &imageHeight, 0, SOIL_LOAD_RGB);
-	RenderTexture RT(imageWidth, imageHeight, GL_TEXTURE_2D, GL_RGB, GL_RGB, image, GL_UNSIGNED_BYTE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	int ImageWidth, ImageHeight, NrChannels;
+	unsigned char *image = SOIL_load_image(filename.c_str(), &ImageWidth, &ImageHeight, &NrChannels, SOIL_LOAD_AUTO);
+
+	auto Format = GL_RED;
+	if (NrChannels == 3)
+	{
+		Format = GL_RGB;
+	}
+	
+	if (NrChannels == 4)
+	{
+		Format = GL_RGBA;
+	}
+
+	RenderTexture RT(ImageWidth, ImageHeight, GL_TEXTURE_2D, Format, Format, image, GL_UNSIGNED_BYTE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 	SOIL_free_image_data(image);
 
 	return RT.GetID();

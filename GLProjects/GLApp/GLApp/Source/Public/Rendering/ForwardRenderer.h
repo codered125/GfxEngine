@@ -4,8 +4,8 @@
 
 //-------------------------------------------------------------------
 
-class Shape;
 class Model;
+class Shape;
 class SkyBox;
 class RenderTextureCubeMap;
 class RenderTextureCubeMapIrradence;
@@ -20,7 +20,6 @@ public:
 
 	virtual void RenderLoop(float TimeLapsed) override;
 	virtual ~ForwardRenderer();
-
 
 protected:
 

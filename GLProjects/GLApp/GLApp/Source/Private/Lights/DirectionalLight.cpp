@@ -25,8 +25,7 @@ glm::mat4 DirectionalLight::GetLightSpaceProjection()
 
 glm::mat4 DirectionalLight::GetLightSpaceViewMatrix()
 {
-	glm::vec3 SunDir(glm::vec3(-0.4f, -1.0f, 0.f));
-	return glm::lookAt(-SunDir * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	return glm::lookAt(-direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 //-------------------------------------------------------------------

@@ -89,7 +89,6 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	// clear all relevant buffers and disable depth test so screen-space quad isn't discarded due to depth test.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	GlfwInterface::ResetScreen(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NONE, GL_DEPTH_TEST);
-
 	PostProcessingQuad->ThisShader->use();
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
 	//End PostProcess Render Pass

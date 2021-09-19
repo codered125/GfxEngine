@@ -49,6 +49,7 @@ protected:
 	SceneRenderTarget* IntermediateRenderBuffer;
 	SceneRenderTarget* DepthRenderBuffer;
 	SceneRenderTarget* GBuffer;
+	SceneRenderTarget* PostProcessRenderBuffer;
 
 
 	GLint AliasingCount = 4;
