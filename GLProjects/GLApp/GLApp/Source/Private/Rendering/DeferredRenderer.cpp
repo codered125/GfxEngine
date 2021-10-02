@@ -94,8 +94,11 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
 	{
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
-		glm::mat4 LightingView = Direction->GetLightSpaceViewMatrix();
-		PostProcessingQuad->ThisShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView);
+		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
+		if (LightingView.has_value())
+		{
+			PostProcessingQuad->ThisShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView.value());
+		}
 	}
 	InitialiseLightingDataForShader(PostProcessingQuad->ThisShader);
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
@@ -154,8 +157,11 @@ void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat
 	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
 	{
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
-		glm::mat4 LightingView = Direction->GetLightSpaceViewMatrix();
-		ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView);
+		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
+		if (LightingView.has_value())
+		{
+			ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView.value());
+		}
 	}
 
 	ModelShader->setMat4("model", model);

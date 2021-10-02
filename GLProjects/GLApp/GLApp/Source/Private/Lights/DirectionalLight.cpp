@@ -14,7 +14,7 @@ DirectionalLight::DirectionalLight(Shader* inShader, std::string inAccessor) : L
 
 //-------------------------------------------------------------------
 
-glm::mat4 DirectionalLight::GetLightSpaceProjection()
+const glm::mat4 DirectionalLight::GetLightSpaceProjection() const
 {
 	auto Left = 40.0f;
 	auto Top = 40.0f;
@@ -23,9 +23,37 @@ glm::mat4 DirectionalLight::GetLightSpaceProjection()
 
 //-------------------------------------------------------------------
 
-glm::mat4 DirectionalLight::GetLightSpaceViewMatrix()
+const std::optional<glm::mat4> DirectionalLight::GetLightSpaceViewMatrix(unsigned int InIndex) const
 {
-	return glm::lookAt(-direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	if (MatrixMappings.size() > InIndex)
+	{
+		return MatrixMappings[InIndex].LightSpaceViewMatrix;
+	}
+
+	return std::optional<glm::mat4>();
+}
+
+//-------------------------------------------------------------------
+
+const unsigned int DirectionalLight::GetNumberOfMatrixMappings() const
+{
+	return MatrixMappings.size();
+}
+
+//-------------------------------------------------------------------
+
+void DirectionalLight::AddLightSpaceViewMatrix(LightSpaceMatrixMappings InMatrixMapping)
+{
+	MatrixMappings.push_back(InMatrixMapping);
+}
+
+//-------------------------------------------------------------------
+
+void DirectionalLight::SetupShader()
+{
+	Light::SetupShader();
+	auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(GetLightSpaceProjection(), glm::lookAt(-direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), position);
+	AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
 }
 
 //-------------------------------------------------------------------

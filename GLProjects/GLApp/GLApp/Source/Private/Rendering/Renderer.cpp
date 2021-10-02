@@ -66,7 +66,7 @@ void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 	Directional0->specular = glm::vec3(1);
 	Directional0->position = TheMostStaticVertices::DebugSunPos;
 	Directional0->intensity = directIntes;
-	Directional0->setUpShader();
+	Directional0->SetupShader();
 
 	// Point light 1
 	for (int i = 0; TheMostStaticVertices::pointLightColours->length() > i; i++)
@@ -77,7 +77,7 @@ void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 		Point.ambient = glm::vec3(1.0f);
 		Point.specular = glm::vec3(1.0f);
 		Point.intensity = pointIntes;
-		Point.setUpShader();
+		Point.SetupShader();
 	}
 }
 

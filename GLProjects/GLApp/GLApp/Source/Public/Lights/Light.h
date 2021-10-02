@@ -38,7 +38,7 @@ struct Light
 
 	Light(Shader* inShader, std::string inAccessor);
 
-	void setUpShader();
+	virtual void SetupShader();
 
 };
 

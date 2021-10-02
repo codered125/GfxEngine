@@ -90,6 +90,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)/../External Libraries/ASSIMP/include;$(SolutionDir)/../External Libraries/GLM;$(SolutionDir)/../External Libraries/SOIL2;$(SolutionDir)/../External Libraries/GLEW/include;$(SolutionDir)/../GLApp/GLApp/;$(SolutionDir)/../External Libraries/GLFW/include;$(SolutionDir)/../External Libraries/STB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

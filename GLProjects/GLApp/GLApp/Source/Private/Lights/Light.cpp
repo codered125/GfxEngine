@@ -27,7 +27,7 @@ Light::Light(Shader * inShader, std::string inAccessor) : ShaderRef(inShader), a
 
 //-------------------------------------------------------------------
 
-void Light::setUpShader()
+void Light::SetupShader()
 {
 	ShaderRef->setVec3(pos, position);
 	ShaderRef->setVec3(dir, direction);

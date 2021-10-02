@@ -16,6 +16,7 @@
 
 #include <glm.hpp>
 #include <gtx\matrix_decompose.hpp>
+#include <optional>
 #include <vector>
 
 //-------------------------------------------------------------------
@@ -43,6 +44,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	ScreenShader = new Shader("Shaders/Forward/ForwardScreen.vs", "Shaders/Forward/ForwardScreen.frag");
 	WaterShader = new Shader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
 
+	//Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/Room/Room.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	//GizMo = new Model(GET_VARIABLE_NAME(GizMo),"Models/Gizmo/GizmoForMo.obj", UnlitShader);
 	//WaterBlock = new Model(GET_VARIABLE_NAME(WaterBlock),"Models/WaterBlock/SM_bathPoolSurface2.obj", WaterShader);
@@ -144,8 +146,12 @@ void ForwardRenderer::DrawModel(Shader* ModelShader, Shape* InModel, glm::mat4 m
 	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
 	{
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
-		glm::mat4 LightingView = Direction->GetLightSpaceViewMatrix();
-		ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView);
+		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
+		if (LightingView.has_value())
+		{
+			auto view = LightingView.value();
+			ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView.value());
+		}
 	}
 	ModelShader->setMat4("model", model);
 	ModelShader->SetSampler("IrradenceMap", &IrradenceCapturer->GetIrradenceDiffuse()->GetID(), GL_TEXTURE_CUBE_MAP);

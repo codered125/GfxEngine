@@ -153,7 +153,6 @@ Mesh Model::proccesMesh(aiMesh* mesh, const aiScene* scene)
 		std::vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "material.texture_diffuse");
 		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-		//vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_specular");
 		std::vector<Texture> metalicMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "material.texture_metallic");
 		textures.insert(textures.end(), metalicMaps.begin(), metalicMaps.end());
 
@@ -166,6 +165,7 @@ Mesh Model::proccesMesh(aiMesh* mesh, const aiScene* scene)
 		std::vector<Texture> roughnessMaps = this->loadMaterialTextures(material, aiTextureType_SHININESS, "material.texture_roughness");
 		textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
 
+		//vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_specular");
 		std::vector<Texture> aoMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "material.texture_ao");
 		textures.insert(textures.end(), aoMaps.begin(), aoMaps.end());
 	}
