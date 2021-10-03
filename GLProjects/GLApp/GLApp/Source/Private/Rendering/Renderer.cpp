@@ -59,14 +59,18 @@ void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
 	//const float pointIntes = 2.5; const float directIntes = 5;
 	const float pointIntes = 1; const float directIntes = 1;
 	// Directional light
-	Directional0 = new DirectionalLight(lightShader, "dirLight");
-	Directional0->direction = TheMostStaticVertices::SunDir;// Camera::GetFront(LightingCamera);
-	Directional0->ambient = glm::vec3(1);
-	Directional0->diffuse = glm::vec3(1.0f, 1.f, 1.f) * 25.0f;
-	Directional0->specular = glm::vec3(1);
-	Directional0->position = TheMostStaticVertices::DebugSunPos;
-	Directional0->intensity = directIntes;
-	Directional0->SetupShader();
+	auto DirectionLight = new DirectionalLight(lightShader, "dirLight");
+	DirectionLight->direction = TheMostStaticVertices::SunDir;// Camera::GetFront(LightingCamera);
+	DirectionLight->ambient = glm::vec3(1);
+	DirectionLight->diffuse = glm::vec3(1.0f, 1.f, 1.f) * 25.0f;
+	DirectionLight->specular = glm::vec3(1);
+	DirectionLight->position = TheMostStaticVertices::DebugSunPos;
+	DirectionLight->intensity = directIntes;
+	DirectionLight->SetupShader();
+
+	auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(-DirectionLight->direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
+	DirectionLight->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
+	Directional0 = DirectionLight;
 
 	// Point light 1
 	for (int i = 0; TheMostStaticVertices::pointLightColours->length() > i; i++)

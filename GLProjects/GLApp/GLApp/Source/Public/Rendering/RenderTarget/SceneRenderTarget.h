@@ -3,11 +3,13 @@
 #include <gl/glew.h>
 #include <vector>
 
+#include "Source/Public/Rendering/RenderTarget/RenderTargetParams.h"
 #include "Source/Public/Rendering/RenderTexture/RenderTexture.h"
 
 //-------------------------------------------------------------------
 
 class RenderTexture;
+struct RenderTargertParam;
 
 //-------------------------------------------------------------------
 
@@ -20,21 +22,16 @@ public:
 	RenderTexture* GetDepthTexture();
 	void ResizeRenderTarget(GLint InWidth, GLint InHeight, GLenum InRBOType);
 
+protected:
+	void InitialiseSceneRenderTarget(RenderTargertParam& Params);
+
 private:
 
 	GLuint Id;
-	GLint Height;
-	GLint Width;
 	GLuint Rbo;
-
-
-	GLenum TargetType;
-
-	//This has been Texture2D 99% of the time
-	GLenum Format;
-	GLenum InternalFormat;
 	std::vector<RenderTexture> ColourAttachments;
 	RenderTexture Depth;
+	RenderTargertParam Param;
 };
 
 //-------------------------------------------------------------------

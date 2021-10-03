@@ -16,7 +16,7 @@ float DetermineShadow(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir, 
   //PCF
   float Shadow = 0.0;
   vec2 TexelSize = 1.0 / textureSize(ShadowMap, 0);
-  int Sample = 3;
+  int Sample = 4;
   for(int x = -Sample; x <= Sample; ++x)
   {
   	for(int y = -Sample; y <= Sample; ++y)

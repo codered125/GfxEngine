@@ -52,8 +52,7 @@ void DirectionalLight::AddLightSpaceViewMatrix(LightSpaceMatrixMappings InMatrix
 void DirectionalLight::SetupShader()
 {
 	Light::SetupShader();
-	auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(GetLightSpaceProjection(), glm::lookAt(-direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), position);
-	AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
+
 }
 
 //-------------------------------------------------------------------
