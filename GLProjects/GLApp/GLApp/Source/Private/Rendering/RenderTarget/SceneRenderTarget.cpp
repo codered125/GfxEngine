@@ -66,7 +66,7 @@ void SceneRenderTarget::InitialiseSceneRenderTarget(RenderTargertParam& Params)
 
 	for (GLuint i = 0; i < Params.NrColourAttachments; i++)
 	{
-		RenderTexture RT(Params.Width, Params.Height, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA);
+		RenderTexture RT(Params.Width, Params.Height, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, NULL, GL_FLOAT);
 		ColourAttachments.push_back(RT);
 		AttachmentEnums[i] = GL_COLOR_ATTACHMENT0 + i;
 		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentEnums[i], Params.TargetType, RT.GetID(), 0);
@@ -95,7 +95,7 @@ void SceneRenderTarget::InitialiseSceneRenderTarget(RenderTargertParam& Params)
 
 	if (Params.MakeDepth)
 	{
-		Depth = RenderTexture(Params.Width, Params.Height, Params.TargetType, Params.InternalFormat, Params.Format);
+		Depth = RenderTexture(Params.Width, Params.Height, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GLenum(GL_NEAREST), GLenum(GL_NEAREST), GLenum(GL_CLAMP_TO_BORDER), NULL, GL_FLOAT);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, Params.TargetType, Depth.GetID(), 0);
 	}
 

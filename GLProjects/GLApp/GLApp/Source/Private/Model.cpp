@@ -47,7 +47,7 @@ void Model::loadModel(std::string path)
 {
 	Assimp::Importer* importer = GetImporterSingleTon();
 	MoMessageLogger(ActorName + "::ReadFileBegin " + std::to_string(glfwGetTime()));
-	const aiScene * scene = importer->ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_FlipUVs);
+	const aiScene * scene = importer->ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 	MoMessageLogger(ActorName + "::ReadFileEnd " + std::to_string(glfwGetTime()));
 
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -218,7 +218,7 @@ GLint Model::TextureFromFile(const char* path, std::string directory)
 	filename = directory + '/' + filename;
 
 	int ImageWidth, ImageHeight, NrChannels;
-	unsigned char *image = SOIL_load_image(filename.c_str(), &ImageWidth, &ImageHeight, &NrChannels, SOIL_LOAD_AUTO);
+	unsigned char *Image = SOIL_load_image(filename.c_str(), &ImageWidth, &ImageHeight, &NrChannels, SOIL_LOAD_AUTO);
 
 	auto Format = GL_RED;
 	if (NrChannels == 3)
@@ -230,9 +230,8 @@ GLint Model::TextureFromFile(const char* path, std::string directory)
 	{
 		Format = GL_RGBA;
 	}
-
-	RenderTexture RT(ImageWidth, ImageHeight, GL_TEXTURE_2D, Format, Format, image, GL_UNSIGNED_BYTE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	SOIL_free_image_data(image);
+	RenderTexture RT(ImageWidth, ImageHeight, GL_TEXTURE_2D, Format, Format, false, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, Image, GL_UNSIGNED_BYTE);
+	SOIL_free_image_data(Image);
 
 	return RT.GetID();
 }

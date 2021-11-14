@@ -4,9 +4,8 @@
 float DetermineShadow(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir, sampler2D ShadowMap)
 {
   //perform perspective divide, not necassary on orthagraphic but is a safe bet for both
- 	vec3 ProjCoords = InFragPosLightSpace.xyz; 
-	ProjCoords = ProjCoords * 0.5 + 0.5; // transform to ndc coordinates
-  ProjCoords = ProjCoords / InFragPosLightSpace.w;
+ 	vec3 ProjCoords = InFragPosLightSpace.xyz / InFragPosLightSpace.w; 
+ 	ProjCoords = ProjCoords * 0.5 + 0.5; // transform to ndc coordinates
 
 	float ClosestDepth = texture(ShadowMap, ProjCoords.xy).r;   
 	float CurrentDepth = ProjCoords.z;  
@@ -26,7 +25,7 @@ float DetermineShadow(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir, 
     }   
  	}
   Shadow /= pow((Sample * 2) + 1, 2);
-	//Shadow = CurrentDepth - Bias > ClosestDepth? 1.0 : 0.0;
+ //Shadow = CurrentDepth - Bias > ClosestDepth? 1.0 : 0.0;
  //keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
  if(ProjCoords.z > 1.0)
  {

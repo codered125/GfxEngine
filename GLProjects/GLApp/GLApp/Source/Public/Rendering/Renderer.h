@@ -55,7 +55,7 @@ protected:
 	GLint AliasingCount = 4;
 	GLint NumberofLights = 3;
 
-	Light* Directional0;
+	Light* Directional0 = nullptr;
 	Quad* PostProcessingQuad;
 	float GameTimeLapsed;
 	float GameTimeDelta;

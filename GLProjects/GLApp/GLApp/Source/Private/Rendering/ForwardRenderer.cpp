@@ -29,7 +29,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_RGBA, 2, false, true, true);
 	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer;
 
-	IntermediateRenderBuffer= new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
+	IntermediateRenderBuffer= new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false, false);
 	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer;
 
 	DepthRenderBuffer = new SceneRenderTarget(4096, 4096, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
@@ -65,17 +65,17 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	//Begin Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
-	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
-	glCullFace(GL_FRONT);
+	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
+	//glCullFace(GL_FRONT);
 
-	DepthShader->use();
 	RenderDemo(RenderStage::Depth, VisualSkybox, MainCamera, nullptr);
 	//End Shadow Render Pass
 
 	//Begin Main Pass
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, MainRenderBuffer->GetID());
-	GlfwInterface::ResetScreen(glm::vec4(0.05f, 0.05f, 0.05f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
+	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
+	glCullFace(GL_BACK);
 	RenderDemo(RenderStage::Main, VisualSkybox, MainCamera, &DepthRenderBuffer->GetDepthTexture()->GetID());
 	//DrawGizmos(MainCamera);
 
@@ -90,7 +90,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	//Begin PostProcess Render Pass
 	// clear all relevant buffers and disable depth test so screen-space quad isn't discarded due to depth test.
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	GlfwInterface::ResetScreen(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NONE, GL_DEPTH_TEST);
+	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NONE, GL_DEPTH_TEST);
 	PostProcessingQuad->ThisShader->use();
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
 	//End PostProcess Render Pass
@@ -98,7 +98,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 
 //-------------------------------------------------------------------
 
-void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Camera* Perspective, GLuint * ShadowMap)
+void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox* InSkybox, Camera* Perspective, GLuint* ShadowMap)
 {
 	//RENDER 
 	//skip this for depth pass
@@ -107,20 +107,15 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Cam
 		InSkybox->SkyboxTexture = IrradenceCapturer->GetUnConvolutedRenderTexture();
 		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
 		DrawLights(Perspective, LampShader);
-
-		auto ModelTransformation = glm::mat4();
-		ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 5.75f, 0.0f));
-		ModelTransformation = glm::scale(ModelTransformation, glm::vec3(10.005f));
-		//DrawWater(WaterShader, WaterBlock, ModelTransformation, MainCamera, GameTimeLapsed);
 	}
 
 	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : PBRshader;
 	 
 	//Room Model
 	auto ModelTransformation = glm::mat4();
-	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, -1.50f, 0.0f));
+	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, -2.0f, 0.0f));
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
-	ModelTransformation = glm::rotate(ModelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+//	ModelTransformation = glm::rotate(ModelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	DrawModel(LocalPBRShader, Sponza, ModelTransformation, Perspective, ShadowMap);
 }
 
@@ -149,7 +144,6 @@ void ForwardRenderer::DrawModel(Shader* ModelShader, Shape* InModel, glm::mat4 m
 		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
 		if (LightingView.has_value())
 		{
-			auto view = LightingView.value();
 			ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView.value());
 		}
 	}

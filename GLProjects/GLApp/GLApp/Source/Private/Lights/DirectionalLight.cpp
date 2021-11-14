@@ -3,7 +3,9 @@
 
 //-------------------------------------------------------------------
 
-DirectionalLight::DirectionalLight(Shader* inShader, std::string inAccessor) : Light(inShader, inAccessor)
+DirectionalLight::DirectionalLight(Shader* inShader, std::string inAccessor)
+	: Light(inShader, inAccessor)
+	, MatrixMappings()
 {
 	inShader->setVec3(pos, position);
 	inShader->setVec3(dir, direction);
@@ -16,9 +18,8 @@ DirectionalLight::DirectionalLight(Shader* inShader, std::string inAccessor) : L
 
 const glm::mat4 DirectionalLight::GetLightSpaceProjection() const
 {
-	auto Left = 40.0f;
-	auto Top = 40.0f;
-	return glm::ortho(-Left, Left, -Top, Top, -15.0f, 20.0f);
+	auto Left = 20.0f; auto Top = 20.0f;
+	return glm::ortho(-Left, Left, -Top, Top, -20.0f, 20.0f);
 }
 
 //-------------------------------------------------------------------
@@ -52,7 +53,6 @@ void DirectionalLight::AddLightSpaceViewMatrix(LightSpaceMatrixMappings InMatrix
 void DirectionalLight::SetupShader()
 {
 	Light::SetupShader();
-
 }
 
 //-------------------------------------------------------------------

@@ -48,9 +48,6 @@
     <ClCompile Include="Source\Private\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\TextureLoading.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\GlfwInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -218,9 +215,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\StaticVertices.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Public\TextureLoading.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Public\GlfwInterface.h">

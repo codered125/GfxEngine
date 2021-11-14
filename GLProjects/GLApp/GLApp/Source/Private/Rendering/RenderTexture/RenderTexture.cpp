@@ -11,9 +11,10 @@ RenderTexture::RenderTexture()
 
 }
 
+
 //-------------------------------------------------------------------
 
-RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA, GLenum InMinFilter, GLenum InMagFilter)
+RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA, GLenum InMinFilter, GLenum InMagFilter, GLenum InWrap, const void* InPixels, GLenum InBufferType)
 {
 	Params.TargetType = InTargetType;
 	Params.Width = InWidth;
@@ -23,11 +24,11 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 	Params.MSAA = InMSAA;
 	Params.MinFilter = InMinFilter;
 	Params.MagFilter = InMagFilter;
-	Params.WrapR = GL_CLAMP_TO_EDGE;
-	Params.WrapS = GL_CLAMP_TO_EDGE;
-	Params.WrapT = GL_CLAMP_TO_EDGE;
-	Params.BufferType = GL_FLOAT;
-	Params.Pixels = NULL;
+	Params.WrapR = InWrap;
+	Params.WrapS = InWrap;
+	Params.WrapT = InWrap;
+	Params.BufferType = InBufferType;
+	Params.Pixels = InPixels;
 	InitialiseRenderTexture(Params);
 	
 
@@ -35,24 +36,24 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 
 //-------------------------------------------------------------------
 
-RenderTexture::RenderTexture(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const void* InPixels, GLenum InBufferType, GLenum InMinFilter, GLenum InMagFilter)
-{
-	Params.TargetType = InTargetType;
-	Params.Width = InWidth;
-	Params.Height = InHeight;
-	Params.Format = InFormat;
-	Params.InternalFormat = InInternalFormat;
-	Params.MSAA = false;
-	Params.MinFilter = InMinFilter;
-	Params.MagFilter = InMagFilter;
-	Params.WrapR = GL_REPEAT;
-	Params.WrapS = GL_REPEAT;
-	Params.WrapT = GL_REPEAT;
-	Params.BufferType = InBufferType;
-	Params.Pixels = InPixels;
-	InitialiseRenderTexture(Params);
-
-}
+//RenderTexture::RenderTexture(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const void* InPixels, GLenum InBufferType, GLenum InMinFilter, GLenum InMagFilter)
+//{
+//	Params.TargetType = InTargetType;
+//	Params.Width = InWidth;
+//	Params.Height = InHeight;
+//	Params.Format = InFormat;
+//	Params.InternalFormat = InInternalFormat;
+//	Params.MSAA = false;
+//	Params.MinFilter = InMinFilter;
+//	Params.MagFilter = InMagFilter;
+//	Params.WrapR = GL_REPEAT;
+//	Params.WrapS = GL_REPEAT;
+//	Params.WrapT = GL_REPEAT;
+//	Params.BufferType = InBufferType;
+//	Params.Pixels = InPixels;
+//	InitialiseRenderTexture(Params);
+//
+//}
 
 //-------------------------------------------------------------------
 

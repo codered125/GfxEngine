@@ -96,7 +96,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 
 
 
-	BRDFLookUpTexture = new RenderTexture(512, 512, GL_TEXTURE_2D, GL_RG16F, GL_RG, false, GL_LINEAR, GL_LINEAR);
+	BRDFLookUpTexture = new RenderTexture(512, 512, GL_TEXTURE_2D, GL_RG16F, GL_RG, false, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, NULL, GL_FLOAT);
 	auto BRDFLookUpShader = &Shader("Shaders/IrradenceMapCapture/BRDFLookUpTexture.vs", "Shaders/IrradenceMapCapture/BRDFLookUpTexture.frag");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, IrrandenceRenderBuffer->GetID());

@@ -176,7 +176,6 @@
     <ClCompile Include="Source\Private\ResourceManager.cpp" />
     <ClCompile Include="Source\Private\Rendering\RenderTarget\SceneRenderTarget.cpp" />
     <ClCompile Include="Source\Private\Shader.cpp" />
-    <ClCompile Include="Source\Private\TextureLoading.cpp" />
     <ClCompile Include="Source\Private\Lights\SpotLight.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -250,7 +249,6 @@
     <ClInclude Include="Source\Public\Shader.h" />
     <ClInclude Include="Source\Public\StaticVertices.h" />
     <ClInclude Include="Source\Public\Texture.h" />
-    <ClInclude Include="Source\Public\TextureLoading.h" />
     <ClInclude Include="Source\Public\Lights\SpotLight.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

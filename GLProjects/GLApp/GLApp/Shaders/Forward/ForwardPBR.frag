@@ -33,17 +33,7 @@ uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform vec3 CamPos;
 uniform vec3 CamDir;
 
-vec2 ParralaxMapping(vec2 InTexCoords, vec3 ViewDirNorm, float HeightScale);
 vec3 GetNormalFromMap();
-
-//-------------------------------------------------------------------
-
-vec2 ParralaxMapping(vec2 InTexCoords, vec3 ViewDirNorm, float HeightScale)
-{
-	float Height =  texture(material.texture_height, InTexCoords).r;     
-	const bool ParralaxMapping = false;
-    return ParralaxMapping? InTexCoords - ViewDirNorm.xy * (Height * HeightScale) : InTexCoords;  
- }
 
 //-------------------------------------------------------------------
 
@@ -58,17 +48,11 @@ vec3 GetNormalFromMap(vec2 InTexCoords)
 
 void main()
 {
-	vec2 PTexCoords = ParralaxMapping( fs_in.TexCoords, normalize(fs_in.TangentViewPos - fs_in.TangentFragPos), 0.1f);
-	if(PTexCoords.x > 1.0 || PTexCoords.y > 1.0 || PTexCoords.x < 0.0 || PTexCoords.y < 0.0)
-	{
-      //  discard;
-	}
-
 	//we normalise this result before returning it
 	const vec3 View = normalize(CamPos - fs_in.WorldPos);
-	const vec3 Norm = GetNormalFromMap(PTexCoords);
+	const vec3 Norm = GetNormalFromMap(fs_in.TexCoords);
 	const float RnMPExponent = 	1.0f;
-	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, PTexCoords);
+	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, fs_in.TexCoords);
 
 	//Metelic ratio
 	vec3 F0 = vec3(0.04);
@@ -82,7 +66,7 @@ void main()
 		//per light radiance
 		const vec3 L = normalize(pointLights[i].position - fs_in.WorldPos);
 		const vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(fs_in.WorldPos, pointLights[i].position);	
-		//L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
+		L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
 	}
 	
 	// IBL Ambient
@@ -103,8 +87,8 @@ void main()
 	
 	vec3 OutputColour = vec3(Ambient + L0); 
 	OutputColour *= max(Shadow, 0.025);
-	FragColor = vec4(OutputColour, 1.0);   
-	//FragColor = vec4(parse.diffuse, 1.0f);
+	FragColor = vec4(OutputColour, parse.alpha);   
+	//FragColor = vec4(vec3(max(Shadow, 0.01)), 1.0f);
 }
 
 //-------------------------------------------------------------------

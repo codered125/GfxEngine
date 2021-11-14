@@ -6,8 +6,9 @@
 #include "Source/Public/Lights/Light.h"
 #include "Source/Public/Lights/DirectionalLight.h"
 #include "Source/Public/Lights/PointLight.h"
-#include "Source/Public/Shader.h"
 #include "Source/Public/Meshes/Cube.h"
+#include "Source/Public/Math.h"
+#include "Source/Public/Shader.h"
 
 #include <GLFW/glfw3.h>
 
@@ -53,24 +54,31 @@ Camera* Renderer::GetMainCamera()
 
 //-------------------------------------------------------------------
 
-void Renderer::InitialiseLightingDataForShader(Shader * lightShader)
+void Renderer::InitialiseLightingDataForShader(Shader* lightShader)
 {
 	//const float pointIntes = 15; const float directIntes = 25;
 	//const float pointIntes = 2.5; const float directIntes = 5;
 	const float pointIntes = 1; const float directIntes = 1;
 	// Directional light
-	auto DirectionLight = new DirectionalLight(lightShader, "dirLight");
-	DirectionLight->direction = TheMostStaticVertices::SunDir;// Camera::GetFront(LightingCamera);
-	DirectionLight->ambient = glm::vec3(1);
-	DirectionLight->diffuse = glm::vec3(1.0f, 1.f, 1.f) * 25.0f;
-	DirectionLight->specular = glm::vec3(1);
-	DirectionLight->position = TheMostStaticVertices::DebugSunPos;
-	DirectionLight->intensity = directIntes;
-	DirectionLight->SetupShader();
+	if (!Directional0)
+	{
+		auto DirectionLight = new DirectionalLight(lightShader, "dirLight");
+		DirectionLight->direction = TheMostStaticVertices::SunDir;
+		DirectionLight->ambient = glm::vec3(1);
+		DirectionLight->diffuse = glm::vec3(1) * 25.0f;
+		DirectionLight->specular = glm::vec3(1);
+		DirectionLight->position = TheMostStaticVertices::DebugSunPos;
+		DirectionLight->intensity = directIntes;
 
-	auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(-DirectionLight->direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
-	DirectionLight->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
-	Directional0 = DirectionLight;
+
+		auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(-DirectionLight->direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
+		//auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(DirectionLight->position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
+		//auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(DirectionLight->position, DirectionLight->position + DirectionLight->direction, glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
+		DirectionLight->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
+		Directional0 = DirectionLight;
+	}
+	Directional0->ShaderRef = lightShader;
+	Directional0->SetupShader();
 
 	// Point light 1
 	for (int i = 0; TheMostStaticVertices::pointLightColours->length() > i; i++)
