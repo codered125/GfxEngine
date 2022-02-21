@@ -5,6 +5,10 @@
 
 //-------------------------------------------------------------------
 
+constexpr bool USEGLM = 0;
+
+//-------------------------------------------------------------------
+
 glm::vec3 MoMath::MoLerp(glm::vec3& a, glm::vec3& b, float& t)
 {
 	return a + ((b - a) * t);
@@ -55,6 +59,58 @@ glm::vec3 MoMath::MoNormalize(glm::vec3& T)
 {
 	const float TLen = sqrt((T.x * T.x) + (T.y * T.y) + (T.z * T.z));
 	return glm::vec3((T.x / TLen), (T.y / TLen), (T.z / TLen));
+}
+
+//-------------------------------------------------------------------
+
+glm::mat4x4 MoMath::MoLookAt(glm::vec3& Position, glm::vec3& Target, glm::vec3& WorldUp)
+{
+	if (USEGLM)
+	{
+		return glm::lookAt(Position, Target, WorldUp);
+	}
+
+	glm::vec3 Forward = MoNormalize(Target - Position); //ZAxis
+	glm::vec3 Right = MoNormalize(MoCrossProduct(Forward, WorldUp)); // XAxis
+	glm::vec3 Up = MoCrossProduct(Right, Forward); //YAxis
+
+	glm::mat4x4 ViewMatrix;
+	ViewMatrix[0][0] = Right.x;
+	ViewMatrix[1][0] = Right.y;
+	ViewMatrix[2][0] = Right.z;
+	ViewMatrix[0][1] = Up.x;
+	ViewMatrix[1][1] = Up.y;
+	ViewMatrix[2][1] = Up.z;
+	ViewMatrix[0][2] = -Forward.x;
+	ViewMatrix[1][2] = -Forward.y;
+	ViewMatrix[2][2] = -Forward.z;
+	ViewMatrix[3][0] = -MoDotProduct(Right, Position);
+	ViewMatrix[3][1] = -MoDotProduct(Up, Position);
+	ViewMatrix[3][2] = MoDotProduct(Forward, Position);
+	return ViewMatrix;
+}
+
+//-------------------------------------------------------------------
+
+glm::mat4x4 MoMath::MoOrthographic(const float& Left, const float& Right, const float& Bottom, const float& Top, const float& Near_Plane, const float& Far_Plane)
+{
+	if (USEGLM)
+	{
+		return glm::ortho(Left, Right, Bottom, Top, Near_Plane, Far_Plane);
+	}
+
+	glm::mat4x4 Result;
+
+	Result[0][0] = 2.0f / (Right - Left);
+	Result[1][1] = 2.0f / (Top - Bottom);
+	Result[2][2] = -2.0f / (Far_Plane - Near_Plane);
+
+	Result[3][0] = -(Right + Left) / (Right - Left);
+	Result[3][1] = -(Top + Bottom) / (Top - Bottom);
+	Result[3][2] = -(Far_Plane + Near_Plane) / (Far_Plane - Near_Plane);
+	Result[3][3] = 1.0f;
+
+	return Result;
 }
 
 //-------------------------------------------------------------------

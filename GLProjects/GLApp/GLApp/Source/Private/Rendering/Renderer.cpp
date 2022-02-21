@@ -63,17 +63,16 @@ void Renderer::InitialiseLightingDataForShader(Shader* lightShader)
 	if (!Directional0)
 	{
 		auto DirectionLight = new DirectionalLight(lightShader, "dirLight");
-		DirectionLight->direction = TheMostStaticVertices::SunDir;
+		DirectionLight->direction = MoMath::MoNormalize(TheMostStaticVertices::SunDir);
 		DirectionLight->ambient = glm::vec3(1);
 		DirectionLight->diffuse = glm::vec3(1) * 25.0f;
 		DirectionLight->specular = glm::vec3(1);
-		DirectionLight->position = TheMostStaticVertices::DebugSunPos;
+		DirectionLight->position = TheMostStaticVertices::SunPos;
 		DirectionLight->intensity = directIntes;
 
-
-		auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(-DirectionLight->direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
+		//auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(-DirectionLight->direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
 		//auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(DirectionLight->position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
-		//auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(DirectionLight->position, DirectionLight->position + DirectionLight->direction, glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
+		auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), MoMath::MoLookAt(DirectionLight->position, DirectionLight->position + DirectionLight->direction, glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
 		DirectionLight->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
 		Directional0 = DirectionLight;
 	}
@@ -104,7 +103,7 @@ void Renderer::DrawLights(Camera * Perspective, Shader* LightShader)
 	glm::mat4 FOV = Camera::GetProjection(Perspective);
 	glm::mat4 View = Camera::GetViewMatrix(Perspective);
 	glm::mat4 Model = glm::mat4();
-	Model = glm::translate(Model, TheMostStaticVertices::DebugSunPos); //pointLightPositions[i]);
+	Model = glm::translate(Model, TheMostStaticVertices::SunPos); //pointLightPositions[i]);
 	Model = glm::scale(Model, glm::vec3(2.f));
 	LightCube.ThisShader = LightShader;
 	LightCube.Draw(Model, FOV, View);
@@ -115,7 +114,7 @@ void Renderer::DrawLights(Camera * Perspective, Shader* LightShader)
 		Model = glm::translate(Model, TheMostStaticVertices::pointLightPositions[i]); //pointLightPositions[i]);
 		Model = glm::scale(Model, glm::vec3(0.2f));
 		LightCube.Colour = TheMostStaticVertices::pointLightColours[i] * 15.5f;
-		LightCube.Draw(Model, FOV, View);
+	//	LightCube.Draw(Model, FOV, View);
 	}
 }
 

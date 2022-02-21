@@ -47,7 +47,7 @@ void Model::loadModel(std::string path)
 {
 	Assimp::Importer* importer = GetImporterSingleTon();
 	MoMessageLogger(ActorName + "::ReadFileBegin " + std::to_string(glfwGetTime()));
-	const aiScene * scene = importer->ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+	const aiScene * scene = importer->ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace );
 	MoMessageLogger(ActorName + "::ReadFileEnd " + std::to_string(glfwGetTime()));
 
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)

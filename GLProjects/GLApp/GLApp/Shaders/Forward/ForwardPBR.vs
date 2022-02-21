@@ -32,8 +32,9 @@ void main()
     vs_Out.FragPosLightSpace = lightSpaceMatrix * model * vec4(position, 1.0f); 
 
     //Push vectors into WS
-    vec3 T = normalize(vec3(model * vec4(Tangent, 0.0)));
-    const vec3 N = normalize(vec3(model * vec4(normal, 0.0)));
+    const mat3 ModelMatrix = mat3(transpose(inverse(model)));
+    vec3 T =  normalize(ModelMatrix * Tangent);
+    const vec3 N = normalize(ModelMatrix * normal);
     T = normalize(T - dot(T, N) * N);
     const vec3 B = cross(N, T);
     vs_Out.TBN = mat3(T, B, N);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Source/Public/Camera.h"
+#include "Source/Public/EngineDebugHelper.h"
 #include "Source/Public/Math.h"
 
 //-------------------------------------------------------------------
@@ -136,7 +137,7 @@ glm::mat4 Camera::GetProjection(Camera * Target)
 {
 	if (Target->IsOrthagraphic)
 	{
-
+		MoMessageLogger("Camera::GetProjection Orthagraphic GetProjection being called and isnt currently supported");
 	}
 
 	return glm::perspective(Camera::GetZoom(Target), Target->AspectRatio, Target->NearPlane, Target->FarPlane);
@@ -169,11 +170,10 @@ glm::mat4 Camera::GetViewMatrix(Camera* Target)
 {
 	if (Target->IsOrthagraphic)
 	{
-		glm::vec3 SunDir(glm::vec3(0.45f, 1.50f, 0.05f));
-		return glm::lookAt(-SunDir * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		MoMessageLogger("Camera::GetViewMatrix Orthagraphic view matrix being called and isnt currently supported");
 	}
 
-	return glm::lookAt(Target->Position, Target->Position + Target->Front, Target->Up);
+	return  MoMath::MoLookAt(Target->Position, Target->Position + Target->Front, Target->Up);
 }
 
 //-------------------------------------------------------------------

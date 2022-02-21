@@ -40,7 +40,7 @@ vec3 GetNormalFromMap();
 vec3 GetNormalFromMap(vec2 InTexCoords)
 {
 	//normalise it to -1, 1
-    vec3 tangentNormal = ((texture(material.texture_normal, InTexCoords).rgb * 2.0) - 1.0);
+    vec3 tangentNormal =  texture(material.texture_normal, InTexCoords).rgb * 2.0 - 1.0;
 	return normalize(fs_in.TBN * tangentNormal);
  }
 
@@ -64,9 +64,10 @@ void main()
 	for(int i = 0; i < NUMBER_OF_POINT_LIGHTS; i++)	
 	{
 		//per light radiance
-		const vec3 L = normalize(pointLights[i].position - fs_in.WorldPos);
-		const vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(fs_in.WorldPos, pointLights[i].position);	
-		L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
+		const vec3 PointlightTangentPos = fs_in.TBN * pointLights[i].position;
+		const vec3 L = normalize(PointlightTangentPos - fs_in.TangentFragPos);
+		const vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(fs_in.TangentFragPos, PointlightTangentPos);	
+	//	L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
 	}
 	
 	// IBL Ambient

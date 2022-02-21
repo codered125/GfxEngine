@@ -26,6 +26,9 @@ public:
 	static float MoClamp(float& T, float A, float B);
 
 	static glm::vec3 MoNormalize(glm::vec3& T);
+
+	static glm::mat4x4 MoLookAt(glm::vec3& Position, glm::vec3& Target, glm::vec3& WorldUp);
+	static glm::mat4x4 MoOrthographic(const float& Left, const float& Right, const float& Bottom, const float& Top, const float& Near_Plane, const float& Far_Plane);
 };
 
 //-------------------------------------------------------------------

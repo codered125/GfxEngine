@@ -113,7 +113,7 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox* InSkybox, Came
 	 
 	//Room Model
 	auto ModelTransformation = glm::mat4();
-	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, -2.0f, 0.0f));
+	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, -2.0f, 2.0f));
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
 //	ModelTransformation = glm::rotate(ModelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	DrawModel(LocalPBRShader, Sponza, ModelTransformation, Perspective, ShadowMap);
