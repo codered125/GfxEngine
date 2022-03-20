@@ -72,7 +72,7 @@ void Renderer::InitialiseLightingDataForShader(Shader* lightShader)
 
 		//auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(-DirectionLight->direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
 		//auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(DirectionLight->position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
-		auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), MoMath::MoLookAt(DirectionLight->position, DirectionLight->position + DirectionLight->direction, glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
+		auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), MoMath::MoLookAt(DirectionLight->position, DirectionLight->position + (DirectionLight->direction * 10.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
 		DirectionLight->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
 		Directional0 = DirectionLight;
 	}
