@@ -7,9 +7,8 @@ float DetermineShadow(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDir, 
  	vec3 ProjCoords = InFragPosLightSpace.xyz / InFragPosLightSpace.w; 
  	ProjCoords = ProjCoords * 0.5 + 0.5; // transform to ndc coordinates
 
-	float ClosestDepth = texture(ShadowMap, ProjCoords.xy).r;   
 	float CurrentDepth = ProjCoords.z;  
-	float Bias = max(0.05 * (1.0 - dot(InNormal, InLightDir)), 0.005); 
+  float Bias = max(0.001 * (1.0 - dot(InNormal, InLightDir)), 0.001); 
 
   //check whether current frag pos is in shadow
   //PCF

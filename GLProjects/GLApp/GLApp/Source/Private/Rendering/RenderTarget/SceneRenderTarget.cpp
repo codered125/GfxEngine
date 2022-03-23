@@ -95,9 +95,7 @@ void SceneRenderTarget::InitialiseSceneRenderTarget(RenderTargertParam& Params)
 
 	if (Params.MakeDepth)
 	{
-		Params.Width = 4096;
-		Params.Height = 4096;
-		Depth = RenderTexture(Params.Width, Params.Height, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GLenum(GL_NEAREST), GLenum(GL_NEAREST), GLenum(GL_CLAMP_TO_BORDER), NULL, GL_UNSIGNED_BYTE);
+		Depth = RenderTexture(Params.Width, Params.Height, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GLenum(GL_NEAREST), GLenum(GL_NEAREST), GLenum(GL_CLAMP_TO_EDGE), NULL, GL_UNSIGNED_BYTE);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, Params.TargetType, Depth.GetID(), 0);
 	}
 

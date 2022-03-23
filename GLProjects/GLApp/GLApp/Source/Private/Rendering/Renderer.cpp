@@ -21,7 +21,7 @@ Renderer::Renderer(GLint InScreenWidth, GLint InScreenHeight)
 {
 	SCREEN_WIDTH = InScreenWidth;
 	SCREEN_HEIGHT = InScreenHeight;
-	SetMainCamera( new Camera(glm::vec3(0.0f, 10.0f, 0.0f)));
+	SetMainCamera( new Camera(glm::vec3(0.0f, 30.0f, 0.0f)));
 }
 
 //-------------------------------------------------------------------
@@ -64,14 +64,12 @@ void Renderer::InitialiseLightingDataForShader(Shader* lightShader)
 	{
 		auto DirectionLight = new DirectionalLight(lightShader, "dirLight");
 		DirectionLight->direction = MoMath::MoNormalize(TheMostStaticVertices::SunDir);
-		DirectionLight->ambient = glm::vec3(1);
-		DirectionLight->diffuse = glm::vec3(1) * 25.0f;
-		DirectionLight->specular = glm::vec3(1);
+		DirectionLight->ambient = glm::vec3(1.0f);
+		DirectionLight->diffuse = glm::vec3(1.0f) * 25.0f;
+		DirectionLight->specular = glm::vec3(1.0f);
 		DirectionLight->position = TheMostStaticVertices::SunPos;
 		DirectionLight->intensity = directIntes;
 
-		//auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(-DirectionLight->direction * 10.0f, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
-		//auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), glm::lookAt(DirectionLight->position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
 		auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), MoMath::MoLookAt(DirectionLight->position, DirectionLight->position + (DirectionLight->direction * 10.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
 		DirectionLight->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
 		Directional0 = DirectionLight;
