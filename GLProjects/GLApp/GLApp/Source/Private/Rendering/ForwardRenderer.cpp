@@ -32,7 +32,6 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	IntermediateRenderBuffer= new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false, false);
 	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer;
 
-	DepthRenderBuffer = new SceneRenderTarget(4096, 4096, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
 	DepthRenderBuffer = new SceneRenderTarget(8192, 8192, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
 	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer;
 
