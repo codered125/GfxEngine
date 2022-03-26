@@ -8,6 +8,7 @@
 #include "Source/Public/Model.h"
 #include "Source/Public/PostProcessing.h"
 #include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTextureCubeMapIrradence.h"
 #include "Source/Public/Shader.h"
 
 #include <glm.hpp>
@@ -28,10 +29,10 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	IntermediateRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
 	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer;
 
-	DepthRenderBuffer = new SceneRenderTarget(4096, 4096, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
+	DepthRenderBuffer = new SceneRenderTarget(8192, 8192, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
 	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer;
 
-	GBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGBA16F, GL_RGBA, 5, false, false, true);
+	GBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGBA16F, GL_RGBA, 6, false, false, true);
 	MainPostProcessSetting->GRenderBuffer = GBuffer;
 
 	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
@@ -41,11 +42,10 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	ScreenShader = new Shader("Shaders/Deffered/DefferedScreen.vs", "Shaders/Deffered/DefferedScreen.frag");
 	GBufferShader = new Shader("Shaders/Deffered/DefferedGBufferFill.vs", "Shaders/Deffered/DefferedGBufferFill.frag");
 
-	Sponza = new Model(GET_VARIABLE_NAME(Sponza),"Models/SponzaTest/sponza.obj", GBufferShader);
-	GizMo = new Model(GET_VARIABLE_NAME(GizMo),"Models/Gizmo/GizmoForMo.obj", UnlitShader);
-	VisualSkybox= new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
+	Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
+	IrradenceCapturer = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
+	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
-	//ArrowLight = &Model("Models/ArrowLight/ArrowLight.obj");
 }
 
 void DefferedRenderer::RenderLoop( float TimeLapsed)
@@ -55,17 +55,15 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	//Begin Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
-	GlfwInterface::ResetScreen(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
+	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-
-	DepthShader->use();
 	RenderDemo(RenderStage::Depth, VisualSkybox, MainCamera, nullptr);
 	//End Shadow Render Pass
 
 	//Begin Main Pass
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, GBuffer->GetID());
-	GlfwInterface::ResetScreen(glm::vec4(0.05f, 0.05f, 0.05f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
+	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	RenderDemo(RenderStage::GBuffer, VisualSkybox, MainCamera, &DepthRenderBuffer->GetDepthTexture()->GetID());
 
@@ -80,7 +78,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	//Begin PostProcess Render Pass
 	// clear all relevant buffers
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-	GlfwInterface::ResetScreen(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NONE, GL_DEPTH_TEST);
+	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NONE, GL_DEPTH_TEST);
 	PostProcessingQuad->ThisShader->use();
 	PostProcessingQuad->ThisShader->setVec3("CamPos",  Camera::GetPosition(MainCamera));
 	PostProcessingQuad->ThisShader->setVec3("CamDir",  Camera::GetFront(MainCamera));
@@ -89,7 +87,11 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	PostProcessingQuad->ThisShader->SetSampler("DiffuseShadowTexture", &GBuffer->GetColourAttachmentByIndex(2)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("NormalMapTexture", &GBuffer->GetColourAttachmentByIndex(3)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("RMATexture", &GBuffer->GetColourAttachmentByIndex(4)->GetID(), GL_TEXTURE_2D);
+	PostProcessingQuad->ThisShader->SetSampler("FragPosLightSpaceTexture", &GBuffer->GetColourAttachmentByIndex(5)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("ShadowMap", &DepthRenderBuffer->GetDepthTexture()->GetID(), GL_TEXTURE_2D);
+	PostProcessingQuad->ThisShader->SetSampler("IrradenceMap", &IrradenceCapturer->GetIrradenceDiffuse()->GetID(), GL_TEXTURE_CUBE_MAP);
+	PostProcessingQuad->ThisShader->SetSampler("PrefilterMap", &IrradenceCapturer->GetPrefilteredEnvironmentMap()->GetID(), GL_TEXTURE_CUBE_MAP);
+	PostProcessingQuad->ThisShader->SetSampler("BrdfLUT", &IrradenceCapturer->GetBRDFLookUpTexture()->GetID(), GL_TEXTURE_2D);
 
 	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
 	{
@@ -102,6 +104,8 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	}
 	InitialiseLightingDataForShader(PostProcessingQuad->ThisShader);
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
+	//VisualSkybox->SkyboxTexture = IrradenceCapturer->GetUnConvolutedRenderTexture();
+	//VisualSkybox->Draw(glm::mat4(), Camera::GetProjection(MainCamera), Camera::GetViewMatrix(MainCamera));
 	//End PostProcess Render Pass
 }
 
@@ -113,23 +117,18 @@ void DefferedRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Ca
 	//skip this for depth pass
 	if (RenderStage != RenderStage::Depth)
 	{
-		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
-		//DrawLights(InLampShader, ourCamera, nullptr);
+		//InSkybox->SkyboxTexture = IrradenceCapturer->GetUnConvolutedRenderTexture();
+		//InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
+		//DrawLights(Perspective, nullptr);
 	}
 
 	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : GBufferShader;
-	auto LocalUnlitShader = RenderStage == RenderStage::Depth ? DepthShader : GBufferShader;
 	 
 	//Room Model
 	auto ModelTransformation = glm::mat4();
+	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 2.0f, -2.0f));
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
-	ModelTransformation = glm::rotate(ModelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	DrawModel(LocalPBRShader, Sponza, ModelTransformation, Perspective, ShadowMap);
-
-	ModelTransformation = glm::mat4();
-	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.25f));
-	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 1.50f, 0.0f));
-	DrawModel(LocalUnlitShader, GizMo, ModelTransformation, Perspective, ShadowMap);
 }
 
 
@@ -143,8 +142,8 @@ void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat
 		ModelShader->SetSampler("ShadowMap", ShadowMap, GL_TEXTURE_2D);
 	}
 
-	ModelShader->setFloat("NearPlane", Camera::GetNearPlane(Perspective));
-	ModelShader->setFloat("FarPlane", Camera::GetFarPlane(Perspective));
+//	ModelShader->setFloat("NearPlane", Camera::GetNearPlane(Perspective));
+//	ModelShader->setFloat("FarPlane", Camera::GetFarPlane(Perspective));
 	ModelShader->setVec3("CamPos",  Camera::GetPosition(Perspective));
 	ModelShader->setVec3("CamDir",  Camera::GetFront(Perspective));
 	

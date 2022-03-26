@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <gl/glew.h>
 #include <vector>
 
@@ -22,6 +23,7 @@ public:
 	const void* Pixels;
 	bool MipMap = true;
 	bool MSAA = false;
+	std::function<void()> PreParamInitalizerFunction = [] { return; };
 };
 
 //-------------------------------------------------------------------

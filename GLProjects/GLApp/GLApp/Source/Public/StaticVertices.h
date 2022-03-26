@@ -30,8 +30,8 @@ namespace TheMostStaticVertices
 	};
 
 	
-	glm::vec3 SunDir = glm::vec3(-0.5f, -2.0f, 1.f);
-	glm::vec3 SunPos = glm::vec3(0.2f, 20.f, -10.f);
+	glm::vec3 SunDir = glm::vec3(-0.5f, -2.0f, 0.75f);
+	glm::vec3 SunPos = glm::vec3(0.f, 15.f, -10.f);
 
 };
 

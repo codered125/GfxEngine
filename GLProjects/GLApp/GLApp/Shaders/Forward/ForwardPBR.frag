@@ -67,7 +67,7 @@ void main()
 		const vec3 PointlightTangentPos = fs_in.TBN * pointLights[i].position;
 		const vec3 L = normalize(PointlightTangentPos - fs_in.TangentFragPos);
 		const vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(fs_in.TangentFragPos, PointlightTangentPos);	
-	//	L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
+		//L0+= ProgrammablePBR(Norm, View, radiance, L, parse, pointLights[i].intensity);
 	}
 	
 	// IBL Ambient
@@ -84,7 +84,6 @@ void main()
 	vec3 L = normalize(-dirLight.direction);
 	float Shadow = 1.0 - DetermineShadow(fs_in.FragPosLightSpace, Norm, L, ShadowMap);
 	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
-	//L0 *= max(Shadow, 0.01);
 	
 	vec3 OutputColour = vec3(Ambient + L0); 
 	OutputColour *= max(Shadow, 0.025);

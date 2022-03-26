@@ -22,6 +22,7 @@ layout (location = 1) out vec3 Normal;
 layout (location = 2) out vec4 DiffuseShadow;
 layout (location = 3) out vec3 NormalMap;
 layout (location = 4) out vec3 RMA;
+layout (location = 5) out vec4 FragPosLightSpaceTexture;
 
 uniform Material material;
 
@@ -47,7 +48,9 @@ void main()
 	Normal = fs_in.Normal;
 	DiffuseShadow = vec4(parse.diffuse, parse.alpha);
 	NormalMap = GetNormalFromMap();
+	FragPosLightSpaceTexture = fs_in.FragPosLightSpace;
 	RMA = vec3(parse.roughness, parse.metallic, parse.ao);
+
 }
 
 //-------------------------------------------------------------------

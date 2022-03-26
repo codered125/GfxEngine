@@ -8,6 +8,7 @@
 #include <SOIL2/src\SOIL2\SOIL2.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <stb_image.h>
 
 //-------------------------------------------------------------------
 
@@ -217,8 +218,10 @@ GLint Model::TextureFromFile(const char* path, std::string directory)
 	std::string filename = std::string(path);
 	filename = directory + '/' + filename;
 
+	stbi_set_flip_vertically_on_load(true);
+
 	int ImageWidth, ImageHeight, NrChannels;
-	unsigned char *Image = SOIL_load_image(filename.c_str(), &ImageWidth, &ImageHeight, &NrChannels, SOIL_LOAD_AUTO);
+	unsigned char *Image = stbi_load(filename.c_str(), &ImageWidth, &ImageHeight, &NrChannels, SOIL_LOAD_AUTO);
 
 	auto Format = GL_RED;
 	if (NrChannels == 3)
@@ -230,8 +233,10 @@ GLint Model::TextureFromFile(const char* path, std::string directory)
 	{
 		Format = GL_RGBA;
 	}
-	RenderTexture RT(ImageWidth, ImageHeight, GL_TEXTURE_2D, Format, Format, false, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, Image, GL_UNSIGNED_BYTE);
-	SOIL_free_image_data(Image);
+
+	RenderTexture RT(ImageWidth, ImageHeight, GL_TEXTURE_2D, Format, Format, false, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, Image, GL_UNSIGNED_BYTE, nullptr);
+	stbi_image_free(Image);
+	stbi_set_flip_vertically_on_load(false);
 
 	return RT.GetID();
 }

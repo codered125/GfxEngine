@@ -44,13 +44,8 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	ScreenShader = new Shader("Shaders/Forward/ForwardScreen.vs", "Shaders/Forward/ForwardScreen.frag");
 	WaterShader = new Shader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
 
-	//Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/Room/Room.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
-	//GizMo = new Model(GET_VARIABLE_NAME(GizMo),"Models/Gizmo/GizmoForMo.obj", UnlitShader);
-	//WaterBlock = new Model(GET_VARIABLE_NAME(WaterBlock),"Models/WaterBlock/SM_bathPoolSurface2.obj", WaterShader);
-	
 	IrradenceCapturer = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
-
 	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
 	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
 
@@ -67,7 +62,6 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-
 	RenderDemo(RenderStage::Depth, VisualSkybox, MainCamera, nullptr);
 	//End Shadow Render Pass
 
@@ -77,7 +71,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
 	RenderDemo(RenderStage::Main, VisualSkybox, MainCamera, &DepthRenderBuffer->GetDepthTexture()->GetID());
-	//DrawGizmos(MainCamera);
+
 
 	//Multisampled image contains more information than normal images, blits downscales / resolves the image
 	//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)

@@ -28,11 +28,9 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 	Params.InternalFormat = InInternalFormat;
 	Params.Format = InFormat;
 
-
 	IrrandenceRenderBuffer = new SceneRenderTarget(512, 512, GL_TEXTURE_2D, InInternalFormat, InFormat, 1, false, false, true);
-	HDRRenderTexture = new RenderTexture(GL_TEXTURE_2D, InInternalFormat, InFormat, InHDRPath, GL_FLOAT);
+	HDRRenderTexture = new RenderTexture(GL_TEXTURE_2D, InInternalFormat, InFormat, InHDRPath, GL_FLOAT, nullptr);
 	UnConvolutedMap = new RenderTextureCubeMap(GL_TEXTURE_CUBE_MAP, InInternalFormat, InFormat, 512, 512, false);
-
 
 	auto CaptureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
 	glm::mat4 CaptureViews[] =
@@ -97,7 +95,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 
 
 
-	BRDFLookUpTexture = new RenderTexture(512, 512, GL_TEXTURE_2D, GL_RG16F, GL_RG, false, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, NULL, GL_FLOAT);
+	BRDFLookUpTexture = new RenderTexture(512, 512, GL_TEXTURE_2D, GL_RG16F, GL_RG, false, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, NULL, GL_FLOAT, nullptr);
 	auto BRDFLookUpShader = &Shader("Shaders/IrradenceMapCapture/BRDFLookUpTexture.vs", "Shaders/IrradenceMapCapture/BRDFLookUpTexture.frag");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, IrrandenceRenderBuffer->GetID());

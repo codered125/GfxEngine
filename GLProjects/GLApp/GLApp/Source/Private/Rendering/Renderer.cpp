@@ -70,7 +70,7 @@ void Renderer::InitialiseLightingDataForShader(Shader* lightShader)
 		DirectionLight->position = TheMostStaticVertices::SunPos;
 		DirectionLight->intensity = directIntes;
 
-		auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), MoMath::MoLookAt(DirectionLight->position, DirectionLight->position + (DirectionLight->direction * 10.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
+		auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), MoMath::MoLookAt(DirectionLight->position, DirectionLight->position + (DirectionLight->direction * 15.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
 		DirectionLight->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
 		Directional0 = DirectionLight;
 	}

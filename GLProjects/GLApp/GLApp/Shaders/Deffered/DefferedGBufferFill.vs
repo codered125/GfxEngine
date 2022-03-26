@@ -1,4 +1,7 @@
- #version 430 core
+#version 430 core
+
+//-------------------------------------------------------------------
+
 layout (location = 0) in vec3 position; 
 layout (location = 1) in vec3 normal; 
 layout (location = 2) in vec2 texCoords; 
@@ -20,6 +23,8 @@ uniform mat4 view; //converts normalised coordinates to window coordinates, aka 
 uniform mat4 projection; //converts those camera coordinates to normalised coordinates(0-1)
 uniform mat4 lightSpaceMatrix;
 
+//-------------------------------------------------------------------
+
 void main()
 {
     gl_Position =  projection * view * model * vec4 (position, 1.0f);
@@ -36,3 +41,7 @@ void main()
     const vec3 B = cross(N, T);
     vs_Out.TBN = mat3(T, B, N);
 };
+
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------

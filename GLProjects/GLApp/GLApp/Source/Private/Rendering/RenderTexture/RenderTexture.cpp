@@ -14,7 +14,7 @@ RenderTexture::RenderTexture()
 
 //-------------------------------------------------------------------
 
-RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA, GLenum InMinFilter, GLenum InMagFilter, GLenum InWrap, const void* InPixels, GLenum InBufferType)
+RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA, GLenum InMinFilter, GLenum InMagFilter, GLenum InWrap, const void* InPixels, GLenum InBufferType, std::function<void()> InPreParamInitalizerFunction)
 {
 	Params.TargetType = InTargetType;
 	Params.Width = InWidth;
@@ -29,8 +29,11 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 	Params.WrapT = InWrap;
 	Params.BufferType = InBufferType;
 	Params.Pixels = InPixels;
+	if (InPreParamInitalizerFunction != nullptr)
+	{
+		Params.PreParamInitalizerFunction = InPreParamInitalizerFunction;
+	}
 	InitialiseRenderTexture(Params);
-	
 
 }
 
@@ -57,7 +60,7 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 
 //-------------------------------------------------------------------
 
-RenderTexture::RenderTexture(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const GLchar* InHDRPath, GLenum InBufferType)
+RenderTexture::RenderTexture(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const GLchar* InHDRPath, GLenum InBufferType, std::function<void()> InPreParamInitalizerFunction)
 {
 	Params.TargetType = InTargetType;
 	Params.Format = InFormat;
@@ -75,6 +78,10 @@ RenderTexture::RenderTexture(GLenum InTargetType, GLenum InInternalFormat, GLenu
 	{
 		Params.BufferType = InBufferType;
 		Params.Pixels = data;
+		if (InPreParamInitalizerFunction != nullptr)
+		{
+			Params.PreParamInitalizerFunction = InPreParamInitalizerFunction;
+		}
 		InitialiseRenderTexture(Params);
 		stbi_image_free(data);
 	}
@@ -89,6 +96,7 @@ RenderTexture::RenderTexture(GLenum InTargetType, GLenum InInternalFormat, GLenu
 
 void RenderTexture::InitialiseRenderTexture(RenderTextureParam& Params)
 {
+	Params.PreParamInitalizerFunction();
 
 	glGenTextures(1, &Id);
 	GLErrorCheck();

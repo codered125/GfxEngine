@@ -6,6 +6,7 @@
 
 class Model;
 class SkyBox;
+class RenderTextureCubeMapIrradence;
 
 //-------------------------------------------------------------------
 
@@ -39,6 +40,7 @@ private:
 	Model* GizMo = nullptr;
 	Model* ArrowLight = nullptr;
 	SkyBox* VisualSkybox = nullptr;
+	RenderTextureCubeMapIrradence* IrradenceCapturer = nullptr;
 
 };
 

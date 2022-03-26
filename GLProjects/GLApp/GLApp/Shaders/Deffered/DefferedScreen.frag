@@ -1,12 +1,14 @@
 #version 430 core
+#define NUMBER_OF_POINT_LIGHTS 3
+
+//-------------------------------------------------------------------
 
 #include Shaders/HelperShaders/Common.glsl
 #include Shaders/HelperShaders/HelperFunctions.glsl
 #include Shaders/HelperShaders/PCFShadowCalculation.glsl
-#include Shaders/HelperShaders/PBR.glsl
+#include Shaders/HelperShaders/IBLPBR.glsl
 
-#define NUMBER_OF_POINT_LIGHTS 3
-
+//-------------------------------------------------------------------
 
 struct PostProcessEffects
 {
@@ -15,22 +17,28 @@ struct PostProcessEffects
  bool HDR;
 };
 
-in vec2 TexCoords;
+//-------------------------------------------------------------------
 
-layout (location = 0) out vec4 FragColor;
- 
-layout (location = 1) uniform sampler2D PositionTexture;
-layout (location = 2) uniform sampler2D NormalTexture;
-layout (location = 3) uniform sampler2D DiffuseShadowTexture;
-layout (location = 4) uniform sampler2D NormalMapTexture;
-layout (location = 5) uniform sampler2D RMATexture;
-layout (location = 6) uniform sampler2D ShadowMap;
+in vec2 TexCoords;
+out vec4 FragColor;
+
+layout (location = 2) uniform sampler2D PositionTexture;
+layout (location = 3) uniform sampler2D NormalTexture;
+layout (location = 4) uniform sampler2D DiffuseShadowTexture;
+layout (location = 5) uniform sampler2D NormalMapTexture;
+layout (location = 6) uniform sampler2D RMATexture;
+layout (location = 7) uniform sampler2D ShadowMap;
+layout (location = 8) uniform sampler2D FragPosLightSpaceTexture;
+layout (location = 9) uniform samplerCube IrradenceMap;
+layout (location = 10) uniform samplerCube PrefilterMap;
+layout (location = 11) uniform sampler2D BrdfLUT;
 
 uniform PostProcessEffects currentPostProcessEffect;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform vec3 CamPos;
 uniform vec3 CamDir;
+uniform mat4 lightSpaceMatrix;
 
 const float exposure = 1.5;
 const float offset = 1 /300.0f;
@@ -39,28 +47,26 @@ vec3 PostProcessEffect(vec3 untouchedColour);
 vec3 ApplyKernal();
 vec4 CalculateLight();
 
+//-------------------------------------------------------------------
+
 void main()
 { 	
 	const float gamma = 1.0f; //const float gamma = 2.2f;
 	vec3 hdrColor = CalculateLight().rgb;
-
 	if(currentPostProcessEffect.HDR)
     {
-        //vec3 result = hdrColor / (hdrColor + vec3(1.0)); // reinhard
-		vec3 result = vec3(1.0) - exp(-hdrColor * exposure); // exposure
-        //gamma correction       
-        result = pow(result, vec3(1.0 / gamma));
-        FragColor = vec4( PostProcessEffect(result), 1.0);
-	   // float brightness = dot(normalize(FragColor.rgb),  vec3(0.2126, 0.7152, 0.0722));
-		//FragColor = brightness > 01.0? vec4(ApplyKernal(), 1.0f) : FragColor;// vec4(ApplyKernal(), 1.0f) : FragColor;	
+        hdrColor *= exposure;
+		hdrColor = hdrColor / (hdrColor + vec3(1.0));
+        FragColor = vec4(pow(hdrColor, vec3(1.0 / gamma)), 1.0);
     }
-
     else
     {
         vec3 result = pow( hdrColor, vec3(1.0 / gamma));
         FragColor = vec4( PostProcessEffect(result), 1.0);
     }
 }
+
+//-------------------------------------------------------------------
 
 vec3 PostProcessEffect(vec3 untouchedColour)
 {
@@ -70,51 +76,20 @@ vec3 PostProcessEffect(vec3 untouchedColour)
 	colourOutput = currentPostProcessEffect.ColourGradiant ==0? colourOutput : lerpedColour;
 	return colourOutput;
 }
-vec3 ApplyKernal()
-{
-	vec2 offsets[9] = vec2[](
-		vec2(-offset,  offset), // top-left
-        vec2( 0.0f,    offset), // top-center
-        vec2( offset,  offset), // top-right
-        vec2(-offset,  0.0f),   // center-left
-        vec2( 0.0f,    0.0f),   // center-center
-        vec2( offset,  0.0f),   // center-right
-        vec2(-offset, -offset), // bottom-left
-        vec2( 0.0f,   -offset), // bottom-center
-        vec2( offset, -offset)  // bottom-right 
-		);
 
-	float kernel[9] = float[](
-		1.0 / 16, 2.0 / 16, 1.0 / 16,
-		2.0 / 16, 4.0 / 16, 2.0 / 16,
-		1.0 / 16, 2.0 / 16, 1.0 / 16  
-	);
-
-	vec3 sampleTex[9];
-	for (int i = 0; i < 9; i++)
-	{
-
-//	 sampleTex[i] =  vec3(texture(screenTexture, TexCoords + offsets[i]));
-	}
-	vec3 outputcol;
-	for (int i = 0 ; i < 9; i++)
-	{
-	outputcol += sampleTex[i] * kernel[i];
-	}
-	
-	return outputcol;
-}
+//-------------------------------------------------------------------
 
 vec4 CalculateLight()
 {
-	vec3 FragPos = texture(PositionTexture, TexCoords).rgb;
-	vec3 FragNormal = texture(NormalTexture, TexCoords).rgb;
-	vec4 FragDiffuseShadow = texture(DiffuseShadowTexture, TexCoords).rgba;
-	vec3 FragNormalMap = texture(NormalMapTexture, TexCoords).rgb;
-	vec3 FragRMA = texture(RMATexture, TexCoords).rgb;
+	const vec3 FragPos = texture(PositionTexture, TexCoords).rgb;
+	const vec3 FragNormal = texture(NormalTexture, TexCoords).rgb;
+	const vec4 FragDiffuseShadow = texture(DiffuseShadowTexture, TexCoords).rgba;
+	const vec3 FragNormalMap = texture(NormalMapTexture, TexCoords).rgb;
+	const vec3 FragRMA = texture(RMATexture, TexCoords).rgb;
+	const vec4 FragPosLightSpace = texture(FragPosLightSpaceTexture, TexCoords).rgba;
 	LinearMatVals Parse = LinearMatVals(FragRMA.x, FragRMA.y, FragRMA.z, FragDiffuseShadow.rgb, FragDiffuseShadow.a);
 
-	vec3 View = normalize(CamPos - FragPos);
+	const vec3 View = normalize(CamPos - FragPos);
 
 	//Metelic ratio
 	vec3 F0 = vec3(0.04);
@@ -126,23 +101,33 @@ vec4 CalculateLight()
 	for(int i = 0; i < NUMBER_OF_POINT_LIGHTS; i++)	
 	{
 		//per light radiance
-		vec3 L = normalize(pointLights[i].position - FragPos);
-		vec3 Halfway = normalize(View + L);
-		vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(FragPos, pointLights[i].position);	
-		L0+= ProgrammablePBR(FragNormalMap, View, radiance, L, Parse, pointLights[i].intensity);
+		const vec3 L = normalize(pointLights[i].position - FragPos);
+		const vec3 Halfway = normalize(View + L);
+		const vec3 radiance = pointLights[i].diffuse * CalculateAttenuation(FragPos, pointLights[i].position);	
+	//	L0+= ProgrammablePBR(FragNormalMap, View, radiance, L, Parse, pointLights[i].intensity);
 	}
 
+	// IBL Ambient
+    const vec3 kS = fresnelSchlick(saturate(dot(FragNormalMap, View)), F0);
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - Parse.metallic;	  
+  	const vec3 Irradiance = texture(IrradenceMap, FragNormalMap).rgb;
+    const vec3 Diffuse = Irradiance * Parse.diffuse;
+	const vec3 Specular = IBLAmbientSpecular(FragNormalMap, View, Parse, BrdfLUT, IrradenceMap, PrefilterMap);
+    const vec3 Ambient = (kD * Diffuse + Specular) * Parse.ao;
+
+
 	//Directional Lights
-	vec3 r = dirLight.diffuse;
-	vec3 L = normalize(-dirLight.direction);
-	vec3 ambient = vec3(0.03) * Parse.diffuse * Parse.ao;
-	
-	//float Shadow = 1.0f - DetermineShadow(fs_in.FragPosLightSpace, normalize(FragNormal), L, ShadowMap);
+	const vec3 r = dirLight.diffuse;
+	const vec3 L = normalize(-dirLight.direction);
+	const float Shadow = 1.0f - DetermineShadow(FragPosLightSpace, FragNormalMap, L, ShadowMap);
 	L0 += ProgrammablePBR(FragNormalMap, View, r, L, Parse, dirLight.intensity);
- 	vec3 color = ambient + L0;
-	
-	//color = color / (color + vec3(1.0));
-	//color = pow(color, vec3(1.0/2.2)); 
-	return vec4(FragRMA, 1.0f);   
-	return vec4(color, Parse.alpha);    
+
+	vec3 OutputColour = vec3(Ambient + L0); 
+	OutputColour *= max(Shadow, 0.025);
+	return vec4(OutputColour, Parse.alpha);   
 }
+
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
