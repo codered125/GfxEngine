@@ -158,15 +158,7 @@ vec3 IBLAmbientSpecular(vec3 Norm, vec3 View, LinearMatVals ToParse, sampler2D B
 	//Metelic ratio
 	vec3 F0 = vec3(0.04);
 	F0 = mix(F0, ToParse.diffuse, ToParse.metallic);
-
     vec3 F = fresnelSchlickRoughness(saturate(dot(Norm, View)), F0, ToParse.roughness);
-    
-    vec3 kS = F;
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - ToParse.metallic;	  
-    
-    vec3 Irradence = texture(IrradenceMap, Norm).rgb;
-    vec3 diffuse      = Irradence * ToParse.diffuse;
     
     // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
     const float MAX_REFLECTION_LOD = 4.0;

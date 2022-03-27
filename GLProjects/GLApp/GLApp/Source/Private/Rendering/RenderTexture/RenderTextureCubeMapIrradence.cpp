@@ -43,6 +43,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 		MoMath::MoLookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
 	};
 
+	//Diffuse preconvoluted map
 	auto EquirectangleToCubemapShader = &Shader("Shaders/IrradenceMapCapture/EquirectangularToCubemap.vs", "Shaders/IrradenceMapCapture/EquirectangularToCubemap.frag");
 	EquirectangleToCubemapShader->use();
 	EquirectangleToCubemapShader->SetSampler("EquirectangularMap", &HDRRenderTexture->GetID(), GL_TEXTURE_2D);
@@ -60,15 +61,14 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
+	//Specular
 	PreFilteredEnvironmentMap = new RenderTextureCubeMap(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, 128, 128, true);
 	auto PrefilterShader = &Shader("Shaders/IrradenceMapCapture/EquirectangularToCubemap.vs", "Shaders/IrradenceMapCapture/PreFilterEnvironmentMap.frag");
 	PrefilterShader->use();
 	PrefilterShader->SetSampler("UnConvolutedMap", &UnConvolutedMap->GetID(), GL_TEXTURE_CUBE_MAP);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, IrrandenceRenderBuffer->GetID());
-	GLuint MaxMipMapLevels = 5;
-
+	const GLuint MaxMipMapLevels = 5;
 	for (GLuint MipIndex = 0; MipIndex < MaxMipMapLevels; ++MipIndex)
 	{
 		// reisze framebuffer according to mip-level size.
@@ -76,7 +76,6 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 		GLuint MipHeight = static_cast<GLuint>(128 * std::pow(0.5, MipIndex));
 		IrrandenceRenderBuffer->ResizeRenderTarget(MipWidth, MipHeight, GL_DEPTH24_STENCIL8);
 		glViewport(0, 0, MipWidth, MipHeight);
-
 
 		float roughness = (float)MipIndex / (float)(MaxMipMapLevels - 1);
 		PrefilterShader->setFloat("MipMapRoughness", roughness);
@@ -93,8 +92,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-
+	//BRDFLookUpText
 	BRDFLookUpTexture = new RenderTexture(512, 512, GL_TEXTURE_2D, GL_RG16F, GL_RG, false, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, NULL, GL_FLOAT, nullptr);
 	auto BRDFLookUpShader = &Shader("Shaders/IrradenceMapCapture/BRDFLookUpTexture.vs", "Shaders/IrradenceMapCapture/BRDFLookUpTexture.frag");
 
@@ -108,10 +106,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 	Plane->Draw(BRDFLookUpShader);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-
-
-
+	//Irradence Diffuse
 	IrradenceDiffuse = new RenderTextureCubeMap();
 	glGenTextures(1, &IrradenceDiffuse->GetID());
 	glBindTexture(InTargetType, IrradenceDiffuse->GetID());

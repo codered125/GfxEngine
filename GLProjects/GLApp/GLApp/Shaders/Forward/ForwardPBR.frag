@@ -88,7 +88,6 @@ void main()
 	vec3 OutputColour = vec3(Ambient + L0); 
 	OutputColour *= max(Shadow, 0.025);
 	FragColor = vec4(OutputColour, parse.alpha);   
-	//FragColor = vec4(vec3(max(Shadow, 0.01)), 1.0f);
 }
 
 //-------------------------------------------------------------------
