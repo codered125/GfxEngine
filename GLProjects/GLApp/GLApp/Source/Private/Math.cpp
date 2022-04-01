@@ -16,6 +16,13 @@ glm::vec3 MoMath::MoLerp(glm::vec3& a, glm::vec3& b, float& t)
 
 //-------------------------------------------------------------------
 
+float MoMath::MoLerpFast(float a, float b, float t)
+{
+	return a + t * (b - a);
+}
+
+//-------------------------------------------------------------------
+
 float MoMath::MoDotProduct(glm::vec3& a, glm::vec3& b)
 {
 	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);

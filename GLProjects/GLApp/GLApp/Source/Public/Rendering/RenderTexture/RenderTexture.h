@@ -13,7 +13,6 @@ class RenderTexture
 public:
 	RenderTexture();
 	RenderTexture(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, bool InMSAA, GLenum InMinFilter, GLenum InMagFilter, GLenum InWrap, const void* InPixels, GLenum InBufferType, std::function<void()> InPreParamInitalizerFunction);
-	//RenderTexture(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const void* InPixels, GLenum InBufferType = GL_UNSIGNED_BYTE, GLenum InMinFilter = GL_LINEAR, GLenum InMagFilter = GL_LINEAR);
 	RenderTexture(GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const GLchar* InHDRPath, GLenum InBufferType, std::function<void()> InPreParamInitalizerFunction);
 
 	GLuint& GetID();

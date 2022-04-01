@@ -32,6 +32,7 @@ layout (location = 8) uniform sampler2D FragPosLightSpaceTexture;
 layout (location = 9) uniform samplerCube IrradenceMap;
 layout (location = 10) uniform samplerCube PrefilterMap;
 layout (location = 11) uniform sampler2D BrdfLUT;
+layout (location = 12) uniform sampler2D screenTexture;
 
 uniform PostProcessEffects currentPostProcessEffect;
 uniform DirLight dirLight;
@@ -39,6 +40,7 @@ uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform vec3 CamPos;
 uniform vec3 CamDir;
 uniform mat4 lightSpaceMatrix;
+uniform bool DebugQuad;
 
 const float exposure = 1.5;
 const float offset = 1 /300.0f;
@@ -53,6 +55,9 @@ void main()
 { 	
 	const float gamma = 1.0f; //const float gamma = 2.2f;
 	vec3 hdrColor = CalculateLight().rgb;
+	FragColor = (vec4(hdrColor, 1.0));
+	return;
+
 	if(currentPostProcessEffect.HDR)
     {
         hdrColor *= exposure;
@@ -64,6 +69,7 @@ void main()
         vec3 result = pow( hdrColor, vec3(1.0 / gamma));
         FragColor = vec4( PostProcessEffect(result), 1.0);
     }
+
 }
 
 //-------------------------------------------------------------------
@@ -125,7 +131,12 @@ vec4 CalculateLight()
 
 	vec3 OutputColour = vec3(Ambient + L0); 
 	OutputColour *= max(Shadow, 0.025);
-	return vec4(OutputColour, Parse.alpha);   
+	if(DebugQuad)
+	{
+		return  texture(screenTexture, TexCoords).r * vec4(1.0f);
+	}
+	return vec4( OutputColour, Parse.alpha); 
+  
 }
 
 //-------------------------------------------------------------------

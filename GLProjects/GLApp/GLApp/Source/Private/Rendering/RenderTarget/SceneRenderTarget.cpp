@@ -55,6 +55,19 @@ void SceneRenderTarget::ResizeRenderTarget(GLint InWidth, GLint InHeight, GLenum
 
 //-------------------------------------------------------------------
 
+void SceneRenderTarget::SetColourAttachmentByIndex(RenderTexture* InColourAttachment, const GLuint Index)
+{
+	if (ColourAttachments.size() > Index)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, Id);
+		ColourAttachments[Index] = *InColourAttachment;
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + Index, Param.TargetType, InColourAttachment->GetID(), 0);
+		GLErrorCheck();
+	}
+}
+
+//-------------------------------------------------------------------
+
 void SceneRenderTarget::InitialiseSceneRenderTarget(RenderTargertParam& Params)
 {
 	glGenFramebuffers(1, &Id);

@@ -21,7 +21,7 @@ Renderer::Renderer(GLint InScreenWidth, GLint InScreenHeight)
 {
 	SCREEN_WIDTH = InScreenWidth;
 	SCREEN_HEIGHT = InScreenHeight;
-	SetMainCamera( new Camera(glm::vec3(0.0f, 30.0f, 0.0f)));
+	SetMainCamera( new Camera(glm::vec3(0.0f, 10.0f, - 3.0f)));
 }
 
 //-------------------------------------------------------------------

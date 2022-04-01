@@ -1,6 +1,8 @@
 #version 430 core
 #define NUMBER_OF_POINT_LIGHTS 1
 
+//-------------------------------------------------------------------
+
 struct Material
 {
     sampler2D  texture_diffuse;
@@ -10,6 +12,8 @@ struct Material
     float shininess;
 };
 
+//-------------------------------------------------------------------
+
 struct DirLight
 {
 	vec3 direction;
@@ -18,6 +22,7 @@ struct DirLight
 	vec3 specular;
 };
 
+//-------------------------------------------------------------------
 
 struct PointLight
 {
@@ -30,6 +35,8 @@ struct PointLight
     vec3 diffuse;
     vec3 specular;
 };
+
+//-------------------------------------------------------------------
 
 struct SpotLight
 {
@@ -46,6 +53,7 @@ struct SpotLight
     vec3 specular;
 };
 
+//-------------------------------------------------------------------
 
 in vec3 FragPos;
 in vec3 Normal;
@@ -63,6 +71,8 @@ bool  blin = false;
 vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir );
 vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir );
 vec3 CalcSpotLight( SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir );
+
+//-------------------------------------------------------------------
 
 void main ()
 {
@@ -82,8 +92,7 @@ void main ()
 
 };
 
-
-
+//-------------------------------------------------------------------
 
 // Calculates the color when using a directional light.
 vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir )
@@ -114,9 +123,7 @@ vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir )
     return ( ambient + diffuse + specular );
 }
 
-
-
-
+//-------------------------------------------------------------------
 
 // Calculates the color when using a point light.
 vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
@@ -165,6 +172,7 @@ vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     return (returnValue);
 }
 
+//-------------------------------------------------------------------
 
 // Calculates the color when using a spot light.
 vec3 CalcSpotLight( SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
@@ -208,3 +216,7 @@ vec3 CalcSpotLight( SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir )
     
     return ( ambient + diffuse + specular );
 }
+
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------

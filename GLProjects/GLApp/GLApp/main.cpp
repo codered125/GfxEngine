@@ -21,7 +21,7 @@
 
 //-------------------------------------------------------------------------------------
 
-#define DEFFERED 0
+#define DEFFERED 1
 int main()
 {
 	//Model::GetImporterSingleTon();

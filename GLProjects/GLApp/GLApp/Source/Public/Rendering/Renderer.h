@@ -9,10 +9,11 @@ class Shader;
 class SkyBox;
 class Camera;
 class Quad;
+class RenderTextureSSAO;
 class SceneRenderTarget;
 class Shape;
-struct PostProcessSettings;
 struct Light;
+struct PostProcessSettings;
 
 //-------------------------------------------------------------------
 
@@ -45,12 +46,15 @@ protected:
 	GLint SCREEN_WIDTH;
 	GLint SCREEN_HEIGHT;
 
+	SceneRenderTarget* SSAO;
+	SceneRenderTarget* Blur;
 	SceneRenderTarget* MainRenderBuffer;
 	SceneRenderTarget* IntermediateRenderBuffer;
 	SceneRenderTarget* DepthRenderBuffer;
 	SceneRenderTarget* GBuffer;
 	SceneRenderTarget* PostProcessRenderBuffer;
 
+	RenderTextureSSAO* SSAOBuilder;
 
 	GLint AliasingCount = 4;
 	GLint NumberofLights = 3;

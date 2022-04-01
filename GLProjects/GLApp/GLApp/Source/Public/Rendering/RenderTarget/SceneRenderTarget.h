@@ -21,6 +21,7 @@ public:
 	RenderTexture* GetColourAttachmentByIndex(GLint Index);
 	RenderTexture* GetDepthTexture();
 	void ResizeRenderTarget(GLint InWidth, GLint InHeight, GLenum InRBOType);
+	void SetColourAttachmentByIndex(RenderTexture* InColourAttachment, const GLuint Index);
 
 protected:
 	void InitialiseSceneRenderTarget(RenderTargertParam& Params);

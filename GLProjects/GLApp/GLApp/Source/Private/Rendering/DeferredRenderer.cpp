@@ -7,6 +7,7 @@
 #include "Source/Public/Meshes/SkyBox.h"
 #include "Source/Public/Model.h"
 #include "Source/Public/PostProcessing.h"
+#include "Source/Public/Rendering/RenderingHelpers/RenderTextureSSAO.h"
 #include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
 #include "Source/Public/Rendering/RenderTexture/RenderTextureCubeMapIrradence.h"
 #include "Source/Public/Shader.h"
@@ -34,6 +35,8 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 
 	GBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGBA16F, GL_RGBA, 6, false, false, true);
 	MainPostProcessSetting->GRenderBuffer = GBuffer;
+
+	SSAOBuilder = new RenderTextureSSAO(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 	SkyboxShader = new Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
@@ -75,7 +78,12 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	//End Main pass
 
-	//Begin PostProcess Render Pass
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	SSAOBuilder->RenderCommandsColour(GBuffer->GetColourAttachmentByIndex(0), GBuffer->GetColourAttachmentByIndex(1), Camera::GetProjection(MainCamera), Camera::GetViewMatrix(MainCamera));
+	 
+
+	//Begin Lighting Render Pass
 	// clear all relevant buffers
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NONE, GL_DEPTH_TEST);
@@ -88,6 +96,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	PostProcessingQuad->ThisShader->SetSampler("NormalMapTexture", &GBuffer->GetColourAttachmentByIndex(3)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("RMATexture", &GBuffer->GetColourAttachmentByIndex(4)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("FragPosLightSpaceTexture", &GBuffer->GetColourAttachmentByIndex(5)->GetID(), GL_TEXTURE_2D);
+
 	PostProcessingQuad->ThisShader->SetSampler("ShadowMap", &DepthRenderBuffer->GetDepthTexture()->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("IrradenceMap", &IrradenceCapturer->GetIrradenceDiffuse()->GetID(), GL_TEXTURE_CUBE_MAP);
 	PostProcessingQuad->ThisShader->SetSampler("PrefilterMap", &IrradenceCapturer->GetPrefilteredEnvironmentMap()->GetID(), GL_TEXTURE_CUBE_MAP);
@@ -102,11 +111,15 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 			PostProcessingQuad->ThisShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView.value());
 		}
 	}
+
 	InitialiseLightingDataForShader(PostProcessingQuad->ThisShader);
-	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
-	//VisualSkybox->SkyboxTexture = IrradenceCapturer->GetUnConvolutedRenderTexture();
-	//VisualSkybox->Draw(glm::mat4(), Camera::GetProjection(MainCamera), Camera::GetViewMatrix(MainCamera));
-	//End PostProcess Render Pass
+	RenderTexture* OutputTexture = SSAOBuilder->GetSSAOColourBuffer()->GetColourAttachmentByIndex(0);
+	//RenderTexture* OutputTexture = GBuffer->GetColourAttachmentByIndex(1);
+	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4(), &OutputTexture->GetID());
+	//PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
+
+
+	//End Lighting Render Pass
 }
 
 //-------------------------------------------------------------------
@@ -117,8 +130,8 @@ void DefferedRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Ca
 	//skip this for depth pass
 	if (RenderStage != RenderStage::Depth)
 	{
-		//InSkybox->SkyboxTexture = IrradenceCapturer->GetUnConvolutedRenderTexture();
-		//InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
+		InSkybox->SkyboxTexture = IrradenceCapturer->GetUnConvolutedRenderTexture();
+		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
 		//DrawLights(Perspective, nullptr);
 	}
 

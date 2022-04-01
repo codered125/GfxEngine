@@ -1,9 +1,6 @@
- #version 430 core
-layout (location = 0) in vec3 position; 
-layout (location = 1) in vec3 normal; 
-layout (location = 2) in vec2 texCoords; 
-layout (location = 3) in vec3 Tangent; 
-layout (location = 4) in vec3 Bitangent; 
+#version 430 core
+
+//-------------------------------------------------------------------
 
 out V2F
 {
@@ -15,6 +12,15 @@ out V2F
 	vec3 TangentFragPos;
     mat3 TBN;
 } 
+
+//-------------------------------------------------------------------
+
+layout (location = 0) in vec3 position; 
+layout (location = 1) in vec3 normal; 
+layout (location = 2) in vec2 texCoords; 
+layout (location = 3) in vec3 Tangent; 
+layout (location = 4) in vec3 Bitangent; 
+
 vs_Out;
 
 uniform mat4 model; //converts local object coords to camera coords
@@ -22,6 +28,8 @@ uniform mat4 view; //converts normalised coordinates to window coordinates, aka 
 uniform mat4 projection; //converts those camera coordinates to normalised coordinates(0-1)
 uniform mat4 lightSpaceMatrix;
 uniform vec3 CamPos;
+
+//-------------------------------------------------------------------
 
 void main()
 {
@@ -41,3 +49,7 @@ void main()
     vs_Out.TangentViewPos = vs_Out.TBN * CamPos;
 	vs_Out.TangentFragPos = vs_Out.TBN * vs_Out.WorldPos;
 };
+
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------

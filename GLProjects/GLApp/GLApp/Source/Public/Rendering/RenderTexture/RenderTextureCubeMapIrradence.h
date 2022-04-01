@@ -2,6 +2,8 @@
 
 #include "Source/Public/Rendering/RenderTexture/RenderTextureCubeMap.h"
 
+#include <memory>
+
 //-------------------------------------------------------------------
 
 class SceneRenderTarget;
@@ -23,13 +25,13 @@ public:
 	virtual ~RenderTextureCubeMapIrradence();
 protected:
 
-	RenderTexture* HDRRenderTexture;
-	RenderTexture* BRDFLookUpTexture;
-	RenderTextureCubeMap* UnConvolutedMap;
-	RenderTextureCubeMap* PreFilteredEnvironmentMap;
-	RenderTextureCubeMap* IrradenceDiffuse;
+	std::unique_ptr<RenderTexture> HDRRenderTexture;
+	std::unique_ptr <RenderTexture> BRDFLookUpTexture;
+	std::unique_ptr <RenderTextureCubeMap> UnConvolutedMap;
+	std::unique_ptr <RenderTextureCubeMap> PreFilteredEnvironmentMap;
+	std::unique_ptr <RenderTextureCubeMap> IrradenceDiffuse;
 	//RenderTextureCubeMap* IrradenceSpecular;
-	SceneRenderTarget* IrrandenceRenderBuffer;
+	std::unique_ptr <SceneRenderTarget> IrrandenceRenderBuffer;
 	RenderTextureCubeMapParam Params;
 };
 

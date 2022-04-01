@@ -1,5 +1,7 @@
 #version 430 core
 
+//-------------------------------------------------------------------
+
 // define the number of CPs in the output patch
 layout (vertices = 3) out;
 
@@ -12,6 +14,8 @@ in vec2 TexCoord_CS_in[];
 out vec3 WorldPos_ES_in[];
 out vec3 Normal_ES_in[];
 out vec2 TexCoord_ES_in[];
+
+//-------------------------------------------------------------------
 
 float GetTessLevel(float Distance0, float Distance1)
 {
@@ -27,6 +31,8 @@ float GetTessLevel(float Distance0, float Distance1)
         return 3.0;
     }
 }
+
+//-------------------------------------------------------------------
 
 void main()
 {
@@ -45,3 +51,7 @@ void main()
     gl_TessLevelOuter[2] = GetTessLevel(EyeToVertexDistance0, EyeToVertexDistance1);
     gl_TessLevelInner[0] = gl_TessLevelOuter[2];
 }
+
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------

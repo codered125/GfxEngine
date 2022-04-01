@@ -1,5 +1,6 @@
 #version 430 core
 #define M_PI 3.14159265359
+
 //-------------------------------------------------------------------
 
 #include Shaders/HelperShaders/Common.glsl
@@ -16,6 +17,8 @@ in V2F
 	vec4 FragPosLightSpace;
 	mat3 TBN;
 } fs_in;
+
+//-------------------------------------------------------------------
 
 layout (location = 0) out vec3 Position;
 layout (location = 1) out vec3 Normal;
@@ -45,7 +48,7 @@ void main()
 	LinearMatVals parse = ConvertMapsToPBRValues(material, RnMPExponent, fs_in.TexCoords);
 
 	Position = fs_in.WorldPos;
-	Normal = fs_in.Normal;
+	Normal = GetNormalFromMap();
 	DiffuseShadow = vec4(parse.diffuse, parse.alpha);
 	NormalMap = GetNormalFromMap();
 	FragPosLightSpaceTexture = fs_in.FragPosLightSpace;

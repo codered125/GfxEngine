@@ -1,7 +1,8 @@
-#version 330 core
+#version 430 core
 #define M_PI 3.14159265359
 #define NUMBER_OF_POINT_LIGHTS 3
 
+//-------------------------------------------------------------------
 
 struct Material
 {
@@ -15,6 +16,8 @@ struct Material
 	float shininess;
 };
 
+//-------------------------------------------------------------------
+
 struct LinearMatVals
 {
 	float roughness;
@@ -22,6 +25,8 @@ struct LinearMatVals
     float ao;
 	vec3 diffuse;
 };
+
+//-------------------------------------------------------------------
 
 in vec2 TexCoords;
 in vec3 Normal;
@@ -35,8 +40,9 @@ uniform vec3 CamPos;
 uniform vec3 CamDir;
 bool  blin = false;
 
-
 vec3 GetNormalFromMap();
+
+//-------------------------------------------------------------------
 
 vec3 GetNormalFromMap()
 {
@@ -56,11 +62,13 @@ vec3 GetNormalFromMap()
     return normalize(TBN * tangentNormal);
 }
 
-
-
+//-------------------------------------------------------------------
 
 void main()
 {
 	color = vec4(texture(material.texture_diffuse, TexCoords).xyz, 1.0f);
 }
 
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
