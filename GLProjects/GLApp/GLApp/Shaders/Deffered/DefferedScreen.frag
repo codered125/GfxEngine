@@ -41,6 +41,7 @@ uniform vec3 CamPos;
 uniform vec3 CamDir;
 uniform mat4 lightSpaceMatrix;
 uniform bool DebugQuad;
+uniform sampler2D SSAOTexture;
 
 const float exposure = 1.5;
 const float offset = 1 /300.0f;
@@ -55,9 +56,11 @@ void main()
 { 	
 	const float gamma = 1.0f; //const float gamma = 2.2f;
 	vec3 hdrColor = CalculateLight().rgb;
-	FragColor = (vec4(hdrColor, 1.0));
-	return;
-
+	if(DebugQuad)
+	{
+		FragColor = vec4(hdrColor, 1.0f);
+		return;
+	}
 	if(currentPostProcessEffect.HDR)
     {
         hdrColor *= exposure;
@@ -93,6 +96,7 @@ vec4 CalculateLight()
 	const vec3 FragNormalMap = texture(NormalMapTexture, TexCoords).rgb;
 	const vec3 FragRMA = texture(RMATexture, TexCoords).rgb;
 	const vec4 FragPosLightSpace = texture(FragPosLightSpaceTexture, TexCoords).rgba;
+	const float AmbientOcclusion = texture(SSAOTexture, TexCoords).r;
 	LinearMatVals Parse = LinearMatVals(FragRMA.x, FragRMA.y, FragRMA.z, FragDiffuseShadow.rgb, FragDiffuseShadow.a);
 
 	const vec3 View = normalize(CamPos - FragPos);
@@ -131,11 +135,12 @@ vec4 CalculateLight()
 
 	vec3 OutputColour = vec3(Ambient + L0); 
 	OutputColour *= max(Shadow, 0.025);
+	OutputColour *= max(AmbientOcclusion, 0.025);
 	if(DebugQuad)
 	{
-		return  texture(screenTexture, TexCoords).r * vec4(1.0f);
+		return texture(screenTexture, TexCoords).r * vec4(1.0f);
 	}
-	return vec4( OutputColour, Parse.alpha); 
+	return vec4( vec3(abs(OutputColour)), 1.0f); 
   
 }
 

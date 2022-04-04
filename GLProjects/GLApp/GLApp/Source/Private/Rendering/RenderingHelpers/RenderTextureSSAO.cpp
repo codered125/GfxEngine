@@ -53,11 +53,13 @@ RenderTextureSSAO::RenderTextureSSAO(int InScreenWidth, int InScreenHeight)
 	NoiseTexture = std::make_unique<RenderTexture>(4, 4, GL_TEXTURE_2D, GL_RGBA32F, GL_RGB, false, GL_NEAREST, GL_NEAREST, GL_REPEAT, &SSAONoise[0], GL_FLOAT, nullptr);
 
 	SSAOBlurBuffer = std::make_unique<SceneRenderTarget>(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, 1);
-	//SSAOBlurBuffer->SetColourAttachmentByIndex(&RenderTexture(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, false, GL_NEAREST, GL_NEAREST, GL_REPEAT, NULL, GL_FLOAT, nullptr), 0);
+	SSAOBlurBuffer.get()->SetColourAttachmentByIndex(&RenderTexture(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, false, GL_NEAREST, GL_NEAREST, GL_REPEAT, NULL, GL_FLOAT, nullptr), 0);
 
 	SSAOColourBuffer = std::make_unique<SceneRenderTarget>(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, 1);
-	//SSAOColourBuffer->SetColourAttachmentByIndex(&RenderTexture(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, false, GL_NEAREST, GL_NEAREST, GL_REPEAT, NULL, GL_FLOAT, nullptr), 0);
+	SSAOColourBuffer.get()->SetColourAttachmentByIndex(&RenderTexture(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, false, GL_NEAREST, GL_NEAREST, GL_REPEAT, NULL, GL_FLOAT, nullptr), 0);
+
 	SSAOShader = std::make_unique<Shader>("Shaders/SSAO/ScreenSpaceAmbientOcclusion.vs", "Shaders/SSAO/ScreenSpaceAmbientOcclusion.frag");
+	SSAOBlurShader = std::make_unique<Shader>("Shaders/SSAO/ScreenSpaceAmbientOcclusion.vs", "Shaders/SSAO/ScreenSpaceAmbientOcclusionBlur.frag");
 }
 
 //-------------------------------------------------------------------
@@ -73,14 +75,31 @@ void RenderTextureSSAO::RenderCommandsColour(RenderTexture* InGBufferPos, Render
 	SSAOShader->setMat4("Projection", InProjection);
 	SSAOShader->setMat4("View", InView);
 	
+	const auto TextureSize = SSAOColourBuffer->GetColourAttachmentByIndex(0)->GetWidthAndHeightOfTexture();
+	SSAOShader->setVec2("ScreenSize", glm::vec2( std::get<0>(TextureSize), std::get<1>(TextureSize)));
+	
 	GLint Counter = 0;
 	for (auto it = SSAOKernal.begin(); it != SSAOKernal.end(); ++it , ++Counter)
 	{
 		SSAOShader->setVec3("Samples[" + std::to_string(Counter) + "]", SSAOKernal[Counter]);
 	}
-	std::shared_ptr<Quad> Plane = std::make_shared<Quad>(SSAOShader.get());
+	std::unique_ptr<Quad>Plane = std::make_unique<Quad>(SSAOShader.get());
 	Plane->DrawTrianglesStrip(SSAOShader.get());
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+//-------------------------------------------------------------------
+
+void RenderTextureSSAO::RenderCommandsBlur(RenderTexture* InSSAO)
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, SSAOBlurBuffer->GetID());
+	glClear(GL_COLOR_BUFFER_BIT);
+	SSAOBlurShader->use();
+	SSAOBlurShader->SetSampler("SSAOTexture", &InSSAO->GetID(), GL_TEXTURE_2D);
+	std::unique_ptr<Quad>Plane = std::make_unique<Quad>(SSAOBlurShader.get());
+	Plane->DrawTrianglesStrip(SSAOBlurShader.get());
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
 }
 
 //-------------------------------------------------------------------

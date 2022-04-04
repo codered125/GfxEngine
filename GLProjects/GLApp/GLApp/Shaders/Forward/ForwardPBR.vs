@@ -11,7 +11,7 @@ out V2F
     vec3 TangentViewPos;
 	vec3 TangentFragPos;
     mat3 TBN;
-} 
+} vs_Out;
 
 //-------------------------------------------------------------------
 
@@ -20,8 +20,6 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoords; 
 layout (location = 3) in vec3 Tangent; 
 layout (location = 4) in vec3 Bitangent; 
-
-vs_Out;
 
 uniform mat4 model; //converts local object coords to camera coords
 uniform mat4 view; //converts normalised coordinates to window coordinates, aka what your window is

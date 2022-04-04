@@ -175,6 +175,13 @@ void Shader::setFloat(const std::string& Accessor, float value)
 
 //-------------------------------------------------------------------
 
+void Shader::setVec2(const std::string& Accessor, glm::vec2 value)
+{
+	glUniform2fv(glGetUniformLocation(shaderProgram, Accessor.c_str()), 1, &value[0]);
+}
+
+//-------------------------------------------------------------------
+
 void Shader::setVec3(const std::string& Accessor, glm::vec3 value)
 {
 	glUniform3fv(glGetUniformLocation(shaderProgram, Accessor.c_str()), 1, &value[0]);

@@ -12,45 +12,42 @@ uniform sampler2D NoiseTexture;
 uniform vec3 Samples[KernalSize];
 uniform mat4 Projection;
 uniform mat4 View;
-
-const vec2 NoiseScale = vec2(2560.0f / 4.0f, 1377.0f / 4.0f);
-//const float Radius = 2.5f;
+uniform vec2 ScreenSize;
 const float Radius = 0.5f;
-//const float Bias = 0.0025f;
 const float Bias = 0.025f;
 
 //-------------------------------------------------------------------
 
 void main()
 {  
-  const vec3 FragPos = vec3(View * vec4(texture(PositionalTexture, TexCoords).xyz, 1.0f));
-  const vec3 FragNormalWorldSpace = texture(NormalTexture, TexCoords).rgb;
-
-  // discard fragment if normal is empty
-  if (FragNormalWorldSpace == vec3(0.0f)) discard;
-
-  const vec3 FragNormalViewSpace = normalize(mat3(View) * FragNormalWorldSpace);
-  //const vec3 FragNormalViewSpace = FragNormal;
-
+  const vec2 NoiseScale = vec2(ScreenSize.x / 4.0f, ScreenSize.y / 4.0f);
+  const vec3 FragPosition = (View * vec4(texture(PositionalTexture, TexCoords).xyz, 1.0f)).xyz;
+  const vec3 FragNormalWorldSpace = normalize(texture(NormalTexture, TexCoords).rgb);
+  const vec3 FragNormalViewSpace = mat3(View) * FragNormalWorldSpace;
   const vec3 RandomVec = texture(NoiseTexture, TexCoords * NoiseScale).xyz;    
+
+  const vec3 Tangent   = normalize(RandomVec - FragNormalViewSpace * dot(RandomVec, FragNormalViewSpace));
+  const vec3 Bitangent = cross(FragNormalViewSpace, Tangent);
+  const mat3 TBN = mat3(Tangent, Bitangent, FragNormalViewSpace); 
+
   float Occlusion = 0.0f;
   for(int i = 0; i < KernalSize; ++i)
   {
-    const vec3 SamplePositionViewSpace = vec3(View * vec4(Samples[i], 1.0f)); //From tangent space
-    const vec3 SamplePosition = FragPos + SamplePositionViewSpace * Radius;
+    const vec3 SamplePositionViewSpace = TBN * Samples[i]; 
+    const vec3 SamplePosition = FragPosition + SamplePositionViewSpace * Radius;
 
     const vec4 OffsetViewSpace = vec4(SamplePosition, 1.0f);
     vec4 OffsetClipSpace = Projection * OffsetViewSpace;
-    OffsetClipSpace.xyz /= OffsetClipSpace.w; // Perspective divide
+    OffsetClipSpace.xyz /= OffsetClipSpace.w; //Perspective divide
     OffsetClipSpace.xyz = OffsetClipSpace.xyz * 0.5 + 0.5; //Remap to 0 - 1
-    
-    const float SamplesDepthViewSpace = vec3(View * texture(PositionalTexture, OffsetClipSpace.xy)).z;
-    float RangeCheck = smoothstep(0.0, 1.0, Radius / abs(FragPos.z - SamplesDepthViewSpace));
-    Occlusion += (SamplesDepthViewSpace >= SamplePosition.z + Bias ? 1.0 : 0.0) * RangeCheck; 
+
+    const float ViewSpaceDepthSample = vec3(View * texture(PositionalTexture, OffsetClipSpace.xy)).z;
+    const float RangeCheck = smoothstep(0.0, 1.0, Radius / abs(FragPosition.z - ViewSpaceDepthSample));
+    Occlusion += (ViewSpaceDepthSample >= SamplePosition.z + Bias ? 1.0 : 0.0) * RangeCheck; 
   }
 
-  FragColour = 1.0 - (Occlusion / KernalSize);  
-  FragColour = Occlusion;
+  FragColour = pow(1.0 - (Occlusion / KernalSize), 3.0f);  
+  //FragColour = Occlusion;
 };
 
 //-------------------------------------------------------------------

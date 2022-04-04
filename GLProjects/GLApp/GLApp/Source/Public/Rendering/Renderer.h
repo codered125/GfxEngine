@@ -46,8 +46,6 @@ protected:
 	GLint SCREEN_WIDTH;
 	GLint SCREEN_HEIGHT;
 
-	SceneRenderTarget* SSAO;
-	SceneRenderTarget* Blur;
 	SceneRenderTarget* MainRenderBuffer;
 	SceneRenderTarget* IntermediateRenderBuffer;
 	SceneRenderTarget* DepthRenderBuffer;

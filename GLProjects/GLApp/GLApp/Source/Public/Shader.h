@@ -33,6 +33,8 @@ public:
 
 	void setFloat(const std::string& Accessor, float value);
 
+	void setVec2(const std::string& Accessor, glm::vec2 value);
+
 	void setVec3(const std::string& Accessor, glm::vec3 value);
 
 	void setVec4(const std::string& Accessor, glm::vec4& value);

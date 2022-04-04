@@ -81,6 +81,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	SSAOBuilder->RenderCommandsColour(GBuffer->GetColourAttachmentByIndex(0), GBuffer->GetColourAttachmentByIndex(1), Camera::GetProjection(MainCamera), Camera::GetViewMatrix(MainCamera));
+	SSAOBuilder->RenderCommandsBlur(SSAOBuilder->GetSSAOColourBuffer()->GetColourAttachmentByIndex(0));
 	 
 
 	//Begin Lighting Render Pass
@@ -101,6 +102,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	PostProcessingQuad->ThisShader->SetSampler("IrradenceMap", &IrradenceCapturer->GetIrradenceDiffuse()->GetID(), GL_TEXTURE_CUBE_MAP);
 	PostProcessingQuad->ThisShader->SetSampler("PrefilterMap", &IrradenceCapturer->GetPrefilteredEnvironmentMap()->GetID(), GL_TEXTURE_CUBE_MAP);
 	PostProcessingQuad->ThisShader->SetSampler("BrdfLUT", &IrradenceCapturer->GetBRDFLookUpTexture()->GetID(), GL_TEXTURE_2D);
+	PostProcessingQuad->ThisShader->SetSampler("SSAOTexture", &SSAOBuilder->GetSSAOBlurBuffer()->GetColourAttachmentByIndex(0)->GetID(), GL_TEXTURE_2D);
 
 	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
 	{
@@ -113,8 +115,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	}
 
 	InitialiseLightingDataForShader(PostProcessingQuad->ThisShader);
-	RenderTexture* OutputTexture = SSAOBuilder->GetSSAOColourBuffer()->GetColourAttachmentByIndex(0);
-	//RenderTexture* OutputTexture = GBuffer->GetColourAttachmentByIndex(1);
+	RenderTexture* OutputTexture = SSAOBuilder->GetSSAOBlurBuffer()->GetColourAttachmentByIndex(0);
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4(), &OutputTexture->GetID());
 	//PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
 
@@ -130,8 +131,8 @@ void DefferedRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Ca
 	//skip this for depth pass
 	if (RenderStage != RenderStage::Depth)
 	{
-		InSkybox->SkyboxTexture = IrradenceCapturer->GetUnConvolutedRenderTexture();
-		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
+		//InSkybox->SkyboxTexture = IrradenceCapturer->GetUnConvolutedRenderTexture();
+		//InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
 		//DrawLights(Perspective, nullptr);
 	}
 
@@ -155,8 +156,6 @@ void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat
 		ModelShader->SetSampler("ShadowMap", ShadowMap, GL_TEXTURE_2D);
 	}
 
-//	ModelShader->setFloat("NearPlane", Camera::GetNearPlane(Perspective));
-//	ModelShader->setFloat("FarPlane", Camera::GetFarPlane(Perspective));
 	ModelShader->setVec3("CamPos",  Camera::GetPosition(Perspective));
 	ModelShader->setVec3("CamDir",  Camera::GetFront(Perspective));
 	

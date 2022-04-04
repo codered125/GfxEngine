@@ -97,19 +97,23 @@ void SceneRenderTarget::InitialiseSceneRenderTarget(RenderTargertParam& Params)
 		if (Params.MakeMSAA)
 		{
 			glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, Params.Width, Params.Height);
+			GLErrorCheck();
 		}
 		else
 		{
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Params.Width, Params.Height);
+			GLErrorCheck();
 		}
 
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, Rbo);
+		GLErrorCheck();
 	}
 
 	if (Params.MakeDepth)
 	{
 		Depth = RenderTexture(Params.Width, Params.Height, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GLenum(GL_NEAREST), GLenum(GL_NEAREST), GLenum(GL_CLAMP_TO_EDGE), NULL, GL_UNSIGNED_BYTE, nullptr);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, Params.TargetType, Depth.GetID(), 0);
+		GLErrorCheck();
 	}
 
 	auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
