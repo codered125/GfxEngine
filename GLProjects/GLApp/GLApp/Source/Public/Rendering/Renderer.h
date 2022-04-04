@@ -46,23 +46,22 @@ protected:
 	GLint SCREEN_WIDTH;
 	GLint SCREEN_HEIGHT;
 
-	SceneRenderTarget* MainRenderBuffer;
-	SceneRenderTarget* IntermediateRenderBuffer;
-	SceneRenderTarget* DepthRenderBuffer;
-	SceneRenderTarget* GBuffer;
-	SceneRenderTarget* PostProcessRenderBuffer;
-
-	RenderTextureSSAO* SSAOBuilder;
+	std::unique_ptr<SceneRenderTarget> MainRenderBuffer;
+	std::unique_ptr<SceneRenderTarget> IntermediateRenderBuffer;
+	std::unique_ptr<SceneRenderTarget> DepthRenderBuffer;
+	std::unique_ptr<SceneRenderTarget> GBuffer;
+	std::unique_ptr<SceneRenderTarget> PostProcessRenderBuffer;
+	std::unique_ptr<RenderTextureSSAO> SSAOBuilder;
 
 	GLint AliasingCount = 4;
 	GLint NumberofLights = 3;
 
-	Light* Directional0 = nullptr;
-	Quad* PostProcessingQuad;
+	std::unique_ptr<Light> Directional0;
+	std::unique_ptr<Quad> PostProcessingQuad;
 	float GameTimeLapsed;
 	float GameTimeDelta;
 	
-	Camera* MainCamera;
+	std::unique_ptr<Camera> MainCamera;
 };
 
 //-------------------------------------------------------------------

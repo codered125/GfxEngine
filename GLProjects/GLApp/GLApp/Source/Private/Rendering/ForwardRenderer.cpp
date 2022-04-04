@@ -26,14 +26,14 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	MainPostProcessSetting = new PostProcessSettings();
 	MainPostProcessSetting->HDR = EffectStatus::Active;
 
-	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_RGBA, 2, false, true, true);
-	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer;
+	MainRenderBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_RGBA, 2, false, true, true);
+	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer.get();
 
-	IntermediateRenderBuffer= new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false, false);
-	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer;
+	IntermediateRenderBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false, false);
+	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer.get();
 
-	DepthRenderBuffer = new SceneRenderTarget(8192, 8192, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
-	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer;
+	DepthRenderBuffer = std::make_unique<SceneRenderTarget>(8192, 8192, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
+	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer.get();
 
 	PBRshader = new Shader("Shaders/Forward/ForwardPBR.vs", "Shaders/Forward/ForwardPBR.frag");
 	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
@@ -47,7 +47,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	IrradenceCapturer = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
 	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
-	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
+	PostProcessingQuad = std::make_unique<Quad>(ScreenShader, MainPostProcessSetting, true);
 
 }
 
@@ -62,7 +62,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-	RenderDemo(RenderStage::Depth, VisualSkybox, MainCamera, nullptr);
+	RenderDemo(RenderStage::Depth, VisualSkybox, GetMainCamera(), nullptr);
 	//End Shadow Render Pass
 
 	//Begin Main Pass
@@ -70,7 +70,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, MainRenderBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
-	RenderDemo(RenderStage::Main, VisualSkybox, MainCamera, &DepthRenderBuffer->GetDepthTexture()->GetID());
+	RenderDemo(RenderStage::Main, VisualSkybox, GetMainCamera(), &DepthRenderBuffer->GetDepthTexture()->GetID());
 
 
 	//Multisampled image contains more information than normal images, blits downscales / resolves the image
@@ -132,7 +132,7 @@ void ForwardRenderer::DrawModel(Shader* ModelShader, Shape* InModel, glm::mat4 m
 	ModelShader->setMat4("view", view);
 	InitialiseLightingDataForShader(ModelShader);
 	
-	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
+	if (auto Direction = static_cast<DirectionalLight*>(Directional0.))
 	{
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
 		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
@@ -206,24 +206,6 @@ ForwardRenderer::~ForwardRenderer()
 	{
 		delete MainPostProcessSetting;
 		MainPostProcessSetting = nullptr;
-	}
-
-	if (MainRenderBuffer)
-	{
-		delete MainRenderBuffer;
-		MainRenderBuffer = nullptr;
-	}
-
-	if (IntermediateRenderBuffer)
-	{
-		delete IntermediateRenderBuffer;
-		IntermediateRenderBuffer = nullptr;
-	}
-	
-	if (DepthRenderBuffer)
-	{
-		delete DepthRenderBuffer;
-		DepthRenderBuffer = nullptr;
 	}
 
 	if (PBRshader)

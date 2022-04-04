@@ -24,19 +24,19 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	MainPostProcessSetting = new PostProcessSettings();
 	MainPostProcessSetting->HDR = EffectStatus::Active;
 
-	MainRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true);
-	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer;
+	MainRenderBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true);
+	MainPostProcessSetting->MainRenderBuffer = MainRenderBuffer.get();
 
-	IntermediateRenderBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
-	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer;
+	IntermediateRenderBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
+	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer.get();
 
-	DepthRenderBuffer = new SceneRenderTarget(8192, 8192, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
-	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer;
+	DepthRenderBuffer = std::make_unique<SceneRenderTarget>(8192, 8192, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
+	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer.get();
 
-	GBuffer = new SceneRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGBA16F, GL_RGBA, 6, false, false, true);
-	MainPostProcessSetting->GRenderBuffer = GBuffer;
+	GBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGBA16F, GL_RGBA, 6, false, false, true);
+	MainPostProcessSetting->GRenderBuffer = GBuffer.get();
 
-	SSAOBuilder = new RenderTextureSSAO(SCREEN_WIDTH, SCREEN_HEIGHT);
+	SSAOBuilder = std::make_unique<RenderTextureSSAO>(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 	SkyboxShader = new Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
@@ -60,7 +60,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-	RenderDemo(RenderStage::Depth, VisualSkybox, MainCamera, nullptr);
+	RenderDemo(RenderStage::Depth, VisualSkybox, GetMainCamera(), nullptr);
 	//End Shadow Render Pass
 
 	//Begin Main Pass
@@ -68,7 +68,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, GBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
-	RenderDemo(RenderStage::GBuffer, VisualSkybox, MainCamera, &DepthRenderBuffer->GetDepthTexture()->GetID());
+	RenderDemo(RenderStage::GBuffer, VisualSkybox, GetMainCamera(), &DepthRenderBuffer->GetDepthTexture()->GetID());
 
 	//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
 	//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)
@@ -80,7 +80,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	SSAOBuilder->RenderCommandsColour(GBuffer->GetColourAttachmentByIndex(0), GBuffer->GetColourAttachmentByIndex(1), Camera::GetProjection(MainCamera), Camera::GetViewMatrix(MainCamera));
+	SSAOBuilder->RenderCommandsColour(GBuffer->GetColourAttachmentByIndex(0), GBuffer->GetColourAttachmentByIndex(1), Camera::GetProjection(GetMainCamera()), Camera::GetViewMatrix(GetMainCamera()));
 	SSAOBuilder->RenderCommandsBlur(SSAOBuilder->GetSSAOColourBuffer()->GetColourAttachmentByIndex(0));
 	 
 
@@ -89,8 +89,8 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NONE, GL_DEPTH_TEST);
 	PostProcessingQuad->ThisShader->use();
-	PostProcessingQuad->ThisShader->setVec3("CamPos",  Camera::GetPosition(MainCamera));
-	PostProcessingQuad->ThisShader->setVec3("CamDir",  Camera::GetFront(MainCamera));
+	PostProcessingQuad->ThisShader->setVec3("CamPos",  Camera::GetPosition(GetMainCamera()));
+	PostProcessingQuad->ThisShader->setVec3("CamDir",  Camera::GetFront(GetMainCamera()));
 	PostProcessingQuad->ThisShader->SetSampler("PositionTexture", &GBuffer->GetColourAttachmentByIndex(0)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("NormalTexture", &GBuffer->GetColourAttachmentByIndex(1)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("DiffuseShadowTexture", &GBuffer->GetColourAttachmentByIndex(2)->GetID(), GL_TEXTURE_2D);
@@ -187,30 +187,6 @@ DefferedRenderer::~DefferedRenderer()
 	{
 		delete MainPostProcessSetting;
 		MainPostProcessSetting = nullptr;
-	}
-
-	if (MainRenderBuffer)
-	{
-		delete MainRenderBuffer;
-		MainRenderBuffer = nullptr;
-	}
-
-	if (GBuffer)
-	{
-		delete GBuffer;
-		GBuffer = nullptr;
-	}
-
-	if (IntermediateRenderBuffer)
-	{
-		delete IntermediateRenderBuffer;
-		IntermediateRenderBuffer = nullptr;
-	}
-
-	if (DepthRenderBuffer)
-	{
-		delete DepthRenderBuffer;
-		DepthRenderBuffer = nullptr;
 	}
 
 	if (PBRshader)

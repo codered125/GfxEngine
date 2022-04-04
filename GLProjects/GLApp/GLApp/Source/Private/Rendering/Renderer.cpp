@@ -8,10 +8,11 @@
 #include "Source/Public/Lights/PointLight.h"
 #include "Source/Public/Meshes/Cube.h"
 #include "Source/Public/Math.h"
+#include "Source/Public/Rendering/RenderingHelpers/RenderTextureSSAO.h"
+#include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
 #include "Source/Public/Shader.h"
 
 #include <GLFW/glfw3.h>
-
 
 #include <string>
 
@@ -21,7 +22,7 @@ Renderer::Renderer(GLint InScreenWidth, GLint InScreenHeight)
 {
 	SCREEN_WIDTH = InScreenWidth;
 	SCREEN_HEIGHT = InScreenHeight;
-	SetMainCamera( new Camera(glm::vec3(0.0f, 10.0f, - 3.0f)));
+	SetMainCamera(&Camera(glm::vec3(0.0f, 10.0f, - 3.0f)));
 }
 
 //-------------------------------------------------------------------
@@ -42,14 +43,14 @@ void Renderer::DrawGizmos(Camera* Perspective)
 
 void Renderer::SetMainCamera(Camera* InCamera)
 {
-	MainCamera = InCamera;
+	MainCamera = std::make_unique<Camera>(*InCamera);
 }
 
 //-------------------------------------------------------------------
 
 Camera* Renderer::GetMainCamera()
 {
-	return MainCamera;
+	return MainCamera.get();
 }
 
 //-------------------------------------------------------------------
@@ -62,17 +63,19 @@ void Renderer::InitialiseLightingDataForShader(Shader* lightShader)
 	// Directional light
 	if (!Directional0)
 	{
-		auto DirectionLight = new DirectionalLight(lightShader, "dirLight");
-		DirectionLight->direction = MoMath::MoNormalize(TheMostStaticVertices::SunDir);
-		DirectionLight->ambient = glm::vec3(1.0f);
-		DirectionLight->diffuse = glm::vec3(1.0f) * 25.0f;
-		DirectionLight->specular = glm::vec3(1.0f);
-		DirectionLight->position = TheMostStaticVertices::SunPos;
-		DirectionLight->intensity = directIntes;
+		Directional0 = std::make_unique<DirectionalLight>(lightShader, "dirLight");
+		if (const auto DirectionalLightType = static_cast<DirectionalLight*>(Directional0.get()))
+		{
+			DirectionalLightType->direction = MoMath::MoNormalize(TheMostStaticVertices::SunDir);
+			DirectionalLightType->ambient = glm::vec3(1.0f);
+			DirectionalLightType->diffuse = glm::vec3(1.0f) * 25.0f;
+			DirectionalLightType->specular = glm::vec3(1.0f);
+			DirectionalLightType->position = TheMostStaticVertices::SunPos;
+			DirectionalLightType->intensity = directIntes;
 
-		auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionLight->GetLightSpaceProjection(), MoMath::MoLookAt(DirectionLight->position, DirectionLight->position + (DirectionLight->direction * 15.0f), glm::vec3(0.0f, 1.0f, 0.0f)), DirectionLight->position);
-		DirectionLight->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
-		Directional0 = DirectionLight;
+			auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionalLightType->GetLightSpaceProjection(), MoMath::MoLookAt(Directional0->position, Directional0->position + (Directional0->direction * 15.0f), glm::vec3(0.0f, 1.0f, 0.0f)), Directional0->position);
+			DirectionalLightType->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
+		}
 	}
 	Directional0->ShaderRef = lightShader;
 	Directional0->SetupShader();
@@ -127,9 +130,6 @@ std::string Renderer::GetGameTimeAsString()
 
 Renderer::~Renderer()
 {
-	delete MainCamera;
-	MainCamera = nullptr;
-
 	delete Directional0;
 	Directional0 = nullptr;
 }
