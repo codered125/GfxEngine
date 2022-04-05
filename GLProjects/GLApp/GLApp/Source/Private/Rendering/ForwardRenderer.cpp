@@ -132,7 +132,7 @@ void ForwardRenderer::DrawModel(Shader* ModelShader, Shape* InModel, glm::mat4 m
 	ModelShader->setMat4("view", view);
 	InitialiseLightingDataForShader(ModelShader);
 	
-	if (auto Direction = static_cast<DirectionalLight*>(Directional0.))
+	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
 	{
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
 		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
@@ -278,12 +278,6 @@ ForwardRenderer::~ForwardRenderer()
 	{
 		delete VisualSkybox;
 		VisualSkybox = nullptr;
-	}
-
-	if (PostProcessingQuad)
-	{
-		delete PostProcessingQuad;
-		PostProcessingQuad = nullptr;
 	}
 
 }

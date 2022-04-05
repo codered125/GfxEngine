@@ -7,6 +7,7 @@
 #include "Source/Public/Lights/DirectionalLight.h"
 #include "Source/Public/Lights/PointLight.h"
 #include "Source/Public/Meshes/Cube.h"
+#include "Source/Public/Meshes/Quad.h"
 #include "Source/Public/Math.h"
 #include "Source/Public/Rendering/RenderingHelpers/RenderTextureSSAO.h"
 #include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
@@ -61,7 +62,7 @@ void Renderer::InitialiseLightingDataForShader(Shader* lightShader)
 	//const float pointIntes = 2.5; const float directIntes = 5;
 	const float pointIntes = 1; const float directIntes = 1;
 	// Directional light
-	if (!Directional0)
+	if (!Directional0.get())
 	{
 		Directional0 = std::make_unique<DirectionalLight>(lightShader, "dirLight");
 		if (const auto DirectionalLightType = static_cast<DirectionalLight*>(Directional0.get()))
@@ -130,8 +131,7 @@ std::string Renderer::GetGameTimeAsString()
 
 Renderer::~Renderer()
 {
-	delete Directional0;
-	Directional0 = nullptr;
+	
 }
 
 //-------------------------------------------------------------------

@@ -48,7 +48,7 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	IrradenceCapturer = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
 	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
-	PostProcessingQuad = new Quad(ScreenShader, MainPostProcessSetting, true);
+	PostProcessingQuad = std::make_unique<Quad>(ScreenShader, MainPostProcessSetting, true);
 }
 
 void DefferedRenderer::RenderLoop( float TimeLapsed)
@@ -104,7 +104,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	PostProcessingQuad->ThisShader->SetSampler("BrdfLUT", &IrradenceCapturer->GetBRDFLookUpTexture()->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("SSAOTexture", &SSAOBuilder->GetSSAOBlurBuffer()->GetColourAttachmentByIndex(0)->GetID(), GL_TEXTURE_2D);
 
-	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
+	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
 	{
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
 		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
@@ -165,7 +165,7 @@ void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat
 	ModelShader->setMat4("view", view);
 	InitialiseLightingDataForShader(ModelShader);
 
-	if (auto Direction = static_cast<DirectionalLight*>(Directional0))
+	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
 	{
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
 		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
@@ -243,11 +243,7 @@ DefferedRenderer::~DefferedRenderer()
 		VisualSkybox = nullptr;
 	}
 
-	if (PostProcessingQuad)
-	{
-		delete PostProcessingQuad;
-		PostProcessingQuad = nullptr;
-	}
+	
 }
 
 //-------------------------------------------------------------------

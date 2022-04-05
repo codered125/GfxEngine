@@ -7,7 +7,6 @@
 
 //-------------------------------------------------------------------
 
-class Quad;
 class RenderTexture;
 class SceneRenderTarget;
 class Shader;
