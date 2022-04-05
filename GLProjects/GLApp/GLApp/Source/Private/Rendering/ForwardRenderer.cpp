@@ -35,19 +35,19 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	DepthRenderBuffer = std::make_unique<SceneRenderTarget>(8192, 8192, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
 	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer.get();
 
-	PBRshader = new Shader("Shaders/Forward/ForwardPBR.vs", "Shaders/Forward/ForwardPBR.frag");
-	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
+	PBRShader = std::make_unique<Shader>("Shaders/Forward/ForwardPBR.vs", "Shaders/Forward/ForwardPBR.frag");
+	UnlitShader = std::make_unique<Shader>("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 
-	SkyboxShader = new Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
-	LampShader = new Shader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
-	DepthShader = new Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
-	ScreenShader = new Shader("Shaders/Forward/ForwardScreen.vs", "Shaders/Forward/ForwardScreen.frag");
-	WaterShader = new Shader("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
+	SkyboxShader = std::make_unique<Shader>("Shaders/Skybox.vs", "Shaders/Skybox.frag");
+	LampShader = std::make_unique<Shader>("Shaders/Lamp.vs", "Shaders/Lamp.frag");
+	DepthShader = std::make_unique<Shader>("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
+	ScreenShader = std::make_unique<Shader>("Shaders/Forward/ForwardScreen.vs", "Shaders/Forward/ForwardScreen.frag");
+	WaterShader = std::make_unique<Shader>("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
 
-	Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
-	IrradenceCapturer = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
-	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
-	PostProcessingQuad = std::make_unique<Quad>(ScreenShader, MainPostProcessSetting, true);
+	Sponza = std::make_unique<Model>(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRShader.get());		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
+	IrradenceCapturer = std::make_unique<RenderTextureCubeMapIrradence>(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
+	VisualSkybox = std::make_unique<SkyBox>(SkyboxShader.get(), "Images/KlopHeimCubeMap/", ".png");
+	PostProcessingQuad = std::make_unique<Quad>(ScreenShader.get(), MainPostProcessSetting, true);
 
 }
 
@@ -62,7 +62,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-	RenderDemo(RenderStage::Depth, VisualSkybox, GetMainCamera(), nullptr);
+	RenderDemo(RenderStage::Depth, VisualSkybox.get(), GetMainCamera(), nullptr);
 	//End Shadow Render Pass
 
 	//Begin Main Pass
@@ -70,7 +70,7 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, MainRenderBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
-	RenderDemo(RenderStage::Main, VisualSkybox, GetMainCamera(), &DepthRenderBuffer->GetDepthTexture()->GetID());
+	RenderDemo(RenderStage::Main, VisualSkybox.get(), GetMainCamera(), &DepthRenderBuffer->GetDepthTexture()->GetID());
 
 
 	//Multisampled image contains more information than normal images, blits downscales / resolves the image
@@ -100,17 +100,17 @@ void ForwardRenderer::RenderDemo(RenderStage RenderStage, SkyBox* InSkybox, Came
 	{
 		InSkybox->SkyboxTexture = IrradenceCapturer->GetUnConvolutedRenderTexture();
 		InSkybox->Draw(glm::mat4(), Camera::GetProjection(Perspective), Camera::GetViewMatrix(Perspective));
-		DrawLights(Perspective, LampShader);
+		DrawLights(Perspective, LampShader.get());
 	}
 
-	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : PBRshader;
+	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader.get() : PBRShader.get();
 	 
 	//Room Model
 	auto ModelTransformation = glm::mat4();
 	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 2.0f, -2.0f));
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
 //	ModelTransformation = glm::rotate(ModelTransformation, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	DrawModel(LocalPBRShader, Sponza, ModelTransformation, Perspective, ShadowMap);
+	DrawModel(LocalPBRShader, Sponza.get(), ModelTransformation, Perspective, ShadowMap);
 }
 
 //-------------------------------------------------------------------
@@ -194,7 +194,7 @@ void ForwardRenderer::DrawGizmos(Camera* Perspective)
 	glm::mat4 view = glm::mat4(glm::mat3(Camera::GetViewMatrix(Perspective)));	// Remove any translation component of the view matrix
 	UnlitShader->setMat4("projection", FOV);
 	UnlitShader->setMat4("view", view);
-	GizMo->Draw(UnlitShader);
+	GizMo->Draw(UnlitShader.get());
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -206,80 +206,7 @@ ForwardRenderer::~ForwardRenderer()
 	{
 		delete MainPostProcessSetting;
 		MainPostProcessSetting = nullptr;
-	}
-
-	if (PBRshader)
-	{
-		delete PBRshader;
-		PBRshader = nullptr;
-	}
-
-	if (UnlitShader)
-	{
-		delete UnlitShader;
-		UnlitShader = nullptr;
-	}
-
-	if (SkyboxShader)
-	{
-		delete SkyboxShader;
-		SkyboxShader = nullptr;
-	}
-
-	if (LampShader)
-	{
-		delete LampShader;
-		LampShader = nullptr;
-	}
-
-	if (DepthShader)
-	{
-		delete DepthShader;
-		DepthShader = nullptr;
-	}
-
-	if (ScreenShader)
-	{
-		delete ScreenShader;
-		ScreenShader = nullptr;
-	}
-
-	if (WaterShader)
-	{
-		delete WaterShader;
-		WaterShader = nullptr;
-	}
-
-	if (Sponza)
-	{
-		delete Sponza;
-		Sponza = nullptr;
-	}
-
-	if (GizMo)
-	{
-		delete GizMo;
-		GizMo = nullptr;
-	}
-
-	if (WaterBlock)
-	{
-		delete WaterBlock;
-		WaterBlock = nullptr;
-	}
-
-	if (IrradenceCapturer)
-	{
-		delete IrradenceCapturer;
-		IrradenceCapturer = nullptr;
-	}
-
-	if (VisualSkybox)
-	{
-		delete VisualSkybox;
-		VisualSkybox = nullptr;
-	}
-
+	}	
 }
 
 //-------------------------------------------------------------------

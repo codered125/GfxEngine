@@ -12,7 +12,7 @@
 
 //-------------------------------------------------------------------
 
-Model::Model(std::string InActorName, GLchar* inpath, Shader* InShader)
+Model::Model(std::string InActorName, const GLchar* inpath, Shader* InShader)
 	: Shape(InActorName, InShader)
 {
 	this->loadModel(inpath);

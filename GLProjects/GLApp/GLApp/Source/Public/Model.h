@@ -30,7 +30,7 @@ struct aiNode;
 class Model : public Shape
 {
 public:
-	Model(std::string InActorName, GLchar* inpath, Shader* InShader);
+	Model(std::string InActorName, const GLchar* inpath, Shader* InShader);
 
 	void Draw(Shader *shader) override;
 

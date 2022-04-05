@@ -6,6 +6,7 @@
 #include <gtc\matrix_transform.hpp>
 #include <gtc\type_ptr.hpp>
 #include <map>
+#include <memory>
 
 //-------------------------------------------------------------------------------------
 
@@ -30,7 +31,7 @@ bool Keys[1024];
 auto firstMouse = false, lightDirection = true;
 std::map<int, int> InputMap;
 
-Renderer* MainRenderer;
+std::unique_ptr<Renderer> MainRenderer;
 
 auto AliasingCount = 4, NumberofLights = 3;
 

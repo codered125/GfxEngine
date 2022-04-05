@@ -21,7 +21,7 @@
 
 //-------------------------------------------------------------------------------------
 
-#define DEFFERED 01
+#define DEFFERED 0
 int main()
 {
 	//Model::GetImporterSingleTon();
@@ -48,11 +48,11 @@ int main()
 
 	if (DEFFERED)
 	{
-		MainRenderer = new DefferedRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+		MainRenderer = std::make_unique<DefferedRenderer>(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 	else
 	{
-		MainRenderer = new ForwardRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+		MainRenderer = std::make_unique<ForwardRenderer>(SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 
 	Input::InitializeInputMap(InputMap);
@@ -67,15 +67,11 @@ int main()
 		Input::DoMovement(deltaTime, MainRenderer->GetMainCamera(), Keys, keyboardlockout, MainRenderer->MainPostProcessSetting, InputMap);
 
 		MainRenderer->RenderLoop(static_cast<float>(glfwGetTime()));
-		
-		
+				
 		//swap screen buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
-	delete MainRenderer;
-	MainRenderer = nullptr;
 
 	glfwTerminate();
 	return EXIT_SUCCESS;

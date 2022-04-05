@@ -29,18 +29,18 @@ private:
 
 	void DrawModel(Shader* ModelShader, Model* InModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap);
 
-	Shader* UnlitShader = nullptr;
-	Shader* PBRshader = nullptr;
-	Shader* SkyboxShader = nullptr;
-	Shader* LampShader = nullptr;
-	Shader* DepthShader = nullptr;
-	Shader* ScreenShader = nullptr;
-	Shader* GBufferShader = nullptr;
-	Model* Sponza = nullptr;
-	Model* GizMo = nullptr;
-	Model* ArrowLight = nullptr;
-	SkyBox* VisualSkybox = nullptr;
-	RenderTextureCubeMapIrradence* IrradenceCapturer = nullptr;
+	std::unique_ptr<Shader> UnlitShader = nullptr;
+	std::unique_ptr<Shader> PBRshader = nullptr;
+	std::unique_ptr<Shader> SkyboxShader = nullptr;
+	std::unique_ptr<Shader> LampShader = nullptr;
+	std::unique_ptr<Shader> DepthShader = nullptr;
+	std::unique_ptr<Shader> ScreenShader = nullptr;
+	std::unique_ptr<Shader> GBufferShader = nullptr;
+	std::unique_ptr<Model> Sponza = nullptr;
+	std::unique_ptr<Model> GizMo = nullptr;
+	std::unique_ptr<Model> ArrowLight = nullptr;
+	std::unique_ptr<SkyBox> VisualSkybox = nullptr;
+	std::unique_ptr<RenderTextureCubeMapIrradence> IrradenceCapturer = nullptr;
 
 };
 

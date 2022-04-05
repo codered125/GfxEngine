@@ -38,17 +38,17 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 
 	SSAOBuilder = std::make_unique<RenderTextureSSAO>(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	UnlitShader = new Shader("Shaders/Unlit.vs", "Shaders/Unlit.frag");
-	SkyboxShader = new Shader("Shaders/Skybox.vs", "Shaders/Skybox.frag");
-	LampShader = new Shader("Shaders/Lamp.vs", "Shaders/Lamp.frag");
-	DepthShader = new Shader("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
-	ScreenShader = new Shader("Shaders/Deffered/DefferedScreen.vs", "Shaders/Deffered/DefferedScreen.frag");
-	GBufferShader = new Shader("Shaders/Deffered/DefferedGBufferFill.vs", "Shaders/Deffered/DefferedGBufferFill.frag");
+	UnlitShader = std::make_unique<Shader>("Shaders/Unlit.vs", "Shaders/Unlit.frag");
+	SkyboxShader = std::make_unique<Shader>("Shaders/Skybox.vs", "Shaders/Skybox.frag");
+	LampShader = std::make_unique<Shader>("Shaders/Lamp.vs", "Shaders/Lamp.frag");
+	DepthShader = std::make_unique<Shader>("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
+	ScreenShader = std::make_unique<Shader>("Shaders/Deffered/DefferedScreen.vs", "Shaders/Deffered/DefferedScreen.frag");
+	GBufferShader = std::make_unique<Shader>("Shaders/Deffered/DefferedGBufferFill.vs", "Shaders/Deffered/DefferedGBufferFill.frag");
 
-	Sponza = new Model(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader);		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
-	IrradenceCapturer = new RenderTextureCubeMapIrradence(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
-	VisualSkybox = new SkyBox(SkyboxShader, "Images/KlopHeimCubeMap/", ".png");
-	PostProcessingQuad = std::make_unique<Quad>(ScreenShader, MainPostProcessSetting, true);
+	Sponza = std::make_unique<Model>(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader.get());		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
+	IrradenceCapturer = std::make_unique<RenderTextureCubeMapIrradence>(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
+	VisualSkybox = std::make_unique<SkyBox>(SkyboxShader.get(), "Images/KlopHeimCubeMap/", ".png");
+	PostProcessingQuad = std::make_unique<Quad>(ScreenShader.get(), MainPostProcessSetting, true);
 }
 
 void DefferedRenderer::RenderLoop( float TimeLapsed)
@@ -60,7 +60,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
-	RenderDemo(RenderStage::Depth, VisualSkybox, GetMainCamera(), nullptr);
+	RenderDemo(RenderStage::Depth, VisualSkybox.get(), GetMainCamera(), nullptr);
 	//End Shadow Render Pass
 
 	//Begin Main Pass
@@ -68,7 +68,7 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	glBindFramebuffer(GL_FRAMEBUFFER, GBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_BACK);
-	RenderDemo(RenderStage::GBuffer, VisualSkybox, GetMainCamera(), &DepthRenderBuffer->GetDepthTexture()->GetID());
+	RenderDemo(RenderStage::GBuffer, VisualSkybox.get(), GetMainCamera(), &DepthRenderBuffer->GetDepthTexture()->GetID());
 
 	//Multisampled image contains more informmation than normal images, blits downscales / resolves the image
 	//Copies a region from one framebuffer ( our read buffer) to another buffer(our draw buffer)
@@ -136,13 +136,13 @@ void DefferedRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Ca
 		//DrawLights(Perspective, nullptr);
 	}
 
-	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader : GBufferShader;
+	auto LocalPBRShader = RenderStage == RenderStage::Depth ? DepthShader.get() : GBufferShader.get();
 	 
 	//Room Model
 	auto ModelTransformation = glm::mat4();
 	ModelTransformation = glm::translate(ModelTransformation, glm::vec3(0.0f, 2.0f, -2.0f));
 	ModelTransformation = glm::scale(ModelTransformation, glm::vec3(0.01f));
-	DrawModel(LocalPBRShader, Sponza, ModelTransformation, Perspective, ShadowMap);
+	DrawModel(LocalPBRShader, Sponza.get(), ModelTransformation, Perspective, ShadowMap);
 }
 
 
@@ -188,61 +188,6 @@ DefferedRenderer::~DefferedRenderer()
 		delete MainPostProcessSetting;
 		MainPostProcessSetting = nullptr;
 	}
-
-	if (PBRshader)
-	{
-		delete PBRshader;
-		PBRshader = nullptr;
-	}
-
-	if (UnlitShader)
-	{
-		delete UnlitShader;
-		UnlitShader = nullptr;
-	}
-
-	if (SkyboxShader)
-	{
-		delete SkyboxShader;
-		SkyboxShader = nullptr;
-	}
-
-	if (LampShader)
-	{
-		delete LampShader;
-		LampShader = nullptr;
-	}
-
-	if (DepthShader)
-	{
-		delete DepthShader;
-		DepthShader = nullptr;
-	}
-
-	if (ScreenShader)
-	{
-		delete ScreenShader;
-		ScreenShader = nullptr;
-	}
-
-	if (Sponza)
-	{
-		delete Sponza;
-		Sponza = nullptr;
-	}
-
-	if (GizMo)
-	{
-		delete GizMo;
-		GizMo = nullptr;
-	}
-
-	if (VisualSkybox)
-	{
-		delete VisualSkybox;
-		VisualSkybox = nullptr;
-	}
-
 	
 }
 
