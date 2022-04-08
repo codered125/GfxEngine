@@ -116,8 +116,8 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 
 	InitialiseLightingDataForShader(PostProcessingQuad->ThisShader);
 	RenderTexture* OutputTexture = SSAOBuilder->GetSSAOBlurBuffer()->GetColourAttachmentByIndex(0);
-	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4(), &OutputTexture->GetID());
-	//PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
+//	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4(), &OutputTexture->GetID());
+	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
 
 
 	//End Lighting Render Pass

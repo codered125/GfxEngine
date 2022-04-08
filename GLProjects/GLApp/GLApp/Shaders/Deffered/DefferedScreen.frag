@@ -134,13 +134,13 @@ vec4 CalculateLight()
 	L0 += ProgrammablePBR(FragNormalMap, View, r, L, Parse, dirLight.intensity);
 
 	vec3 OutputColour = vec3(Ambient + L0); 
-	OutputColour *= max(Shadow, 0.025);
+	OutputColour *= max(Shadow, 0.05);
 	OutputColour *= max(AmbientOcclusion, 0.025);
 	if(DebugQuad)
 	{
 		return texture(screenTexture, TexCoords).r * vec4(1.0f);
 	}
-	return vec4( vec3(abs(OutputColour)), 1.0f); 
+	return vec4( OutputColour, 1.0f); 
   
 }
 

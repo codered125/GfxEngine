@@ -41,13 +41,12 @@ void main()
     OffsetClipSpace.xyz /= OffsetClipSpace.w; //Perspective divide
     OffsetClipSpace.xyz = OffsetClipSpace.xyz * 0.5 + 0.5; //Remap to 0 - 1
 
-    const float ViewSpaceDepthSample = vec3(View * texture(PositionalTexture, OffsetClipSpace.xy)).z;
+    const float ViewSpaceDepthSample = (View * vec4(texture(PositionalTexture, OffsetClipSpace.xy).xyz, 1.0f)).z;
     const float RangeCheck = smoothstep(0.0, 1.0, Radius / abs(FragPosition.z - ViewSpaceDepthSample));
     Occlusion += (ViewSpaceDepthSample >= SamplePosition.z + Bias ? 1.0 : 0.0) * RangeCheck; 
   }
 
   FragColour = pow(1.0 - (Occlusion / KernalSize), 3.0f);  
-  //FragColour = Occlusion;
 };
 
 //-------------------------------------------------------------------

@@ -53,10 +53,10 @@ RenderTextureSSAO::RenderTextureSSAO(int InScreenWidth, int InScreenHeight)
 	NoiseTexture = std::make_unique<RenderTexture>(4, 4, GL_TEXTURE_2D, GL_RGBA32F, GL_RGB, false, GL_NEAREST, GL_NEAREST, GL_REPEAT, &SSAONoise[0], GL_FLOAT, nullptr);
 
 	SSAOBlurBuffer = std::make_unique<SceneRenderTarget>(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, 1);
-	SSAOBlurBuffer.get()->SetColourAttachmentByIndex(&RenderTexture(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, false, GL_NEAREST, GL_NEAREST, GL_REPEAT, NULL, GL_FLOAT, nullptr), 0);
+	SSAOBlurBuffer.get()->SetColourAttachmentByIndex(&RenderTexture(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, false, GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, NULL, GL_FLOAT, nullptr), 0);
 
 	SSAOColourBuffer = std::make_unique<SceneRenderTarget>(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, 1);
-	SSAOColourBuffer.get()->SetColourAttachmentByIndex(&RenderTexture(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, false, GL_NEAREST, GL_NEAREST, GL_REPEAT, NULL, GL_FLOAT, nullptr), 0);
+	SSAOColourBuffer.get()->SetColourAttachmentByIndex(&RenderTexture(InScreenWidth, InScreenHeight, GL_TEXTURE_2D, GL_RED, GL_RED, false, GL_NEAREST, GL_NEAREST, GL_CLAMP_TO_EDGE, NULL, GL_FLOAT, nullptr), 0);
 
 	SSAOShader = std::make_unique<Shader>("Shaders/SSAO/ScreenSpaceAmbientOcclusion.vs", "Shaders/SSAO/ScreenSpaceAmbientOcclusion.frag");
 	SSAOBlurShader = std::make_unique<Shader>("Shaders/SSAO/ScreenSpaceAmbientOcclusion.vs", "Shaders/SSAO/ScreenSpaceAmbientOcclusionBlur.frag");
