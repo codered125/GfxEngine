@@ -11,7 +11,6 @@
 #include "Source/Public/Rendering/DefferedRenderer.h"
 #include "Source/Public/Rendering/ForwardRenderer.h"
 
-
 //-------------------------------------------------------------------------------------
 
 #include <future>
@@ -64,7 +63,7 @@ int main()
 
 		//INPUTS
 		Tick();
-		Input::DoMovement(deltaTime, MainRenderer->GetMainCamera(), Keys, keyboardlockout, MainRenderer->MainPostProcessSetting, InputMap);
+		Input::DoMovement(deltaTime, MainRenderer->GetMainCamera(), Keys, keyboardlockout, MainRenderer->MainPostProcessSetting.get(), InputMap);
 
 		MainRenderer->RenderLoop(static_cast<float>(glfwGetTime()));
 				
@@ -81,7 +80,7 @@ int main()
 
 void Tick()
 {
-	const auto currentFrame = (GLfloat)glfwGetTime();
+	const auto currentFrame = (float)glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 	keyboardlockout = keyboardlockout > 0 ? keyboardlockout - deltaTime : 0;

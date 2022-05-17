@@ -23,10 +23,10 @@ void KeyCallback(GLFWwindow  * window, int key, int scancode, int action, int mo
 void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset);
 void MouseCallback(GLFWwindow * window, double xPos, double yPos);
 
-GLfloat lastX = width / 2.0f;
-GLfloat lastY = height / 2.0f;
+float lastX = width / 2.0f;
+float lastY = height / 2.0f;
 
-GLfloat deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 1.0f;
+float deltaTime, keyboardlockout, lastFrame = 0.0f, SecondCounter = 1.0f;
 bool Keys[1024];
 auto firstMouse = false, lightDirection = true;
 std::map<int, int> InputMap;

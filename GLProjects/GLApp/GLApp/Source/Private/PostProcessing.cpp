@@ -20,7 +20,7 @@ void PostProcessing::ApplyEffects(Shader* FBShader, PostProcessSettings *PPS)
 
 //-------------------------------------------------------------------
 
-void PostProcessing::TogglePostProcessEffects(int effectNumber, PostProcessSettings * PPS, GLfloat & keyboardlockout)
+void PostProcessing::TogglePostProcessEffects(int effectNumber, PostProcessSettings * PPS, float & keyboardlockout)
 {
 	keyboardlockout = 0.1f;
 	switch (effectNumber)

@@ -27,7 +27,7 @@ public:
 
 	Renderer(GLint InScreenWidth, GLint InScreenHeight);
 	
-	PostProcessSettings* MainPostProcessSetting;
+	std::unique_ptr<PostProcessSettings> MainPostProcessSetting;
 	virtual void RenderLoop(float TimeLapsed) = 0;
 	virtual void DrawGizmos(Camera* Perspective);
 	
@@ -39,6 +39,7 @@ public:
 protected:
 
 	void InitialiseLightingDataForShader(Shader * lightShader);
+	void InitialiseLightSpaceMatrices();
 
 	void DrawLights(Camera* Perspective, Shader* LightShader);
 	std::string GetGameTimeAsString();
@@ -55,6 +56,7 @@ protected:
 
 	GLint AliasingCount = 4;
 	GLint NumberofLights = 3;
+	GLuint LightMatricesUBO;
 
 	std::unique_ptr<Light> Directional0;
 	std::unique_ptr<Quad> PostProcessingQuad;

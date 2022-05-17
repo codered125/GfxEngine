@@ -9,28 +9,28 @@ constexpr bool USEGLM = 0;
 
 //-------------------------------------------------------------------
 
-glm::vec3 MoMath::MoLerp(glm::vec3& a, glm::vec3& b, float& t)
+glm::vec3 MoMath::MoLerp(const glm::vec3& a, const glm::vec3& b, const float& t)
 {
 	return a + ((b - a) * t);
 }
 
 //-------------------------------------------------------------------
 
-float MoMath::MoLerpFast(float a, float b, float t)
+float MoMath::MoLerpFast(const float a, const float b, const float t)
 {
 	return a + t * (b - a);
 }
 
 //-------------------------------------------------------------------
 
-float MoMath::MoDotProduct(glm::vec3& a, glm::vec3& b)
+float MoMath::MoDotProduct(const glm::vec3& a, const glm::vec3& b)
 {
 	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
 //-------------------------------------------------------------------
 
-glm::vec3 MoMath::MoCrossProduct(glm::vec3& a, glm::vec3& b)
+glm::vec3 MoMath::MoCrossProduct(const glm::vec3& a, const glm::vec3& b)
 {
 	const float x = (a.y * b.z) - (a.z * b.y);
 	const float y = (a.z * b.x) - (a.x * b.z);
@@ -52,6 +52,8 @@ float MoMath::MoSign(float T)
 	return static_cast<float>((T > 0) - (T < 0));
 }
 
+//-------------------------------------------------------------------
+
 float MoMath::MoClamp(float& T, float A, float B)
 {
 	const float Min = fmin(A, B);
@@ -62,7 +64,7 @@ float MoMath::MoClamp(float& T, float A, float B)
 
 //-------------------------------------------------------------------
 
-glm::vec3 MoMath::MoNormalize(glm::vec3& T)
+glm::vec3 MoMath::MoNormalize(const glm::vec3& T)
 {
 	const float TLen = sqrt((T.x * T.x) + (T.y * T.y) + (T.z * T.z));
 	return glm::vec3((T.x / TLen), (T.y / TLen), (T.z / TLen));
@@ -70,7 +72,7 @@ glm::vec3 MoMath::MoNormalize(glm::vec3& T)
 
 //-------------------------------------------------------------------
 
-glm::mat4x4 MoMath::MoLookAt(glm::vec3& Position, glm::vec3& Target, glm::vec3& WorldUp)
+glm::mat4x4 MoMath::MoLookAt(const glm::vec3 Position, const glm::vec3 Target, const glm::vec3& WorldUp)
 {
 	if (USEGLM)
 	{

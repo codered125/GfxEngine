@@ -11,6 +11,7 @@ struct RenderTextureParam
 public:
 	GLint Height;
 	GLint Width;
+	GLint Depth;
 	GLenum WrapS = GL_CLAMP_TO_EDGE;
 	GLenum WrapT = GL_CLAMP_TO_EDGE;
 	GLenum WrapR = GL_CLAMP_TO_EDGE;

@@ -6,7 +6,7 @@
 
 namespace StaticVerts
 {
-	GLfloat vertices[108] = {
+	float vertices[108] = {
 		// Positions 
 
 		-1.0f,  1.0f, -1.0f,
@@ -76,7 +76,7 @@ void SkyBox::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView)
 		glBindVertexArray(ShapeVAO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(StaticVerts::vertices), StaticVerts::vertices, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (GLvoid *)0);
 
 		glDepthFunc(GL_LEQUAL);  // Change depth function so depth test passes when values are equal to depth buffer's content
 		glm::mat4 view = glm::mat4(glm::mat3(InView));	// Remove any translation component of the view matrix

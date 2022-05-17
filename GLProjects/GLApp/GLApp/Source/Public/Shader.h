@@ -25,9 +25,7 @@ public:
 
 	Shader() {};
 
-	Shader(const GLchar *vertexPath, const GLchar *fragmentPath, const GLchar *ComputePath = nullptr);
-
-	std::string ParseShaderForIncludes(const GLchar* CurrentShaderPath);
+	Shader(const GLchar *vertexPath, const GLchar *fragmentPath, const GLchar* GeometryPath = nullptr, const GLchar *ComputePath = nullptr,  const GLchar *TesselationPath = nullptr);
 
 	void use();
 
@@ -48,6 +46,12 @@ public:
 	void SetSampler(const std::string& Accessor, GLuint* value, GLenum TextureType);
 
 	GLint GetUniformLocation(const std::string& Accessor);
+
+private:
+
+	std::string ParseShaderForIncludes(const GLchar* CurrentShaderPath);
+
+	GLuint MakeInternalShader(const GLchar* InPath, const GLenum ShaderType, const std::string FailureMessage);
 };
 
 #endif

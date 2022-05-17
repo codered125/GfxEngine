@@ -10,7 +10,7 @@
 
 #define GLErrorCheck()EngineDebugHelper::GLErrorCheckWrapper_(__FILE__, __LINE__) 
 #define MoMessageLogger(LogText)EngineDebugHelper::MessageLogger(__FILE__, __LINE__, LogText) 
-#define GLDebugOutputCallback()EngineDebugHelper::GLDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char *message, const void *userParam) 
+#define GLDebugOutputCallback()EngineDebugHelper::GLDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam) 
 
 class EngineDebugHelper
 {
@@ -38,7 +38,7 @@ public:
 
 	//-------------------------------------------------------------------
 
-	static void GLAPIENTRY GLDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char *message, const void *userParam)
+	static void GLAPIENTRY GLDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam)
 	{
 		// ignore non-significant error/warning codes
 		if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;

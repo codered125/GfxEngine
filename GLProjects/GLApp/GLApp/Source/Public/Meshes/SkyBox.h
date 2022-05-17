@@ -19,7 +19,7 @@ public:
 
 	SkyBox(Shader* SkyboxShader, std::string InPath, std::string InFormat);
 
-	const GLfloat* GetVertices();
+	const float* GetVertices();
 
 	virtual void Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView) override;
 

@@ -23,7 +23,7 @@
 
 ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Renderer(InScreenWidth, InScreenHeight)
 {
-	MainPostProcessSetting = new PostProcessSettings();
+	MainPostProcessSetting = std::make_unique<PostProcessSettings>();
 	MainPostProcessSetting->HDR = EffectStatus::Active;
 
 	MainRenderBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_RGBA, 2, false, true, true);
@@ -32,7 +32,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	IntermediateRenderBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false, false);
 	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer.get();
 
-	DepthRenderBuffer = std::make_unique<SceneRenderTarget>(8192, 8192, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
+	DepthRenderBuffer = std::make_unique<SceneRenderTarget>(4096, 4096, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
 	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer.get();
 
 	PBRShader = std::make_unique<Shader>("Shaders/Forward/ForwardPBR.vs", "Shaders/Forward/ForwardPBR.frag");
@@ -47,7 +47,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	Sponza = std::make_unique<Model>(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRShader.get());		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	IrradenceCapturer = std::make_unique<RenderTextureCubeMapIrradence>(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
 	VisualSkybox = std::make_unique<SkyBox>(SkyboxShader.get(), "Images/KlopHeimCubeMap/", ".png");
-	PostProcessingQuad = std::make_unique<Quad>(ScreenShader.get(), MainPostProcessSetting, true);
+	PostProcessingQuad = std::make_unique<Quad>(ScreenShader.get(), MainPostProcessSetting.get(), true);
 
 }
 
@@ -63,13 +63,13 @@ void ForwardRenderer::RenderLoop(float TimeLapsed)
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 	RenderDemo(RenderStage::Depth, VisualSkybox.get(), GetMainCamera(), nullptr);
+	glCullFace(GL_BACK);
 	//End Shadow Render Pass
 
 	//Begin Main Pass
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, MainRenderBuffer->GetID());
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
-	glCullFace(GL_BACK);
 	RenderDemo(RenderStage::Main, VisualSkybox.get(), GetMainCamera(), &DepthRenderBuffer->GetDepthTexture()->GetID());
 
 
@@ -134,6 +134,8 @@ void ForwardRenderer::DrawModel(Shader* ModelShader, Shape* InModel, glm::mat4 m
 	
 	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
 	{
+		CascadingShadowMapHelper::AddCascadingLevelsToShader(ModelShader, Camera::GetFarPlane(Perspective));
+
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
 		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
 		if (LightingView.has_value())
@@ -202,11 +204,7 @@ void ForwardRenderer::DrawGizmos(Camera* Perspective)
 
 ForwardRenderer::~ForwardRenderer()
 {
-	if (MainPostProcessSetting)
-	{
-		delete MainPostProcessSetting;
-		MainPostProcessSetting = nullptr;
-	}	
+
 }
 
 //-------------------------------------------------------------------

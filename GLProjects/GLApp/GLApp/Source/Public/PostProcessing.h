@@ -29,7 +29,7 @@ public:
 
 	static void ApplyEffects(Shader* FBShader, PostProcessSettings* PPS);
 
-	static void TogglePostProcessEffects(int effectNumber, PostProcessSettings* PPS, GLfloat& keyboardlockout);
+	static void TogglePostProcessEffects(int effectNumber, PostProcessSettings* PPS, float& keyboardlockout);
 };
 
 //-------------------------------------------------------------------

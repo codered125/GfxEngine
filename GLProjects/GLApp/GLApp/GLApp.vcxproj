@@ -126,6 +126,7 @@
       <DebugInformationFormat>None</DebugInformationFormat>
       <SupportJustMyCode>true</SupportJustMyCode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -173,10 +174,11 @@
     <ClCompile Include="Source\Private\Rendering\DeferredRenderer.cpp" />
     <ClCompile Include="Source\Private\Rendering\ForwardRenderer.cpp" />
     <ClCompile Include="Source\Private\Rendering\Renderer.cpp" />
+    <ClCompile Include="Source\Private\Rendering\RenderingHelpers\CascadingShadowMapHelper.cpp" />
     <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTexture.cpp" />
     <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMap.cpp" />
     <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureCubeMapIrradence.cpp" />
-    <ClCompile Include="Source\Private\Rendering\RenderingHelpers\RenderTextureSSAO.cpp" />
+    <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureSSAO.cpp" />
     <ClCompile Include="Source\Private\ResourceManager.cpp" />
     <ClCompile Include="Source\Private\Rendering\RenderTarget\SceneRenderTarget.cpp" />
     <ClCompile Include="Source\Private\Shader.cpp" />
@@ -241,9 +243,10 @@
     <ClInclude Include="Source\Public\Rendering\DefferedRenderer.h" />
     <ClInclude Include="Source\Public\Rendering\ForwardRenderer.h" />
     <ClInclude Include="Source\Public\Rendering\Renderer.h" />
+    <ClInclude Include="Source\Public\Rendering\RenderingHelpers\CascadingShadowMapHelper.h" />
     <ClInclude Include="Source\Public\Rendering\RenderTarget\RenderTargetParams.h" />
-    <ClInclude Include="Source\Public\Rendering\RenderingHelpers\RenderTextureSSAO.h" />
     <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureParams.h" />
+    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureSSAO.h" />
     <ClInclude Include="Source\Public\RenderTarget.h" />
     <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTexture.h" />
     <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureCubeMap.h" />

@@ -9,8 +9,10 @@
 #include "Source/Public/Meshes/Cube.h"
 #include "Source/Public/Meshes/Quad.h"
 #include "Source/Public/Math.h"
-#include "Source/Public/Rendering/RenderingHelpers/RenderTextureSSAO.h"
+#include "Source/Public/PostProcessing.h"
 #include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTextureSSAO.h"
+#include "Source/Public/Rendering/RenderingHelpers/CascadingShadowMapHelper.h"
 #include "Source/Public/Shader.h"
 
 #include <GLFW/glfw3.h>
@@ -22,8 +24,9 @@
 Renderer::Renderer(GLint InScreenWidth, GLint InScreenHeight)
 {
 	SCREEN_WIDTH = InScreenWidth;
-	SCREEN_HEIGHT = InScreenHeight;
-	SetMainCamera(&Camera(glm::vec3(0.0f, 10.0f, - 3.0f)));
+	SCREEN_HEIGHT = InScreenHeight; 
+	float AspectRatio = (float)InScreenWidth / (float)InScreenHeight;
+	SetMainCamera(&Camera(AspectRatio, glm::vec3(0.0f, 10.0f, - 3.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 }
 
 //-------------------------------------------------------------------
@@ -65,22 +68,19 @@ void Renderer::InitialiseLightingDataForShader(Shader* lightShader)
 	if (!Directional0.get())
 	{
 		Directional0 = std::make_unique<DirectionalLight>(lightShader, "dirLight");
-		if (const auto DirectionalLightType = static_cast<DirectionalLight*>(Directional0.get()))
-		{
-			DirectionalLightType->direction = MoMath::MoNormalize(TheMostStaticVertices::SunDir);
-			DirectionalLightType->ambient = glm::vec3(1.0f);
-			DirectionalLightType->diffuse = glm::vec3(1.0f) * 25.0f;
-			DirectionalLightType->specular = glm::vec3(1.0f);
-			DirectionalLightType->position = TheMostStaticVertices::SunPos;
-			DirectionalLightType->intensity = directIntes;
-
-			auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionalLightType->GetLightSpaceProjection(), MoMath::MoLookAt(Directional0->position, Directional0->position + (Directional0->direction * 15.0f), glm::vec3(0.0f, 1.0f, 0.0f)), Directional0->position);
-			DirectionalLightType->AddLightSpaceViewMatrix(LightSpaceMatrixMapping);
-		}
 	}
-	Directional0->ShaderRef = lightShader;
-	Directional0->SetupShader();
 
+	if (const auto DirectionalLightType = static_cast<DirectionalLight*>(Directional0.get()))
+	{
+		DirectionalLightType->direction = MoMath::MoNormalize(TheMostStaticVertices::SunDir);
+		DirectionalLightType->ambient = glm::vec3(1.0f);
+		DirectionalLightType->diffuse = glm::vec3(1.0f) * 25.0f;
+		DirectionalLightType->specular = glm::vec3(1.0f);
+		DirectionalLightType->position = TheMostStaticVertices::SunPos;
+		DirectionalLightType->intensity = directIntes;
+		DirectionalLightType->SetupNewShader(lightShader);
+	}
+	
 	// Point light 1
 	for (int i = 0; TheMostStaticVertices::pointLightColours->length() > i; i++)
 	{
@@ -91,6 +91,41 @@ void Renderer::InitialiseLightingDataForShader(Shader* lightShader)
 		Point.specular = glm::vec3(1.0f);
 		Point.intensity = pointIntes;
 		Point.SetupShader();
+	}
+}
+
+//-------------------------------------------------------------------
+
+void Renderer::InitialiseLightSpaceMatrices()
+{
+	if (!Directional0.get())
+	{
+		Directional0 = std::make_unique<DirectionalLight>("dirLight");
+	}
+
+	if (const auto DirectionalLightType = static_cast<DirectionalLight*>(Directional0.get()))
+	{
+		const auto MainCam = GetMainCamera();
+		const auto Levels = CascadingShadowMapHelper::GetCascadingLevels(Camera::GetFarPlane(MainCam));
+		const auto CascadingCount = Levels.size();
+		DirectionalLightType->direction = MoMath::MoNormalize(TheMostStaticVertices::SunDir);
+		DirectionalLightType->ReserveMatrixMappings(CascadingCount);
+		for (GLuint it = 0; it < CascadingCount + 1; ++it)
+		{
+			if (it == 0)
+			{
+				DirectionalLightType->AddLightSpaceViewMatrix(CascadingShadowMapHelper::MakeCascadingLightSpaceMatrix(MainCam, Directional0->direction, Camera::GetNearPlane(MainCam), Levels[it]), it);
+			}
+			else if (it < CascadingCount)
+			{
+				DirectionalLightType->AddLightSpaceViewMatrix(CascadingShadowMapHelper::MakeCascadingLightSpaceMatrix(MainCam, Directional0->direction, Levels[it - 1], Levels[it]), it);
+			}
+			else
+			{
+				DirectionalLightType->AddLightSpaceViewMatrix(CascadingShadowMapHelper::MakeCascadingLightSpaceMatrix(MainCam, Directional0->direction, Levels[it - 1], Camera::GetFarPlane(MainCam)), it);
+			}
+		}
+
 	}
 }
 

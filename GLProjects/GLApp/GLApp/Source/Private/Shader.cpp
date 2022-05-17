@@ -2,97 +2,72 @@
 
 //-------------------------------------------------------------------
 
-Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath, const GLchar *ComputePath)
+Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath, const GLchar* GeometryPath, const GLchar* ComputePath, const GLchar* TesselationPath )
 {
 
-	//Recursively get shader source code from frag and vert path
-	std::string vertexCode = ParseShaderForIncludes(vertexPath);
-	std::string fragmentCode = ParseShaderForIncludes(fragmentPath);
+	GLuint VertexShader;
+	GLuint FragmentShader;
+	GLuint ComputeShader;
+	GLuint GeometryShader;
+	GLuint TEvaluationShader;
+	GLuint TControlShader;
 
-	const GLchar* vShaderCode = vertexCode.c_str();
-	const GLchar* fShaderCode = fragmentCode.c_str();
+	if (vertexPath)
+	{
+		VertexShader = MakeInternalShader(vertexPath, GL_VERTEX_SHADER, "Vertex Compile Fail");
+	}
 
-	//2. Compile Shaders
+	if (fragmentPath)
+	{
+		FragmentShader = MakeInternalShader(fragmentPath, GL_FRAGMENT_SHADER, "Fragment Compile Fail");
+	}
+
+	if (ComputePath)
+	{
+		ComputeShader = MakeInternalShader(ComputePath, GL_COMPUTE_SHADER, "Compute Compile Fail");
+	}
+	
+	if (GeometryPath)
+	{
+		GeometryShader = MakeInternalShader(GeometryPath, GL_GEOMETRY_SHADER, "Geometry Compile Fail");
+	}
+
+	if (TesselationPath && Tesselation)
+	{ 
+		auto ControlPath = std::string(TesselationPath) + ".tesc";
+		TControlShader = MakeInternalShader(ComputePath, GL_TESS_CONTROL_SHADER, "Tessellation control Compile Fail");
+	
+		auto EvaluationPath = std::string(TesselationPath) + ".tese";
+		TEvaluationShader = MakeInternalShader(ComputePath, GL_TESS_EVALUATION_SHADER, "Tessellation Evaluate Fail");	
+	}
+
+	//2. Create program and Attach Shaders
 	GLint Success;
 	GLchar infolog[512];
-
-	//Create vertex shader
-	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertShader, 1, &vShaderCode, NULL);
-	
-	glCompileShader(vertShader);
-
-	//Vertex Safety check
-	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &Success);
-	if (!Success)
-	{
-		glGetShaderInfoLog(vertShader, 512, NULL, infolog);
-		std::cout << "VertCompile Fail\n" << infolog << std::endl;
-	}
-
-	//Create Fragment shader
-	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragShader, 1, &fShaderCode, NULL);
-	glCompileShader(fragShader);
-
-	//Fragment Saftey check
-	glGetShaderiv(fragShader, GL_COMPILE_STATUS, &Success);
-	if (!Success)
-	{
-		glGetShaderInfoLog(fragShader, 512, NULL, infolog);
-		std::cout << "frag  Fail\n" << infolog << std::endl;
-	}
-
-	GLuint EvaluationShader;
-	GLuint ControlShader;
-
-	if (ComputePath && Tesselation)
-	{
-		
-		std::string ControlPath = std::string(ComputePath) + ".cs";
-		std::string ControlCode = ParseShaderForIncludes(ControlPath.c_str());
-		const GLchar* cShaderCode = ControlCode.c_str();
-		//Create vertex shader
-		ControlShader = glCreateShader(GL_TESS_CONTROL_SHADER);
-		glShaderSource(ControlShader, 1, &cShaderCode, NULL);
-		glCompileShader(ControlShader);
-
-		//Vertex Safety check
-		glGetShaderiv(ControlShader, GL_COMPILE_STATUS, &Success);
-		if (!Success)
-		{
-			glGetShaderInfoLog(ControlShader, 512, NULL, infolog);
-			std::cout << "Control Compile Fail\n" << infolog << std::endl;
-		}
-
-		auto EvaluationPath = std::string(ComputePath) + ".es";
-		std::string EvaluationCode = ParseShaderForIncludes(EvaluationPath.c_str());
-		const GLchar* eShaderCode = EvaluationCode.c_str();
-		//Create vertex shader
-		EvaluationShader = glCreateShader(GL_TESS_EVALUATION_SHADER);
-		glShaderSource(EvaluationShader, 1, &eShaderCode, NULL);
-		glCompileShader(EvaluationShader);
-
-		//Vertex Safety check
-		glGetShaderiv(EvaluationShader, GL_COMPILE_STATUS, &Success);
-		if (!Success)
-		{
-			glGetShaderInfoLog(EvaluationShader, 512, NULL, infolog);
-			std::cout << "Evaluation Compile Fail\n" << infolog << std::endl;
-		}
-	}
-
 	this->shaderProgram = glCreateProgram();
-	glAttachShader(this->shaderProgram, vertShader);
+	glAttachShader(this->shaderProgram, VertexShader);
 
-	if (ComputePath && Tesselation)
+	if (ComputePath)
 	{
-		glAttachShader(this->shaderProgram, ControlShader);
-		glAttachShader(this->shaderProgram, EvaluationShader);
+		glAttachShader(this->shaderProgram, ComputeShader);
 	}
-	glAttachShader(this->shaderProgram, fragShader);
-	glLinkProgram(this->shaderProgram);
+	
+	if (GeometryPath)
+	{
+		glAttachShader(this->shaderProgram, GeometryShader);
+	}
 
+	if (TesselationPath && Tesselation)
+	{
+		glAttachShader(this->shaderProgram, TControlShader);
+		glAttachShader(this->shaderProgram, TEvaluationShader);
+	}
+	glAttachShader(this->shaderProgram, FragmentShader);
+
+
+
+	//Link Shaders
+	glLinkProgram(this->shaderProgram);
 	glGetProgramiv(this->shaderProgram, GL_LINK_STATUS, &Success);
 	if (!Success)
 	{
@@ -100,11 +75,20 @@ Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath, const GLcha
 		std::cout << "program  Fail\n" << infolog << std::endl;
 		std::cout << vertexPath << std::endl;
 
-
-		if (ComputePath && Tesselation)
+		if (ComputePath)
 		{
-			std::string ControlPath = std::string(ComputePath) + ".cs";
-			auto EvaluationPath = std::string(ComputePath) + ".es";
+			std::cout << ComputePath << std::endl;
+		}
+
+		if (GeometryPath)
+		{
+			std::cout << GeometryPath << std::endl;
+		}
+
+		if (TesselationPath && Tesselation)
+		{
+			std::string ControlPath = std::string(TesselationPath) + ".cs";
+			auto EvaluationPath = std::string(TesselationPath) + ".es";
 
 			std::cout << ControlPath << std::endl;
 			std::cout << EvaluationPath << std::endl;
@@ -112,15 +96,30 @@ Shader::Shader(const GLchar *vertexPath, const GLchar *fragmentPath, const GLcha
 		std::cout << fragmentPath << std::endl;
 	}
 
-	glDeleteShader(vertShader);
-	if (ComputePath && Tesselation)
+
+	//3. Delete Shaders
+	glDeleteShader(VertexShader);
+
+	if (ComputePath)
 	{
-		glDeleteShader(ControlShader);
-		glDeleteShader(EvaluationShader);
+		glDeleteShader(ComputeShader);
 	}
-	glDeleteShader(fragShader);
+	
+	if (GeometryPath)
+	{
+		glDeleteShader(GeometryShader);
+	}
+	
+	if (TesselationPath && Tesselation)
+	{
+		glDeleteShader(TControlShader);
+		glDeleteShader(TEvaluationShader);
+	}
+	glDeleteShader(FragmentShader);
 
 }
+
+//-------------------------------------------------------------------
 
 std::string Shader::ParseShaderForIncludes(const GLchar* CurrentShaderPath)
 {
@@ -157,6 +156,34 @@ std::string Shader::ParseShaderForIncludes(const GLchar* CurrentShaderPath)
 		std::cout << "shader include failed to read" << CurrentShaderPath << std::endl;
 	}
 	return OutputShader;
+}
+
+//-------------------------------------------------------------------
+
+GLuint Shader::MakeInternalShader(const GLchar* InPath, const GLenum ShaderType, const std::string FailureMessage)
+{
+	//Recursively get shader source code from path
+	const std::string CompleteShader = ParseShaderForIncludes(InPath);
+	const GLchar* ShaderCode = CompleteShader.c_str();
+
+
+	//2. Compile Shaders
+	GLint Success;
+	GLchar infolog[512];
+
+	//Create vertex shader
+	GLuint Shader = glCreateShader(ShaderType);
+	glShaderSource(Shader, 1, &ShaderCode, NULL);
+	glCompileShader(Shader);
+
+	//Vertex Safety check
+	glGetShaderiv(Shader, GL_COMPILE_STATUS, &Success);
+	if (!Success)
+	{
+		glGetShaderInfoLog(Shader, 512, NULL, infolog);
+		std::cout << FailureMessage << "\n" << infolog << std::endl;
+	}
+	return Shader;
 }
 
 //-------------------------------------------------------------------

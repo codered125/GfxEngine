@@ -24,7 +24,7 @@ public:
 
 protected:
 
-	PostProcessSettings* ThisPPS;
+	std::shared_ptr<PostProcessSettings> ThisPPS;
 
 };
 

@@ -64,7 +64,7 @@ Quad::Quad(Shader* InShader, PostProcessSettings* InPPS, bool InNDC)
 
 	ShapeID = ShapeVAO;
 	ThisShader = InShader;
-	ThisPPS = InPPS;
+	ThisPPS = std::make_shared<PostProcessSettings>(*InPPS);
 	
 }
 
@@ -98,7 +98,7 @@ void Quad::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView)
 	glBindVertexArray(ShapeID);
 	//ThisShader->use();
 
-	PostProcessing::ApplyEffects(ThisShader, ThisPPS);
+	PostProcessing::ApplyEffects(ThisShader, ThisPPS.get());
 	ThisShader->SetSampler("screenTexture", &ThisPPS->IntermediateRenderBuffer->GetColourAttachmentByIndex(0)->GetID(), GL_TEXTURE_2D);
 
 	if (DEBUGSHADOWMAP)
@@ -118,7 +118,7 @@ void Quad::Draw(glm::mat4 InModel, glm::mat4 InFOV, glm::mat4 InView, GLuint* Sa
 		glBindVertexArray(ShapeID);
 		ThisShader->use();
 
-		PostProcessing::ApplyEffects(ThisShader, ThisPPS);
+		PostProcessing::ApplyEffects(ThisShader, ThisPPS.get());
 		ThisShader->setBool("DebugQuad", true);
 		ThisShader->SetSampler("screenTexture", Sampler, GL_TEXTURE_2D);
 

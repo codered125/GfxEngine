@@ -11,13 +11,13 @@ RenderTexture::RenderTexture()
 
 }
 
-
 //-------------------------------------------------------------------
 
-RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA, GLenum InMinFilter, GLenum InMagFilter, GLenum InWrap, const void* InPixels, GLenum InBufferType, std::function<void()> InPreParamInitalizerFunction)
+RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLuint InDepth, GLenum InTargetType, GLenum InInternalFormat,  GLenum InFormat, bool InMSAA, GLenum InMinFilter, GLenum InMagFilter, GLenum InWrap, const void* InPixels, GLenum InBufferType, std::function<void()> InPreParamInitalizerFunction)
 {
 	Params.TargetType = InTargetType;
 	Params.Width = InWidth;
+	Params.Depth = InDepth;
 	Params.Height = InHeight;
 	Params.Format = InFormat;
 	Params.InternalFormat = InInternalFormat;
@@ -36,27 +36,6 @@ RenderTexture::RenderTexture( GLuint InWidth, GLuint InHeight, GLenum InTargetTy
 	InitialiseRenderTexture(Params);
 
 }
-
-//-------------------------------------------------------------------
-
-//RenderTexture::RenderTexture(GLuint InWidth, GLuint InHeight, GLenum InTargetType, GLenum InInternalFormat, GLenum InFormat, const void* InPixels, GLenum InBufferType, GLenum InMinFilter, GLenum InMagFilter)
-//{
-//	Params.TargetType = InTargetType;
-//	Params.Width = InWidth;
-//	Params.Height = InHeight;
-//	Params.Format = InFormat;
-//	Params.InternalFormat = InInternalFormat;
-//	Params.MSAA = false;
-//	Params.MinFilter = InMinFilter;
-//	Params.MagFilter = InMagFilter;
-//	Params.WrapR = GL_REPEAT;
-//	Params.WrapS = GL_REPEAT;
-//	Params.WrapT = GL_REPEAT;
-//	Params.BufferType = InBufferType;
-//	Params.Pixels = InPixels;
-//	InitialiseRenderTexture(Params);
-//
-//}
 
 //-------------------------------------------------------------------
 
@@ -111,11 +90,20 @@ void RenderTexture::InitialiseRenderTexture(RenderTextureParam& Params)
 	}
 	if(!Params.MSAA)
 	{
-		glTexImage2D(Params.TargetType, 0, Params.InternalFormat, Params.Width, Params.Height, 0, Params.Format, Params.BufferType, Params.Pixels);
-		GLErrorCheck();
+		if (Params.TargetType == GL_TEXTURE_2D)
+		{
+			glTexImage2D(Params.TargetType, 0, Params.InternalFormat, Params.Width, Params.Height, 0, Params.Format, Params.BufferType, Params.Pixels);
+			GLErrorCheck();
+		}
+
+		if (Params.TargetType == GL_TEXTURE_2D_ARRAY)
+		{
+			glTexImage3D(Params.TargetType, 0, Params.InternalFormat, Params.Width, Params.Height, Params.Depth, 0, Params.Format, Params.BufferType, Params.Pixels);
+			GLErrorCheck();
+		}
 	}
 
-	if (Params.Format == GL_DEPTH_COMPONENT)
+	if (Params.Format == GL_DEPTH_COMPONENT || Params.Format == GL_DEPTH_COMPONENT32F)
 	{
 		float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glTexParameterfv(Params.TargetType, GL_TEXTURE_BORDER_COLOR, borderColor);

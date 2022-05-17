@@ -13,14 +13,14 @@ in V2F
 {
 	vec3 Normal;
 	vec2 TexCoords;
-	vec3 WorldPos;
+	vec4 WorldPos;
 	vec4 FragPosLightSpace;
 	mat3 TBN;
 } fs_in;
 
 //-------------------------------------------------------------------
 
-layout (location = 0) out vec3 Position;
+layout (location = 0) out vec4 Position;
 layout (location = 1) out vec3 Normal;
 layout (location = 2) out vec4 DiffuseShadow;
 layout (location = 3) out vec3 NormalMap;

@@ -42,31 +42,31 @@ void Input::KeyCallback(GLFWwindow * window, int key, int scancode, int action, 
 
 void Input::ScrollCallback(GLFWwindow * window, double xOffset, double yOffset, Camera * Cam)
 {
-	Cam->ProessMouseSroll((GLfloat)yOffset);
+	Cam->ProessMouseSroll((float)yOffset);
 }
 
 //-------------------------------------------------------------------
 
-void Input::MouseCallback(GLFWwindow * window, double xPos, double yPos, Camera * Cam, GLfloat & lastX, GLfloat & lastY, bool & firstMouse)
+void Input::MouseCallback(GLFWwindow * window, double xPos, double yPos, Camera * Cam, float & lastX, float & lastY, bool & firstMouse)
 {
 	if (firstMouse)
 	{
-		lastX = (GLfloat)xPos;
-		lastY = (GLfloat)yPos;
+		lastX = (float)xPos;
+		lastY = (float)yPos;
 		firstMouse = false;
 	}
 
-	GLfloat xOffset = (GLfloat)xPos - lastX;
-	GLfloat yOffset = lastY - (GLfloat)yPos; //this is reverse because opengl Y coords start from bottom left and go reverse
+	float xOffset = (float)xPos - lastX;
+	float yOffset = lastY - (float)yPos; //this is reverse because opengl Y coords start from bottom left and go reverse
 
-	lastX = (GLfloat)xPos;
-	lastY = (GLfloat)yPos;
+	lastX = (float)xPos;
+	lastY = (float)yPos;
 	Cam->ProcessMouseMovement(xOffset, yOffset);
 }
 
 //-------------------------------------------------------------------
 
-void Input::DoMovement(float deltaTime, Camera * Cam, bool Keys[], GLfloat & KeyboardLockout, PostProcessSettings * PPS, std::map<int, int> & InputMap)
+void Input::DoMovement(float deltaTime, Camera * Cam, bool Keys[], float & KeyboardLockout, PostProcessSettings * PPS, std::map<int, int> & InputMap)
 {
 	if (Keys[GLFW_KEY_W] || Keys[GLFW_KEY_UP])
 	{

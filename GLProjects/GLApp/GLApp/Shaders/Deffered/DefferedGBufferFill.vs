@@ -6,7 +6,7 @@ out V2F
 {
     vec3 Normal;
     vec2 TexCoords;
-    vec3 WorldPos;
+    vec4 WorldPos;
     vec4 FragPosLightSpace;
     mat3 TBN;
 } vs_Out;
@@ -29,9 +29,8 @@ uniform mat4 lightSpaceMatrix;
 void main()
 {
     gl_Position =  projection * view * model * vec4 (position, 1.0f);
-    vs_Out.WorldPos = vec3(model * vec4(position, 1.0f));
+    vs_Out.WorldPos = model * vec4(position, 1.0f);
     vs_Out.Normal = mat3(transpose(inverse(model))) * normal;
-    //vs_Out.Normal = mat3(model) * normal;
     vs_Out.TexCoords = texCoords;
     vs_Out.FragPosLightSpace = lightSpaceMatrix * model * vec4(position, 1.0f); 
 

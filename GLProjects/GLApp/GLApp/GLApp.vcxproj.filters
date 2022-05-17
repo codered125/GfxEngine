@@ -102,7 +102,10 @@
     <ClCompile Include="Source\Private\Rendering\RenderTarget\SceneRenderTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Rendering\RenderingHelpers\RenderTextureSSAO.cpp">
+    <ClCompile Include="Source\Private\Rendering\RenderTexture\RenderTextureSSAO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Rendering\RenderingHelpers\CascadingShadowMapHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -292,7 +295,10 @@
     <ClInclude Include="Source\Public\Rendering\RenderTarget\RenderTargetParams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\Rendering\RenderingHelpers\RenderTextureSSAO.h">
+    <ClInclude Include="Source\Public\Rendering\RenderTexture\RenderTextureSSAO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Public\Rendering\RenderingHelpers\CascadingShadowMapHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

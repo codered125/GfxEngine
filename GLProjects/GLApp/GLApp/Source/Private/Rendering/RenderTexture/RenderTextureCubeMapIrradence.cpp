@@ -52,7 +52,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 
 	glViewport(0, 0, 512, 512);
 	glBindFramebuffer(GL_FRAMEBUFFER, IrrandenceRenderBufferStrong->GetID());
-	for (unsigned int i = 0; i < 6; ++i)
+	for (GLuint i = 0; i < 6; ++i)
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, GetUnConvolutedRenderTexture()->GetID(), 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -81,7 +81,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 
 		float roughness = (float)MipIndex / (float)(MaxMipMapLevels - 1);
 		PrefilterShader->setFloat("MipMapRoughness", roughness);
-		for (unsigned int i = 0; i < 6; ++i)
+		for (GLuint i = 0; i < 6; ++i)
 		{
 			PrefilterShader->setMat4("view", CaptureViews[i]);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, PreFilteredEnvironmentMap->GetID(), MipIndex);
@@ -95,7 +95,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//BRDFLookUpText
-	BRDFLookUpTexture = std::make_unique<RenderTexture>(512, 512, GL_TEXTURE_2D, GL_RG16F, GL_RG, false, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, nullptr, GL_FLOAT, nullptr);
+	BRDFLookUpTexture = std::make_unique<RenderTexture>(512, 512, 0, GL_TEXTURE_2D, GL_RG16F, GL_RG, false, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, nullptr, GL_FLOAT, nullptr);
 	auto BRDFLookUpShader = &Shader("Shaders/IrradenceMapCapture/BRDFLookUpTexture.vs", "Shaders/IrradenceMapCapture/BRDFLookUpTexture.frag");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, IrrandenceRenderBufferStrong->GetID());
@@ -131,7 +131,7 @@ RenderTextureCubeMapIrradence::RenderTextureCubeMapIrradence(GLenum InTargetType
 
 	glViewport(0, 0, 32, 32);
 	glBindFramebuffer(GL_FRAMEBUFFER, IrrandenceRenderBufferStrong->GetID());
-	for (unsigned int i = 0; i < 6; ++i)
+	for (GLuint i = 0; i < 6; ++i)
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, IrradenceDiffuse.get()->GetID(), 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

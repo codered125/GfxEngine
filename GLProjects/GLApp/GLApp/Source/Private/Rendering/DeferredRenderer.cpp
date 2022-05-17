@@ -7,9 +7,9 @@
 #include "Source/Public/Meshes/SkyBox.h"
 #include "Source/Public/Model.h"
 #include "Source/Public/PostProcessing.h"
-#include "Source/Public/Rendering/RenderingHelpers/RenderTextureSSAO.h"
 #include "Source/Public/Rendering/RenderTarget/SceneRenderTarget.h"
 #include "Source/Public/Rendering/RenderTexture/RenderTextureCubeMapIrradence.h"
+#include "Source/Public/Rendering/RenderTexture/RenderTextureSSAO.h"
 #include "Source/Public/Shader.h"
 
 #include <glm.hpp>
@@ -21,7 +21,7 @@
 
 DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Renderer(InScreenWidth, InScreenHeight)
 {
-	MainPostProcessSetting = new PostProcessSettings();
+	MainPostProcessSetting = std::make_unique<PostProcessSettings>();
 	MainPostProcessSetting->HDR = EffectStatus::Active;
 
 	MainRenderBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D_MULTISAMPLE, GL_RGBA16F, GL_UNSIGNED_BYTE, 2, false, true);
@@ -30,7 +30,8 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	IntermediateRenderBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGB16F, GL_RGBA, 1, false, false);
 	MainPostProcessSetting->IntermediateRenderBuffer = IntermediateRenderBuffer.get();
 
-	DepthRenderBuffer = std::make_unique<SceneRenderTarget>(8192, 8192, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
+	//DepthRenderBuffer = std::make_unique<SceneRenderTarget>(4096, 4096, GL_TEXTURE_2D, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, 0, true, false);
+	DepthRenderBuffer = std::make_unique<SceneRenderTarget>(4096, 4096, GL_TEXTURE_2D_ARRAY, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, 0, true, false);
 	MainPostProcessSetting->DepthRenderBuffer = DepthRenderBuffer.get();
 
 	GBuffer = std::make_unique<SceneRenderTarget>(SCREEN_WIDTH, SCREEN_HEIGHT, GL_TEXTURE_2D, GL_RGBA16F, GL_RGBA, 6, false, false, true);
@@ -41,26 +42,52 @@ DefferedRenderer::DefferedRenderer(int InScreenWidth, int InScreenHeight) : Rend
 	UnlitShader = std::make_unique<Shader>("Shaders/Unlit.vs", "Shaders/Unlit.frag");
 	SkyboxShader = std::make_unique<Shader>("Shaders/Skybox.vs", "Shaders/Skybox.frag");
 	LampShader = std::make_unique<Shader>("Shaders/Lamp.vs", "Shaders/Lamp.frag");
-	DepthShader = std::make_unique<Shader>("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
+	
+	DepthShader = std::make_unique<Shader>("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag", "Shaders/ShadowMapping.gs");
+	//DepthShader = std::make_unique<Shader>("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
+	
 	ScreenShader = std::make_unique<Shader>("Shaders/Deffered/DefferedScreen.vs", "Shaders/Deffered/DefferedScreen.frag");
 	GBufferShader = std::make_unique<Shader>("Shaders/Deffered/DefferedGBufferFill.vs", "Shaders/Deffered/DefferedGBufferFill.frag");
 
 	Sponza = std::make_unique<Model>(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRshader.get());		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	IrradenceCapturer = std::make_unique<RenderTextureCubeMapIrradence>(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
 	VisualSkybox = std::make_unique<SkyBox>(SkyboxShader.get(), "Images/KlopHeimCubeMap/", ".png");
-	PostProcessingQuad = std::make_unique<Quad>(ScreenShader.get(), MainPostProcessSetting, true);
+	PostProcessingQuad = std::make_unique<Quad>(ScreenShader.get(), MainPostProcessSetting.get(), true);
+
+	LightMatricesUBO = CascadingShadowMapHelper::CreateMatricesUBO(16);
 }
 
-void DefferedRenderer::RenderLoop( float TimeLapsed)
+//-------------------------------------------------------------------
+
+
+void DefferedRenderer::RenderLoop(float TimeLapsed)
 {
 	Renderer::RenderLoop(TimeLapsed);
+
+	InitialiseLightSpaceMatrices();
 
 	//Begin Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
+	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, LightMatricesUBO);
+		for (GLuint i = 0; i < Direction->GetNumberOfMatrixMappings(); ++i)
+		{
+			const auto LightMatrix = Direction->GetLightSpaceMatrix(i);
+			if (LightMatrix.has_value())
+			{
+				const auto LightMatrixStrong = LightMatrix.value();
+				glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::mat4x4), sizeof(glm::mat4x4), &(LightMatrixStrong.LightSpaceProjection * LightMatrixStrong.LightSpaceViewMatrix));
+			}
+		}
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 	RenderDemo(RenderStage::Depth, VisualSkybox.get(), GetMainCamera(), nullptr);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	//End Shadow Render Pass
 
 	//Begin Main Pass
@@ -77,7 +104,6 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	glBlitFramebuffer(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	//End Main pass
-
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	SSAOBuilder->RenderCommandsColour(GBuffer->GetColourAttachmentByIndex(0), GBuffer->GetColourAttachmentByIndex(1), Camera::GetProjection(GetMainCamera()), Camera::GetViewMatrix(GetMainCamera()));
@@ -98,28 +124,25 @@ void DefferedRenderer::RenderLoop( float TimeLapsed)
 	PostProcessingQuad->ThisShader->SetSampler("RMATexture", &GBuffer->GetColourAttachmentByIndex(4)->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("FragPosLightSpaceTexture", &GBuffer->GetColourAttachmentByIndex(5)->GetID(), GL_TEXTURE_2D);
 
-	PostProcessingQuad->ThisShader->SetSampler("ShadowMap", &DepthRenderBuffer->GetDepthTexture()->GetID(), GL_TEXTURE_2D);
+	PostProcessingQuad->ThisShader->SetSampler("ShadowMaps", &DepthRenderBuffer->GetDepthTexture()->GetID(), GL_TEXTURE_2D_ARRAY);
 	PostProcessingQuad->ThisShader->SetSampler("IrradenceMap", &IrradenceCapturer->GetIrradenceDiffuse()->GetID(), GL_TEXTURE_CUBE_MAP);
 	PostProcessingQuad->ThisShader->SetSampler("PrefilterMap", &IrradenceCapturer->GetPrefilteredEnvironmentMap()->GetID(), GL_TEXTURE_CUBE_MAP);
 	PostProcessingQuad->ThisShader->SetSampler("BrdfLUT", &IrradenceCapturer->GetBRDFLookUpTexture()->GetID(), GL_TEXTURE_2D);
 	PostProcessingQuad->ThisShader->SetSampler("SSAOTexture", &SSAOBuilder->GetSSAOBlurBuffer()->GetColourAttachmentByIndex(0)->GetID(), GL_TEXTURE_2D);
 
-	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
-	{
-		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
-		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
-		if (LightingView.has_value())
-		{
-			PostProcessingQuad->ThisShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView.value());
-		}
-	}
+	PostProcessingQuad->ThisShader->setMat4("ViewMatrix", Camera::GetViewMatrix(GetMainCamera()));
+	PostProcessingQuad->ThisShader->setFloat("CameraNearPlane", Camera::GetNearPlane(GetMainCamera()));
+	PostProcessingQuad->ThisShader->setFloat("CameraFarPlane", Camera::GetFarPlane(GetMainCamera()));
 
 	InitialiseLightingDataForShader(PostProcessingQuad->ThisShader);
-	RenderTexture* OutputTexture = SSAOBuilder->GetSSAOBlurBuffer()->GetColourAttachmentByIndex(0);
-//	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4(), &OutputTexture->GetID());
+	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
+	{
+		CascadingShadowMapHelper::AddCascadingLevelsToShader(PostProcessingQuad->ThisShader, Camera::GetFarPlane(GetMainCamera()));
+		CascadingShadowMapHelper::AddLightSpaceMatrixToShader(PostProcessingQuad->ThisShader, Direction);
+	}
+
+
 	PostProcessingQuad->Draw(glm::mat4(), glm::mat4(), glm::mat4());
-
-
 	//End Lighting Render Pass
 }
 
@@ -148,12 +171,12 @@ void DefferedRenderer::RenderDemo(RenderStage RenderStage, SkyBox * InSkybox, Ca
 
 //-------------------------------------------------------------------
 
-void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat4 model, Camera * Perspective, GLuint * ShadowMap)
+void DefferedRenderer::DrawModel(Shader* ModelShader, Model* InModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap)
 {
 	ModelShader->use();
 	if (ShadowMap)
 	{
-		ModelShader->SetSampler("ShadowMap", ShadowMap, GL_TEXTURE_2D);
+		ModelShader->SetSampler("ShadowMaps", ShadowMap, GL_TEXTURE_2D_ARRAY);
 	}
 
 	ModelShader->setVec3("CamPos",  Camera::GetPosition(Perspective));
@@ -167,6 +190,8 @@ void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat
 
 	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
 	{
+		CascadingShadowMapHelper::AddCascadingLevelsToShader(ModelShader, Camera::GetFarPlane(Perspective));
+
 		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
 		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
 		if (LightingView.has_value())
@@ -183,11 +208,6 @@ void DefferedRenderer::DrawModel(Shader * ModelShader, Model * InModel, glm::mat
 
 DefferedRenderer::~DefferedRenderer()
 {
-	if (MainPostProcessSetting)
-	{
-		delete MainPostProcessSetting;
-		MainPostProcessSetting = nullptr;
-	}
 	
 }
 

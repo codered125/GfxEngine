@@ -21,23 +21,24 @@ class Camera
 {
 public:
 	// Constructor with vectors
-	Camera(glm::vec3 InPosition = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 InUp = glm::vec3(0.0f, 1.0f, 0.0f));
+	Camera(const float InAspectRatio, glm::vec3 InPosition = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 InUp = glm::vec3(0.0f, 1.0f, 0.0f));
 
 	// Constructor with exposed values for fake views
-	Camera(glm::vec3 InPosition, glm::vec3 InDirection, bool InIsOrthagraphic, GLfloat InAspectRatio, GLfloat InNearPlane, GLfloat InFarPlane, glm::vec3 InUp = glm::vec3(0.0f, 1.0f, 0.0f));
+	Camera(glm::vec3 InPosition, glm::vec3 InDirection, bool InIsOrthagraphic, float InAspectRatio, float InNearPlane, float InFarPlane, glm::vec3 InUp = glm::vec3(0.0f, 1.0f, 0.0f));
 
-	void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime);
-	void ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true);
-	void ProessMouseSroll(GLfloat yOffset);
+	void ProcessKeyboard(Camera_Movement direction, float deltaTime);
+	void ProcessMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
+	void ProessMouseSroll(float yOffset);
 
-	static GLfloat GetZoom(Camera* Target);
+	static float GetZoom(Camera* Target);
 	static glm::vec3 GetPosition(Camera* Target);
 	static glm::vec3 GetFront(Camera* Target);
 	static glm::mat4 GetViewMatrix(Camera* Target);
 	static glm::mat4 GetProjection(Camera* Target);
-	static GLfloat GetAspectRatio(Camera* Target);
-	static GLfloat GetNearPlane(Camera* Target);
-	static GLfloat GetFarPlane(Camera* Target);
+	static glm::mat4 GetProjection(Camera* Target, const float InNearPlane, const float InFarPlane);
+	static float GetAspectRatio(Camera* Target);
+	static float GetNearPlane(Camera* Target);
+	static float GetFarPlane(Camera* Target);
 
 
 
@@ -53,17 +54,17 @@ private:
 	glm::vec3 WorldUp;
 
 	// Eular Angles
-	GLfloat Yaw;
-	GLfloat Pitch;
+	float Yaw;
+	float Pitch;
 
 	// Camera options
-	GLfloat MovementSpeed;
-	GLfloat MouseSensitivity;
-	GLfloat Zoom;
+	float MovementSpeed;
+	float MouseSensitivity;
+	float Zoom;
 
-	GLfloat AspectRatio;
-	GLfloat NearPlane;
-	GLfloat FarPlane;
+	float AspectRatio;
+	float NearPlane;
+	float FarPlane;
 
 	bool IsOrthagraphic;
 

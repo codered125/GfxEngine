@@ -46,7 +46,7 @@ void main()
     Occlusion += (ViewSpaceDepthSample >= SamplePosition.z + Bias ? 1.0 : 0.0) * RangeCheck; 
   }
 
-  FragColour = pow(1.0 - (Occlusion / KernalSize), 3.0f);  
+  FragColour = pow(1.0 - (Occlusion / KernalSize), 7.0f);  
 };
 
 //-------------------------------------------------------------------

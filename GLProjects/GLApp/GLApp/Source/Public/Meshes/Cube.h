@@ -11,7 +11,7 @@ class Cube : public Shape
 
 public:
 
-	const GLfloat* GetVertices();
+	const float* GetVertices();
 
 	glm::vec3 Colour;
 

@@ -8,29 +8,28 @@
 
 namespace CameraStatics
 {
-	const GLfloat YAW = 90.0f;
-	const GLfloat PITCH = 0.0f;
-	const GLfloat SPEED = 6.0f;
+	const float YAW = 90.0f;
+	const float PITCH = 0.0f;
+	const float SPEED = 6.0f;
 	//Mousemovement sense
-	const GLfloat SENSITIVTY = 0.15f;
+	const float SENSITIVTY = 0.15f;
 	//Feild of view
-	const GLfloat ZOOM = 45.0f;
+	const float ZOOM = 45.0f;
 
-	const GLfloat AspectRatio = 1920.0f / 1080.0f;
-	const GLfloat NearPlane = 0.1f;
-	const GLfloat FarPlane = 50.0f;
+	const float NearPlane = 0.1f;
+	const float FarPlane = 500.0f;
 }
 
 //-------------------------------------------------------------------
 
-Camera::Camera(glm::vec3 InPosition, glm::vec3 InUp)
+Camera::Camera(const float InAspectRatio, glm::vec3 InPosition, glm::vec3 InUp)
 	: Front(glm::vec3(0.0f, 0.0f, -1.0f))
 	, MovementSpeed(CameraStatics::SPEED)
 	, MouseSensitivity(CameraStatics::SENSITIVTY)
 	, Zoom(CameraStatics::ZOOM)
 	, Yaw(CameraStatics::YAW)
 	, Pitch(CameraStatics::PITCH)
-	, AspectRatio(CameraStatics::AspectRatio)
+	, AspectRatio(InAspectRatio)
 	, FarPlane(CameraStatics::FarPlane)
 	, NearPlane(CameraStatics::NearPlane)
 {
@@ -42,7 +41,7 @@ Camera::Camera(glm::vec3 InPosition, glm::vec3 InUp)
 	updateCameraVectors();
 }
 
-Camera::Camera(glm::vec3 InPosition, glm::vec3 InDirection, bool InIsOrthagraphic, GLfloat InAspectRatio, GLfloat InNearPlane, GLfloat InFarPlane, glm::vec3 InUp )
+Camera::Camera(glm::vec3 InPosition, glm::vec3 InDirection, bool InIsOrthagraphic, float InAspectRatio, float InNearPlane, float InFarPlane, glm::vec3 InUp )
 {
 	Position = InPosition;
 	WorldUp = InUp;
@@ -65,15 +64,15 @@ void Camera::updateCameraVectors()
 	Front = glm::normalize(LocalFront);
 	
 	// Also re-calculate the Right and Up vector
-	Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look Upor down which results in slower movement.
+	Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look Up or down which results in slower movement.
 	Up = glm::normalize(glm::cross(this->Right, this->Front));
 }
 
 //-------------------------------------------------------------------
 
-void Camera::ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
+void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
 {
-	GLfloat velocity = (this->MovementSpeed * deltaTime) * MoMath::MoSign((float)direction);
+	float velocity = (this->MovementSpeed * deltaTime) * MoMath::MoSign((float)direction);
 	if (direction == Camera_Movement::EForward || direction == Camera_Movement::EBackward)
 	{
 		this->Position += this->Front * (velocity);
@@ -87,7 +86,7 @@ void Camera::ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
 
 //-------------------------------------------------------------------
 
-void Camera::ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch)
+void Camera::ProcessMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch)
 {
 	xOffset *= MouseSensitivity;
 	yOffset *= MouseSensitivity;
@@ -104,7 +103,7 @@ void Camera::ProcessMouseMovement(GLfloat xOffset, GLfloat yOffset, GLboolean co
 
 //-------------------------------------------------------------------
 
-void Camera::ProessMouseSroll(GLfloat yOffset)
+void Camera::ProessMouseSroll(float yOffset)
 {
 	this->Zoom -= (yOffset / 5);
 	this->Zoom = MoMath::MoClamp(this->Zoom, 1.0f, 45.0f);
@@ -112,7 +111,7 @@ void Camera::ProessMouseSroll(GLfloat yOffset)
 
 //-------------------------------------------------------------------
 
-GLfloat Camera::GetZoom(Camera* Target)
+float Camera::GetZoom(Camera* Target)
 {
 	return Target->Zoom;
 }
@@ -133,7 +132,7 @@ glm::vec3 Camera::GetFront(Camera* Target)
 
 //-------------------------------------------------------------------
 
-glm::mat4 Camera::GetProjection(Camera * Target)
+glm::mat4 Camera::GetProjection(Camera* Target)
 {
 	if (Target->IsOrthagraphic)
 	{
@@ -145,21 +144,28 @@ glm::mat4 Camera::GetProjection(Camera * Target)
 
 //-------------------------------------------------------------------
 
-GLfloat Camera::GetAspectRatio(Camera * Target)
+glm::mat4 Camera::GetProjection(Camera* Target, const float InNearPlane, const float InFarPlane)
+{
+	return glm::perspective(Camera::GetZoom(Target), Target->AspectRatio, InNearPlane, InFarPlane);
+}
+
+//-------------------------------------------------------------------
+
+float Camera::GetAspectRatio(Camera* Target)
 {
 	return Target->AspectRatio;
 }
 
 //-------------------------------------------------------------------
 
-GLfloat Camera::GetNearPlane(Camera * Target)
+float Camera::GetNearPlane(Camera* Target)
 {
 	return Target->NearPlane;
 }
 
 //-------------------------------------------------------------------
 
-GLfloat Camera::GetFarPlane(Camera * Target)
+float Camera::GetFarPlane(Camera* Target)
 {
 	return Target->FarPlane;
 }

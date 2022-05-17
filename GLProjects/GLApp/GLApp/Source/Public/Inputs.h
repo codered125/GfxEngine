@@ -23,9 +23,9 @@ public:
 
 	static void ScrollCallback(GLFWwindow * window, double xOffset, double yOffset, Camera * Cam);
 
-	static void MouseCallback(GLFWwindow * window, double xPos, double yPos, Camera * Cam, GLfloat & lastX, GLfloat & lastY, bool & firstMouse);
+	static void MouseCallback(GLFWwindow * window, double xPos, double yPos, Camera * Cam, float & lastX, float & lastY, bool & firstMouse);
 
-	static void DoMovement(float deltaTime, Camera * Cam, bool Keys[], GLfloat & KeyboardLockout, PostProcessSettings * PPS, std::map<int, int> & InputMap);
+	static void DoMovement(float deltaTime, Camera * Cam, bool Keys[], float & KeyboardLockout, PostProcessSettings * PPS, std::map<int, int> & InputMap);
 };
 
 //-------------------------------------------------------------------

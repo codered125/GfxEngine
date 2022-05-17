@@ -218,7 +218,7 @@ GLint Model::TextureFromFile(const char* path, std::string directory)
 	std::string filename = std::string(path);
 	filename = directory + '/' + filename;
 
-	stbi_set_flip_vertically_on_load(true);
+	//stbi_set_flip_vertically_on_load(true);
 
 	int ImageWidth, ImageHeight, NrChannels;
 	unsigned char *Image = stbi_load(filename.c_str(), &ImageWidth, &ImageHeight, &NrChannels, SOIL_LOAD_AUTO);
@@ -234,9 +234,9 @@ GLint Model::TextureFromFile(const char* path, std::string directory)
 		Format = GL_RGBA;
 	}
 
-	RenderTexture RT(ImageWidth, ImageHeight, GL_TEXTURE_2D, Format, Format, false, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, Image, GL_UNSIGNED_BYTE, nullptr);
+	RenderTexture RT(ImageWidth, ImageHeight, 0, GL_TEXTURE_2D, Format, Format, false, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_REPEAT, Image, GL_UNSIGNED_BYTE, nullptr);
 	stbi_image_free(Image);
-	stbi_set_flip_vertically_on_load(false);
+	//stbi_set_flip_vertically_on_load(false);
 
 	return RT.GetID();
 }

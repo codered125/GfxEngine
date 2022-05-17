@@ -79,7 +79,7 @@ void SceneRenderTarget::InitialiseSceneRenderTarget(RenderTargertParam& Params)
 
 	for (GLuint i = 0; i < Params.NrColourAttachments; i++)
 	{
-		RenderTexture RT(Params.Width, Params.Height, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, NULL, GL_FLOAT, nullptr);
+		RenderTexture RT(Params.Width, Params.Height, 0, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, NULL, GL_FLOAT, nullptr);
 		ColourAttachments.push_back(RT);
 		AttachmentEnums[i] = GL_COLOR_ATTACHMENT0 + i;
 		glFramebufferTexture2D(GL_FRAMEBUFFER, AttachmentEnums[i], Params.TargetType, RT.GetID(), 0);
@@ -111,9 +111,19 @@ void SceneRenderTarget::InitialiseSceneRenderTarget(RenderTargertParam& Params)
 
 	if (Params.MakeDepth)
 	{
-		Depth = RenderTexture(Params.Width, Params.Height, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GLenum(GL_NEAREST), GLenum(GL_NEAREST), GLenum(GL_CLAMP_TO_EDGE), NULL, GL_UNSIGNED_BYTE, nullptr);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, Params.TargetType, Depth.GetID(), 0);
-		GLErrorCheck();
+		if (Params.TargetType == GL_TEXTURE_2D)
+		{
+			Depth = RenderTexture(Params.Width, Params.Height, 0, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GLenum(GL_NEAREST), GLenum(GL_NEAREST), GLenum(GL_CLAMP_TO_EDGE), NULL, GL_UNSIGNED_BYTE, nullptr);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, Params.TargetType, Depth.GetID(), 0);
+			GLErrorCheck();
+		}
+
+		else if (Params.TargetType == GL_TEXTURE_2D_ARRAY)
+		{
+			Depth = RenderTexture(Params.Width, Params.Height, 5, Params.TargetType, Params.InternalFormat, Params.Format, Params.MakeMSAA, GLenum(GL_NEAREST), GLenum(GL_NEAREST), GLenum(GL_CLAMP_TO_BORDER), NULL, GL_FLOAT, nullptr);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, Depth.GetID(), 0);
+			GLErrorCheck();
+		}
 	}
 
 	auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
