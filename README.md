@@ -15,9 +15,11 @@ The Graphics Engine currently has the following features implemented:
 - [x] Modularising my lighting and shading algorithms in prep for Deffered
 - [x] Deffered Rendering - After PBR
 - [x] Deffered Lighting - After Deffered Rendering
-- [ ] Implementing Tesselation (PN Triangles)
+- [x] Implementing Tesselation (PN Triangles)
 - [ ] Port Gertsner water sim to engine
-- [ ] Image Based Lighting PBR
+- [x] Image Based Lighting PBR
+- [x] Screen Spaced Ambient Occlusion
+- [ ] Cascaded Shadow maps - In progress
 
 The Graphics Engine currently utalises the current libraries:
 - [x] ASSIMP
