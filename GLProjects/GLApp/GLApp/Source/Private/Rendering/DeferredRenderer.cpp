@@ -199,7 +199,7 @@ void DefferedRenderer::DrawModel(Shader* ModelShader, Model* InModel, glm::mat4 
 			ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView.value());
 		}
 	}
-
+	ModelShader->setBool("CSM", true);
 	ModelShader->setMat4("model", model);
 	InModel->Draw(ModelShader);
 }

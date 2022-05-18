@@ -29,6 +29,7 @@ private:
 
 	void DrawModel(Shader* ModelShader, Shape* InModel, glm::mat4 model, Camera* Perspective, GLuint* ShadowMap);
 	void DrawWater(Shader* ModelShader, Model* InModel, glm::mat4 model, Camera* Perspective, float TimeLapsed);
+	void InitialiseLightSpaceMatrices() override;
 	virtual void DrawGizmos(Camera* Perspective) override;
 
 	std::unique_ptr<Shader> UnlitShader = nullptr;

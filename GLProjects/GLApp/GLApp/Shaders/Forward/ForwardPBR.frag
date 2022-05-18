@@ -22,7 +22,7 @@ in V2F
 } fs_in;
 
 out vec4 FragColor;
-layout (location = 5) uniform sampler2DArray ShadowMaps;
+layout (location = 5) uniform sampler2D ShadowMap;
 layout (location = 6) uniform samplerCube IrradenceMap;
 layout (location = 7) uniform samplerCube PrefilterMap;
 layout (location = 8) uniform sampler2D BrdfLUT;
@@ -83,7 +83,7 @@ void main()
 	//Directional Lights
 	vec3 r = dirLight.diffuse;
 	vec3 L = normalize(-dirLight.direction);
-	//float Shadow = 1.0 - DetermineShadowCSM(fs_in.FragPosLightSpace, Norm, L, ShadowMaps);
+	float Shadow = 1.0 - DetermineShadow(fs_in.FragPosLightSpace, Norm, L, ShadowMap);
 	L0 += ProgrammablePBR(Norm, View, r, L, parse, dirLight.intensity);
 	
 	vec3 OutputColour = vec3(Ambient + L0); 

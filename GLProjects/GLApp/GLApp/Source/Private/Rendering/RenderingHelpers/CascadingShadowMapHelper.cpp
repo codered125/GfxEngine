@@ -80,7 +80,7 @@ void CascadingShadowMapHelper::AdjustProjectionTrackerToView(const glm::mat4& In
 glm::mat4 CascadingShadowMapHelper::GetFrustrumLightProjection(ProjectionTracker& Intracker)
 {
 	// Tune this parameter according to the scene
-	constexpr float zMult = 1.0f;
+	constexpr float zMult = 10.0f;
 	if (Intracker.ZMin < 0)
 	{
 		Intracker.ZMin *= zMult;

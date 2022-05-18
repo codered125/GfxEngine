@@ -39,7 +39,7 @@ public:
 protected:
 
 	void InitialiseLightingDataForShader(Shader * lightShader);
-	void InitialiseLightSpaceMatrices();
+	virtual void InitialiseLightSpaceMatrices();
 
 	void DrawLights(Camera* Perspective, Shader* LightShader);
 	std::string GetGameTimeAsString();

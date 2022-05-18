@@ -42,7 +42,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 	LampShader = std::make_unique<Shader>("Shaders/Lamp.vs", "Shaders/Lamp.frag");
 	DepthShader = std::make_unique<Shader>("Shaders/ShadowMapping.vs", "Shaders/ShadowMapping.frag");
 	ScreenShader = std::make_unique<Shader>("Shaders/Forward/ForwardScreen.vs", "Shaders/Forward/ForwardScreen.frag");
-	WaterShader = std::make_unique<Shader>("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
+	//WaterShader = std::make_unique<Shader>("Shaders/WaterShader.vs", "Shaders/WaterShader.frag", "Shaders/WaterShader");
 
 	Sponza = std::make_unique<Model>(GET_VARIABLE_NAME(Sponza), "Models/SponzaTest/sponza.obj", PBRShader.get());		// 	MoMessageLogger("Sponza: " + GetGameTimeAsString()); I'll optimise my mesh loading later sponza is the longest thing there
 	IrradenceCapturer = std::make_unique<RenderTextureCubeMapIrradence>(GL_TEXTURE_CUBE_MAP, GL_RGB16F, GL_RGB, "Images/HDR.hdr");
@@ -56,6 +56,7 @@ ForwardRenderer::ForwardRenderer(int InScreenWidth, int InScreenHeight) : Render
 void ForwardRenderer::RenderLoop(float TimeLapsed)
 {
 	Renderer::RenderLoop( TimeLapsed);
+	InitialiseLightSpaceMatrices();
 
 	//Begin Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
@@ -143,6 +144,7 @@ void ForwardRenderer::DrawModel(Shader* ModelShader, Shape* InModel, glm::mat4 m
 			ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView.value());
 		}
 	}
+
 	ModelShader->setMat4("model", model);
 	ModelShader->SetSampler("IrradenceMap", &IrradenceCapturer->GetIrradenceDiffuse()->GetID(), GL_TEXTURE_CUBE_MAP);
 	ModelShader->SetSampler("PrefilterMap", &IrradenceCapturer->GetPrefilteredEnvironmentMap()->GetID(), GL_TEXTURE_CUBE_MAP);
@@ -175,6 +177,20 @@ void ForwardRenderer::DrawWater(Shader* ModelShader, Model* InModel, glm::mat4 m
 
 	InitialiseLightingDataForShader(ModelShader);
 	InModel->Draw(ModelShader);
+}
+
+//-------------------------------------------------------------------
+
+void ForwardRenderer::InitialiseLightSpaceMatrices()
+{
+	if (Directional0.get())
+	{
+		if (const auto DirectionalLightType = static_cast<DirectionalLight*>(Directional0.get()))
+		{
+			auto LightSpaceMatrixMapping = LightSpaceMatrixMappings(DirectionalLightType->GetLightSpaceProjection(), MoMath::MoLookAt(Directional0->position, Directional0->position + (Directional0->direction * 15.0f), glm::vec3(0.0f, 1.0f, 0.0f)), Directional0->position);
+			DirectionalLightType->AddLightSpaceViewMatrix(LightSpaceMatrixMapping, 0);
+		}
+	}
 }
 
 //-------------------------------------------------------------------
