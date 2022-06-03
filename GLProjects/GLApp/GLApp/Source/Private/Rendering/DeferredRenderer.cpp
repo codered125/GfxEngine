@@ -69,20 +69,6 @@ void DefferedRenderer::RenderLoop(float TimeLapsed)
 	//Begin Shadow Render Pass
 	glViewport(0, 0, std::get<0>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()), std::get<1>(DepthRenderBuffer->GetDepthTexture()->GetWidthAndHeightOfTexture()));
 	glBindFramebuffer(GL_FRAMEBUFFER, DepthRenderBuffer->GetID());
-	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
-	{
-		glBindBuffer(GL_UNIFORM_BUFFER, LightMatricesUBO);
-		for (GLuint i = 0; i < Direction->GetNumberOfMatrixMappings(); ++i)
-		{
-			const auto LightMatrix = Direction->GetLightSpaceMatrix(i);
-			if (LightMatrix.has_value())
-			{
-				const auto LightMatrixStrong = LightMatrix.value();
-				glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::mat4x4), sizeof(glm::mat4x4), &(LightMatrixStrong.LightSpaceProjection * LightMatrixStrong.LightSpaceViewMatrix));
-			}
-		}
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	}
 	GlfwInterface::ResetScreen(glm::vec4(0.0f, 0.0f, 0.0f, 0.0f), GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST);
 	glCullFace(GL_FRONT);
 	RenderDemo(RenderStage::Depth, VisualSkybox.get(), GetMainCamera(), nullptr);
@@ -178,6 +164,20 @@ void DefferedRenderer::DrawModel(Shader* ModelShader, Model* InModel, glm::mat4 
 	{
 		ModelShader->SetSampler("ShadowMaps", ShadowMap, GL_TEXTURE_2D_ARRAY);
 	}
+	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, LightMatricesUBO);
+		for (GLuint i = 0; i < Direction->GetNumberOfMatrixMappings(); ++i)
+		{
+			const auto LightMatrix = Direction->GetLightSpaceMatrix(i);
+			if (LightMatrix.has_value())
+			{
+				const auto LightMatrixStrong = LightMatrix.value();
+				glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::mat4x4), sizeof(glm::mat4x4), &(LightMatrixStrong.LightSpaceProjection * LightMatrixStrong.LightSpaceViewMatrix));
+			}
+		}
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
 
 	ModelShader->setVec3("CamPos",  Camera::GetPosition(Perspective));
 	ModelShader->setVec3("CamDir",  Camera::GetFront(Perspective));
@@ -186,21 +186,9 @@ void DefferedRenderer::DrawModel(Shader* ModelShader, Model* InModel, glm::mat4 
 	glm::mat4 view = Camera::GetViewMatrix(Perspective);
 	ModelShader->setMat4("projection", FOV);
 	ModelShader->setMat4("view", view);
-	InitialiseLightingDataForShader(ModelShader);
-
-	if (auto Direction = static_cast<DirectionalLight*>(Directional0.get()))
-	{
-		CascadingShadowMapHelper::AddCascadingLevelsToShader(ModelShader, Camera::GetFarPlane(Perspective));
-
-		glm::mat4 LightingProjection = Direction->GetLightSpaceProjection();
-		std::optional<glm::mat4> LightingView = Direction->GetLightSpaceViewMatrix(0);
-		if (LightingView.has_value())
-		{
-			ModelShader->setMat4("lightSpaceMatrix", LightingProjection * LightingView.value());
-		}
-	}
 	ModelShader->setBool("CSM", true);
 	ModelShader->setMat4("model", model);
+	InitialiseLightingDataForShader(ModelShader);
 	InModel->Draw(ModelShader);
 }
 

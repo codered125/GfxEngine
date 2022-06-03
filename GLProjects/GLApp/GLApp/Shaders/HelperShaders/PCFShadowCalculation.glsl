@@ -39,7 +39,6 @@ int GetCascadingLayer(vec4 InFragPosWorldSpace, mat4 InView, float InCascadingLe
 {
   const vec4 FragPosViewSpace = InView * InFragPosWorldSpace;
   const float DepthValue = abs(FragPosViewSpace.z);
-    
   int Layer = -1;
   for (int i = 0; i < InCascadeCount; ++i)
   {
@@ -71,8 +70,8 @@ float DetermineShadowCSM(vec4 InFragPosLightSpace, vec3 InNormal, vec3 InLightDi
     return 0.0f; 
   }
   
-  float Bias = max(0.001 * (1.0 - dot(InNormal, InLightDir)), 0.001);
-  //float Bias = max(0.05 * (1.0 - dot(InNormal, InLightDir)), 0.005); 
+  //float Bias = max(0.001 * (1.0 - dot(InNormal, InLightDir)), 0.001);
+  float Bias = max(0.05 * (1.0 - dot(InNormal, InLightDir)), 0.005); 
   if (Layer == InCascadeCount)
   {
     Bias *= 1 / (InFarPlane * 0.5f);

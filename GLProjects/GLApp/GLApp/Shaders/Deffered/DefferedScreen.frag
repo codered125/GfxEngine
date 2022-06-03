@@ -133,17 +133,10 @@ vec4 CalculateLight()
 	//Directional Lights
 	const vec3 r = dirLight.diffuse;
 	const vec3 L = normalize(-dirLight.direction);
-	//const float Shadow = 1.0f - DetermineShadow(FragPosLightSpace, FragNormalMap, L, ShadowMap);
-
+	
 	int Layer = GetCascadingLayer(vec4(FragPos, 1.0f), ViewMatrix, CascadingLevelsArray, CascadeCount);
-	//Layer = 1;
 	const vec4 FragPosLightSpace = LightSpaceMatricesArray[Layer] * vec4(FragPos, 1.0f);
-	const float Shadow = 1.0f - DetermineShadowCSM(FragPosLightSpace, normalize(FragNormalMap), L, ShadowMaps, Layer, CascadingLevelsArray,  CascadeCount, CameraFarPlane);
-	//if(length(FragPos) != 0)
-	{
-		//return vec4(Shadow);
-		//return vec4( 1 / FragPosLightSpace);
-	}
+	const float Shadow = 1.0f - DetermineShadowCSM(FragPosLightSpace, normalize(FragNormalMap), L, ShadowMaps, Layer, CascadingLevelsArray, CascadeCount, CameraFarPlane);
 	L0 += ProgrammablePBR(FragNormalMap, View, r, L, Parse, dirLight.intensity);
 
 	vec3 OutputColour = vec3(Ambient + L0); 
@@ -153,7 +146,7 @@ vec4 CalculateLight()
 	{
 		return vec4(texture(ShadowMaps, vec3(TexCoords, 1)).r * vec4(1.0f));
 	}
-	return vec4( OutputColour, 1.0f); 
+	return vec4(vec3(Shadow), 1.0f); 
   
 }
 
